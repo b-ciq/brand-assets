@@ -4,7 +4,7 @@ CIQ Brand Assets MCP Server (FastMCP Version)
 Intelligent brand asset delivery with smart logo recommendations
 """
 
-from fastmcp import FastMCP
+from mcp.server.fastmcp import FastMCP
 import json
 import requests
 from typing import Optional
