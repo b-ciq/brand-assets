@@ -6,8 +6,7 @@ Intelligent brand asset delivery with smart logo recommendations
 
 from mcp.server.fastmcp import FastMCP
 import json
-import asyncio
-import aiohttp
+import requests  # Changed from aiohttp to requests for better GitHub compatibility
 from typing import Optional
 
 # Asset metadata URL
@@ -19,15 +18,14 @@ mcp = FastMCP("CIQ Brand Assets")
 # Global asset data cache
 asset_data = None
 
-async def load_asset_data():
-    """Load asset metadata from GitHub using aiohttp"""
+def load_asset_data():
+    """Load asset metadata from GitHub using requests (more compatible than aiohttp)"""
     global asset_data
     try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(METADATA_URL) as response:
-                response.raise_for_status()
-                asset_data = await response.json()
-                return True
+        response = requests.get(METADATA_URL)
+        response.raise_for_status()
+        asset_data = response.json()
+        return True
     except Exception as e:
         print(f"Failed to load asset data: {e}")
         return False
@@ -103,13 +101,9 @@ def get_brand_asset(
         design_context: What type of design is this for? (e.g., "colorful marketing flyer", "minimal black and white ad")
     """
     
-    # Load data if not already loaded (sync version for compatibility)
+    # Load data if not already loaded
     if asset_data is None:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        success = loop.run_until_complete(load_asset_data())
-        loop.close()
-        if not success:
+        if not load_asset_data():
             return "🚨 Sorry, I couldn't load the brand assets data. Please try again later."
     
     # If we don't have enough info, ask clarifying questions
@@ -120,8 +114,8 @@ For your request: *"{request}"*
 
 **What background will this logo be placed on?**
 
-• 🌞 **Light background** → white, light gray, light colors, most websites
-• 🌙 **Dark background** → black, dark gray, dark colors, dark photos
+• 🌞 **light** → white, light gray, light colors, most websites
+• 🌙 **dark** → black, dark gray, dark colors, dark photos
 
 This helps me recommend the right color version for proper contrast."""
     
@@ -130,11 +124,11 @@ This helps me recommend the right color version for proper contrast."""
 
 I need to understand the logo's role in your design:
 
-🌟 **Main element** → Logo is the hero/star of your design
+🌟 **main** → Logo is the hero/star of your design
    • Homepage headers, business cards, presentation title slides
    • Main branding where the logo IS the focus
    
-🏷️ **Supporting element** → Logo is secondary/background element  
+🏷️ **supporting** → Logo is secondary/background element  
    • Footers, watermarks, corner branding, signatures
    • Small elements that shouldn't compete with main content
 
@@ -173,11 +167,7 @@ def list_all_assets() -> str:
     
     # Load data if not already loaded
     if asset_data is None:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        success = loop.run_until_complete(load_asset_data())
-        loop.close()
-        if not success:
+        if not load_asset_data():
             return "🚨 Sorry, I couldn't load the brand assets data. Please try again later."
     
     result = "# 🎨 CIQ Brand Assets Library\n\n"
@@ -229,11 +219,7 @@ def brand_guidelines() -> str:
     
     # Load data if not already loaded
     if asset_data is None:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        success = loop.run_until_complete(load_asset_data())
-        loop.close()
-        if not success:
+        if not load_asset_data():
             return "🚨 Sorry, I couldn't load the brand assets data. Please try again later."
     
     guidelines = asset_data.get('brand_guidelines', {})
@@ -279,6 +265,6 @@ def brand_guidelines() -> str:
 Need help choosing the right logo? Just describe your project and I'll recommend the perfect version!"""
 
 if __name__ == "__main__":
-    # Pre-load asset data on startup
-    asyncio.run(load_asset_data())
+    # Load asset data on startup
+    load_asset_data()
     mcp.run()
