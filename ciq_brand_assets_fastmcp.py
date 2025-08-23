@@ -64,7 +64,7 @@ def get_smart_recommendation(background: str, element_type: str, design_context:
     if element_type == 'main':
         return {
             'key': f'2color-{background}',
-            'reasoning': '🌟 Two-color version provides maximum brand recognition for main design elements'
+            'reasoning': 'Two-color version provides maximum brand recognition for main design elements'
         }
     
     # Supporting element logic
@@ -76,7 +76,7 @@ def get_smart_recommendation(background: str, element_type: str, design_context:
         if is_colorful_design:
             return {
                 'key': f'1color-{background}',
-                'reasoning': "🎨 Neutral version won't compete with your colorful design elements"
+                'reasoning': "Neutral version won't compete with your colorful design elements"
             }
         
         # Check for minimal/neutral design indicators + advertising context
@@ -89,19 +89,19 @@ def get_smart_recommendation(background: str, element_type: str, design_context:
         if is_minimal_design and is_advertising:
             return {
                 'key': f'green-{background}',
-                'reasoning': '🟢 Green version helps your logo jump out in minimal advertising designs'
+                'reasoning': 'Green version helps your logo jump out in minimal advertising designs'
             }
         
         # Default to neutral for supporting elements (when in doubt)
         return {
             'key': f'1color-{background}',
-            'reasoning': "⚪ Neutral version is professional and won't distract from your main content"
+            'reasoning': "Neutral version is professional and won't distract from your main content"
         }
     
     # Fallback
     return {
         'key': f'1color-{background}',
-        'reasoning': '🔒 When in doubt, neutral is the safest choice'
+        'reasoning': 'When in doubt, neutral is the safest choice'
     }
 
 def parse_user_response(response: str) -> tuple[Optional[str], Optional[str]]:
@@ -154,13 +154,13 @@ async def get_brand_asset(
     
     # If we still don't have data, try once more
     if asset_data is None:
-        return "🚨 Sorry, I couldn't load the brand assets data. Please try again later."
+        return "Sorry, I couldn't load the brand assets data. Please try again later."
     
     # First, determine which logo type they want
     logo_type = determine_logo_type(request)
     
     if logo_type == 'product':
-        return f"""🎨 **Product logos aren't supported yet, but coming soon!**
+        return f"""Product logos aren't supported yet, but coming soon!
 
 I can help you with the **CIQ main company logo** for now.
 
@@ -172,12 +172,12 @@ I can help you with the **CIQ main company logo** for now.
 Would you like the CIQ company logo instead?"""
 
     elif logo_type == 'unclear':
-        return f"""🎨 **Which logo do you need?**
+        return f"""Which logo do you need?
 
-• 🏢 **CIQ company logo** (main brand logo)
-• 📦 **Product logo** (RLC, Rocky Linux, Warewulf, etc. - coming soon!)
+• **CIQ company logo** (main brand logo)
+• **Product logo** (RLC, Rocky Linux, Warewulf, etc. - coming soon!)
 
-*Most requests are for the CIQ company logo.*"""
+Most requests are for the CIQ company logo."""
     
     # If we get here, they want the CIQ main logo
     # Try to parse combined responses like "supporting, light"
@@ -189,30 +189,30 @@ Would you like the CIQ company logo instead?"""
     
     # If we still need info, ask our improved question
     if not background or not element_type:
-        return f"""🎨 **CIQ company logo - got it!**
+        return f"""CIQ company logo - got it!
 
 Is this logo going to be:
-• 🌟 **The star** (main element, hero placement)
-• 🏷️ **Supporting** (alongside contact info/text)
+• **The star** (main element, hero placement)
+• **Supporting** (alongside contact info/text)
 
-What COLOR is the background this logo will be placed ON?
-• ⚪ **Light/white** background (paper, websites, light colors)
-• ⚫ **Dark/black** background (dark photos, black slides, dark colors)
+What **background** will this logo sit on?
+• **Light background** - we'll give you a dark logo
+• **Dark background** - we'll give you a light logo
 
-*Example: "Supporting, light background" or "Star, dark background"*"""
+Example: "Supporting, light background" or "Star, dark background" """
     
     # Apply smart decision logic
     recommendation = get_smart_recommendation(background, element_type, design_context or "")
     
     asset = asset_data['logos'].get(recommendation['key'])
     if not asset:
-        return "🚨 Sorry, I couldn't find the appropriate asset. Please try again or contact the design team."
+        return "Sorry, I couldn't find the appropriate asset. Please try again or contact the design team."
     
     # Clean delivery - just link and reasoning
-    result = f"""✅ **Here's your CIQ logo:**
-📎 **Download:** {asset['url']}
+    result = f"""Here's your CIQ logo:
+**Download:** {asset['url']}
 
-🎯 {recommendation.get('reasoning', 'Perfect for your use case!')}"""
+{recommendation.get('reasoning', 'Perfect for your use case!')}"""
     
     return result
 
@@ -225,48 +225,48 @@ async def list_all_assets() -> str:
         await asyncio.get_event_loop().run_in_executor(None, load_asset_data)
     
     if asset_data is None:
-        return "🚨 Sorry, I couldn't load the brand assets data. Please try again later."
+        return "Sorry, I couldn't load the brand assets data. Please try again later."
     
-    result = "# 🎨 CIQ Brand Assets Library\n\n"
+    result = "# CIQ Brand Assets Library\n\n"
     
     # Group by background type for better organization
     light_assets = []
     dark_assets = []
     
     for key, asset in asset_data['logos'].items():
-        asset_info = f"• **{asset['filename']}** - {asset['description']}\n  📎 {asset['url']}"
+        asset_info = f"• **{asset['filename']}** - {asset['description']}\n  {asset['url']}"
         
         if 'light' in key:
             light_assets.append(asset_info)
         else:
             dark_assets.append(asset_info)
     
-    result += "## 🌞 Light Background Versions\n\n"
+    result += "## Light Background Versions\n\n"
     result += "\n\n".join(light_assets)
     
-    result += "\n\n## 🌙 Dark Background Versions\n\n"
+    result += "\n\n## Dark Background Versions\n\n"
     result += "\n\n".join(dark_assets)
     
     result += f"""
 
-## 💡 Smart Recommendations Available
+## Smart Recommendations Available
 
 Instead of choosing manually, just tell me what you need! For example:
 
-• *"I need a logo for an email signature"*
-• *"Logo for a PowerPoint footer"* 
-• *"Small logo for a magazine ad"*
-• *"Hero logo for our homepage"*
-• *"Watermark for a colorful brochure"*
+• "I need a logo for an email signature"
+• "Logo for a PowerPoint footer" 
+• "Small logo for a magazine ad"
+• "Hero logo for our homepage"
+• "Watermark for a colorful brochure"
 
 I'll ask smart questions and recommend the perfect logo for your specific use case!
 
-## 🎯 Quick Decision Guide
+## Quick Decision Guide
 
-**🌟 Main elements** (logo is the star) → Always **2-color** for maximum brand recognition  
-**🏷️ Supporting elements** → **1-color neutral** (safe default) or **green** (minimal ads)  
-**🎨 Colorful designs** → **1-color neutral** (won't compete)  
-**🔍 Minimal + advertising** → **Green** (helps logo pop)"""
+**Main elements** (logo is the star) - Always **2-color** for maximum brand recognition  
+**Supporting elements** - **1-color neutral** (safe default) or **green** (minimal ads)  
+**Colorful designs** - **1-color neutral** (won't compete)  
+**Minimal + advertising** - **Green** (helps logo pop)"""
     
     return result
 
@@ -279,13 +279,13 @@ async def brand_guidelines() -> str:
         await asyncio.get_event_loop().run_in_executor(None, load_asset_data)
     
     if asset_data is None:
-        return "🚨 Sorry, I couldn't load the brand assets data. Please try again later."
+        return "Sorry, I couldn't load the brand assets data. Please try again later."
     
     guidelines = asset_data.get('brand_guidelines', {})
     
-    return f"""# 📐 CIQ Brand Guidelines
+    return f"""# CIQ Brand Guidelines
 
-## 🎨 Logo Usage
+## Logo Usage
 
 **Clear Space Rules:**
 • Maintain clear space equal to **{guidelines.get('clear_space', '1/4 the height of the Q')}**
@@ -296,7 +296,7 @@ async def brand_guidelines() -> str:
 • Never scale smaller than minimum requirements
 • Maintain aspect ratio - never stretch or compress
 
-## 🌈 Brand Colors
+## Brand Colors
 
 **Primary Green:** `{guidelines.get('primary_green', '#229529')}` (PMS 347)
 
@@ -304,7 +304,7 @@ async def brand_guidelines() -> str:
 • Light backgrounds: {guidelines.get('neutral_colors', {}).get('light_background', 'Dark grey')}
 • Dark backgrounds: {guidelines.get('neutral_colors', {}).get('dark_background', 'Light grey')}
 
-## 🎯 Smart Usage Logic
+## Smart Usage Logic
 
 {asset_data.get('decision_logic', {}).get('main_element', {}).get('description', 'Main elements')}:
 • Examples: {', '.join(asset_data.get('decision_logic', {}).get('main_element', {}).get('examples', []))}
@@ -312,10 +312,10 @@ async def brand_guidelines() -> str:
 
 {asset_data.get('decision_logic', {}).get('supporting_element', {}).get('description', 'Supporting elements')}:
 • Examples: {', '.join(asset_data.get('decision_logic', {}).get('supporting_element', {}).get('examples', []))}
-• **Default:** {asset_data.get('decision_logic', {}).get('supporting_element', {}.get('default', '1-color neutral')}
+• **Default:** {asset_data.get('decision_logic', {}).get('supporting_element', {}).get('default', '1-color neutral')}
 • **Alternative:** {asset_data.get('decision_logic', {}).get('supporting_element', {}).get('alternative', 'Green for minimal designs')}
 
-## ❌ What NOT to Do
+## What NOT to Do
 • Don't alter the logo colors, fonts, or proportions
 • Don't place logo on busy backgrounds without proper contrast
 • Don't use outdated logo versions
