@@ -164,11 +164,6 @@ async def get_brand_asset(
 
 I can help you with the **CIQ main company logo** for now.
 
-**Available product logos in the future:**
-• RLC, RLC Hardened, RLC AI
-• Rocky Linux from CIQ
-• Warewulf, Fuzzball, Apptainer
-
 Would you like the CIQ company logo instead?"""
 
     elif logo_type == 'unclear':
@@ -187,9 +182,9 @@ Most requests are for the CIQ company logo."""
             element_type = parsed_element
             background = parsed_background
     
-    # If we still need info, ask our improved question
-    if not background or not element_type:
-        return f"""CIQ company logo - got it!
+    # Ask only for what's missing - be concise
+    if not background and not element_type:
+        return """CIQ company logo - got it!
 
 Is this logo going to be:
 • **The star** (main element, hero placement)
@@ -197,9 +192,17 @@ Is this logo going to be:
 
 What **background** will this logo sit on?
 • **Light background** - we'll give you a dark logo
-• **Dark background** - we'll give you a light logo
-
-Example: "Supporting, light background" or "Star, dark background" """
+• **Dark background** - we'll give you a light logo"""
+        
+    elif not element_type:
+        return """Will this logo be:
+• **The main element** (hero placement)
+• **Supporting element** (alongside other content)"""
+        
+    elif not background:
+        return """What **background** will this logo sit on?
+• **Light background** - we'll give you a dark logo
+• **Dark background** - we'll give you a light logo"""
     
     # Apply smart decision logic
     recommendation = get_smart_recommendation(background, element_type, design_context or "")
@@ -208,7 +211,7 @@ Example: "Supporting, light background" or "Star, dark background" """
     if not asset:
         return "Sorry, I couldn't find the appropriate asset. Please try again or contact the design team."
     
-    # Clean delivery - just link and reasoning
+    # Clean delivery - just link and brief reasoning
     result = f"""Here's your CIQ logo:
 **Download:** {asset['url']}
 
