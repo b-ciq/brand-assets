@@ -114,18 +114,23 @@ def parse_user_response(response: str) -> tuple[Optional[str], Optional[str]]:
         element_type = 'main'
     elif any(word in response for word in ['support', 'secondary', 'alongside', 'with']):
         element_type = 'supporting'
-    # NEW: Parse logo color specifications
+    # Parse logo color specifications
     elif '2 color' in response or 'two color' in response:
         element_type = 'main'  # 2-color always means main element in our logic
     elif '1 color' in response or 'one color' in response or 'neutral' in response or 'green' in response:
         element_type = 'supporting'  # 1-color/neutral/green = supporting element
     
-    # Parse background - be more flexible with terms
+    # Parse background - enhanced with mode terminology
     background = None
     if any(word in response for word in ['light', 'white', 'bright']):
         background = 'light'
     elif any(word in response for word in ['dark', 'black']):
         background = 'dark'
+    # NEW: Parse light/dark mode terminology
+    elif 'light mode' in response:
+        background = 'light'  # light mode interface = light background
+    elif 'dark mode' in response:
+        background = 'dark'   # dark mode interface = dark background
     
     return element_type, background
 
@@ -180,7 +185,7 @@ Would you like the CIQ company logo instead?"""
 Most requests are for the CIQ company logo."""
     
     # If we get here, they want the CIQ main logo
-    # Try to parse combined responses like "supporting, light" OR "2 color logo, white background"
+    # Try to parse combined responses like "supporting, light" OR "2 color logo, white background" OR "1 color for dark mode"
     if not background or not element_type:
         parsed_element, parsed_background = parse_user_response(request)
         if parsed_element and parsed_background:
