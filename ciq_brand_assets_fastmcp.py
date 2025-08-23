@@ -9,7 +9,6 @@ import json
 import requests
 from typing import Optional
 import asyncio
-import base64
 
 # Asset metadata URL
 METADATA_URL = 'https://raw.githubusercontent.com/b-ciq/brand-assets/main/metadata/asset-inventory.json'
@@ -31,32 +30,6 @@ def load_asset_data():
     except Exception as e:
         print(f"Failed to load asset data: {e}")
         return False
-
-async def fetch_image_as_base64(url: str) -> Optional[str]:
-    """Fetch image from URL and convert to base64"""
-    try:
-        # Run the image fetch in a thread to avoid blocking
-        loop = asyncio.get_event_loop()
-        response = await loop.run_in_executor(None, lambda: requests.get(url))
-        response.raise_for_status()
-        
-        # Convert to base64
-        image_data = base64.b64encode(response.content).decode('utf-8')
-        
-        # Determine MIME type from URL
-        if url.lower().endswith('.png'):
-            mime_type = 'image/png'
-        elif url.lower().endswith('.jpg') or url.lower().endswith('.jpeg'):
-            mime_type = 'image/jpeg'
-        elif url.lower().endswith('.svg'):
-            mime_type = 'image/svg+xml'
-        else:
-            mime_type = 'image/png'  # Default assumption
-            
-        return f"data:{mime_type};base64,{image_data}"
-    except Exception as e:
-        print(f"Failed to fetch image from {url}: {e}")
-        return None
 
 def determine_logo_type(request: str) -> str:
     """Determine which type of logo the user is requesting"""
@@ -233,20 +206,11 @@ And what background: **light** or **dark**?
     if not asset:
         return "🚨 Sorry, I couldn't find the appropriate asset. Please try again or contact the design team."
     
-    # Fetch the image as base64 for inline display
-    image_base64 = await fetch_image_as_base64(asset['url'])
-    
-    # Build response with both download link and inline image
+    # Clean delivery - just link and reasoning
     result = f"""✅ **Here's your CIQ logo:**
 📎 **Download:** {asset['url']}
 
 🎯 {recommendation.get('reasoning', 'Perfect for your use case!')}"""
-    
-    # Add inline image if we successfully fetched it
-    if image_base64:
-        result += f"""
-
-![CIQ Logo]({image_base64})"""
     
     return result
 
