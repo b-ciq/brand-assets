@@ -126,7 +126,7 @@ def parse_user_response(response: str) -> tuple[Optional[str], Optional[str]]:
         background = 'light'
     elif any(word in response for word in ['dark', 'black']):
         background = 'dark'
-    # NEW: Parse light/dark mode terminology
+    # Parse light/dark mode terminology
     elif 'light mode' in response:
         background = 'light'  # light mode interface = light background
     elif 'dark mode' in response:
@@ -177,12 +177,11 @@ I can help you with the **CIQ main company logo** for now.
 Would you like the CIQ company logo instead?"""
 
     elif logo_type == 'unclear':
-        return f"""Which logo do you need?
+        return """Great, I can find that for you. Tell me more about how it will be used:
 
-• **CIQ company logo** (main brand logo)
-• **Product logo** (RLC, Rocky Linux, Warewulf, etc. - coming soon!)
+Will it be on a **dark** or **light** background?
 
-Most requests are for the CIQ company logo."""
+Do you want the **1 color version** (standard) or the **2 color version** (when it is the hero and main visual element)?"""
     
     # If we get here, they want the CIQ main logo
     # Try to parse combined responses like "supporting, light" OR "2 color logo, white background" OR "1 color for dark mode"
