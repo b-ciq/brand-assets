@@ -1,49 +1,52 @@
 # Installation Guide - CIQ Brand Assets MCP
 
-## Quick Install (Recommended)
+## 🐍 FastMCP Version (Recommended - Easiest!)
 
-Add this to your `.claude_desktop_config.json` file:
+**Super simple setup with visual interface:**
 
-```json
-{
-  "mcpServers": {
-    "ciq-brand-assets": {
-      "command": "npx",
-      "args": ["-y", "https://github.com/b-ciq/brand-assets.git"],
-      "cwd": "/tmp"
-    }
-  }
-}
-```
+### Quick Install
+1. **Download the Python file:** [`ciq_brand_assets_fastmcp.py`](https://raw.githubusercontent.com/b-ciq/brand-assets/main/ciq_brand_assets_fastmcp.py)
+2. **Install dependencies:** `pip install fastmcp requests`
+3. **Run the server:** `python ciq_brand_assets_fastmcp.py`
+4. **Open FastMCP interface:** Visit the URL shown in terminal (usually `http://localhost:8000`)
+5. **Click "Add to Claude Desktop"** → Done! 🎉
 
-## Alternative Install Methods
+### What You Get
+- ✅ **Visual setup interface** - no config file editing
+- ✅ **One Python file** - easy to modify later  
+- ✅ **Same smart logic** - identical brand recommendations
+- ✅ **One-click connection** to Claude Desktop
 
-### Method 1: Direct from GitHub
-```json
-"ciq-brand-assets": {
-  "command": "node", 
-  "args": ["src/index.js"],
-  "cwd": "/path/to/cloned/brand-assets"
-}
-```
+---
 
-### Method 2: Local Development
+## 🟢 Node.js Version (Advanced)
+
+For developers who prefer Node.js or want package management:
+
+### Local Installation
 ```bash
 git clone https://github.com/b-ciq/brand-assets.git
 cd brand-assets
 npm install
 ```
 
-Then add to Claude Desktop config:
+### Claude Desktop Configuration
+Add to `.claude_desktop_config.json`:
 ```json
-"ciq-brand-assets": {
-  "command": "node",
-  "args": ["src/index.js"], 
-  "cwd": "/full/path/to/brand-assets"
+{
+  "mcpServers": {
+    "ciq-brand-assets": {
+      "command": "node",
+      "args": ["src/index.js"],
+      "cwd": "/full/path/to/brand-assets"
+    }
+  }
 }
 ```
 
-## Usage Examples
+---
+
+## Usage Examples (Both Versions)
 
 Once installed, you can ask Claude:
 
@@ -66,18 +69,36 @@ Once installed, you can ask Claude:
 
 ## Troubleshooting
 
-- **Make sure Claude Desktop is restarted** after adding the configuration
-- **Check for MCP server indicators** at the bottom of chat input
-- **All logo files are accessible** via direct GitHub raw URLs
-- **No authentication needed** for team members - they just use Claude
+### FastMCP Issues
+- **Make sure Python and pip are installed**
+- **Check terminal for the server URL** (usually localhost:8000)
+- **Restart Claude Desktop** after adding via FastMCP interface
+
+### Node.js Issues
+- **Make sure Node.js is installed** (version 18+)
+- **Use full absolute path** in cwd setting
+- **Restart Claude Desktop** after config changes
+- **Check for MCP server indicators** at bottom of chat input
 
 ## What Makes This Smart
 
-The MCP implements professional design decision-making:
+Both versions implement professional design decision-making:
 - **When in doubt → defaults to neutral** (safe choice)
 - **Colorful designs → recommends neutral** (won't compete) 
 - **Minimal designs + ads → offers green** (helps logo pop)
 - **Main/hero elements → always two-color** (maximum brand recognition)
+
+## For Your Team
+
+**FastMCP approach:**
+- Share the Python file + simple install instructions
+- Everyone gets the same visual setup experience
+- No JSON config file editing needed
+
+**Node.js approach:**  
+- Professional package structure
+- Traditional MCP setup
+- More familiar to developers
 
 ---
 
