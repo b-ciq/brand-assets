@@ -1,0 +1,38 @@
+{
+  "name": "@b-ciq/brand-assets-mcp",
+  "version": "1.0.0",
+  "description": "Intelligent CIQ brand asset delivery via MCP - provides smart logo recommendations with brand guidance",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "ciq-brand-assets-mcp": "src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "keywords": [
+    "mcp",
+    "brand",
+    "assets",
+    "ciq",
+    "logo",
+    "design"
+  ],
+  "author": "CIQ Design Team",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "node-fetch": "^3.3.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/b-ciq/brand-assets.git"
+  },
+  "files": [
+    "src/"
+  ]
+}
