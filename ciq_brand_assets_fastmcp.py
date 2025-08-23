@@ -80,10 +80,7 @@ def determine_logo_type(request: str) -> str:
     if any(keyword in request_lower for keyword in main_logo_keywords):
         return 'ciq_main'
     
-    # If they just say "logo" without specifics, it's probably the main CIQ logo
-    if request_lower.strip() in ['logo', 'a logo', 'the logo']:
-        return 'ciq_main_likely'
-    
+    # Generic requests should ask for clarification, not assume
     return 'unclear'
 
 def get_smart_recommendation(background: str, element_type: str, design_context: str = "") -> dict:
@@ -208,14 +205,6 @@ Would you like the CIQ company logo instead?"""
 • 📦 **Product logo** (RLC, Rocky Linux, Warewulf, etc. - coming soon!)
 
 *Most requests are for the CIQ company logo.*"""
-
-    elif logo_type == 'ciq_main_likely':
-        return f"""🎨 **Just to confirm - you want the CIQ company logo, right?**
-
-• ✅ **Yes, CIQ company logo**
-• 📦 **No, a product logo** (coming soon!)
-
-*I'm assuming you want the main CIQ brand logo.*"""
     
     # If we get here, they want the CIQ main logo
     # Try to parse combined responses like "supporting, light"
