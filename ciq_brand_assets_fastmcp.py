@@ -79,6 +79,26 @@ def get_smart_recommendation(background: str, element_type: str, design_context:
         'reasoning': '🔒 When in doubt, neutral is the safest choice'
     }
 
+def parse_user_response(response: str) -> tuple[Optional[str], Optional[str]]:
+    """Parse user response for element_type and background"""
+    response = response.lower()
+    
+    # Parse element type
+    element_type = None
+    if any(word in response for word in ['star', 'hero', 'main', 'primary', 'focus']):
+        element_type = 'main'
+    elif any(word in response for word in ['support', 'secondary', 'alongside', 'with']):
+        element_type = 'supporting'
+    
+    # Parse background
+    background = None
+    if 'light' in response:
+        background = 'light'
+    elif 'dark' in response:
+        background = 'dark'
+    
+    return element_type, background
+
 @mcp.tool()
 async def get_brand_asset(
     request: str,
@@ -111,33 +131,34 @@ async def get_brand_asset(
     if asset_data is None:
         return "🚨 Sorry, I couldn't load the brand assets data. Please try again later."
     
-    # If we don't have enough info, ask clarifying questions
-    if not background:
-        return f"""🎨 **I'd love to help you find the perfect CIQ logo!**
+    # Check for product logos first
+    request_lower = request.lower()
+    if any(word in request_lower for word in ['product', 'application', 'app', 'software']):
+        return f"""🎨 **Which logo do you need?**
 
-For your request: *"{request}"*
+• 🏢 **CIQ main logo** 
+• 📦 **Product logo** (coming soon!)
 
-**What background will this logo be placed on?**
-
-• 🌞 **light** → white, light gray, light colors, most websites
-• 🌙 **dark** → black, dark gray, dark colors, dark photos
-
-This helps me recommend the right color version for proper contrast."""
+*For now, I can help you with the CIQ main logo.*"""
     
-    if not element_type:
-        return f"""✨ **Perfect! For {background} backgrounds...**
+    # Try to parse combined responses like "supporting, light"
+    if not background or not element_type:
+        parsed_element, parsed_background = parse_user_response(request)
+        if parsed_element and parsed_background:
+            element_type = parsed_element
+            background = parsed_background
+    
+    # If we still need info, ask our combined question
+    if not background or not element_type:
+        return f"""🎨 **Logo request: "{request}"**
 
-I need to understand the logo's role in your design:
+Is this logo going to be:
+• 🌟 **The star** (main element, hero placement)
+• 🏷️ **Supporting** (alongside contact info/text)
 
-🌟 **main** → Logo is the hero/star of your design
-   • Homepage headers, business cards, presentation title slides
-   • Main branding where the logo IS the focus
-   
-🏷️ **supporting** → Logo is secondary/background element  
-   • Footers, watermarks, corner branding, signatures
-   • Small elements that shouldn't compete with main content
+And what background: **light** or **dark**?
 
-Which describes your use case: *"{request}"* better?"""
+*Example: "Supporting, light" or "Star, dark"*"""
     
     # Apply smart decision logic
     recommendation = get_smart_recommendation(background, element_type, design_context or "")
@@ -146,23 +167,11 @@ Which describes your use case: *"{request}"* better?"""
     if not asset:
         return "🚨 Sorry, I couldn't find the appropriate asset. Please try again or contact the design team."
     
-    result = f"""✅ **Perfect! Here's your CIQ logo:**
+    # Clean, minimal delivery
+    result = f"""✅ **Here's your CIQ logo:**
+📎 {asset['url']}
 
-## 🎨 {asset['description']}
-
-📎 **Download:** {asset['url']}
-
-## 📋 Brand Guidelines
-• {asset['guidance']}
-• **Clear space:** Keep space equal to 1/4 the height of the 'Q' around the logo
-• **Minimum size:** 70px height for digital applications
-
-"""
-    
-    if recommendation.get('reasoning'):
-        result += f"💡 **Why this recommendation:** {recommendation['reasoning']}\n\n"
-    
-    result += "🔄 **Need a different variation?** Just ask with more context!"
+🎯 {recommendation.get('reasoning', 'Perfect for your use case!')}"""
     
     return result
 
