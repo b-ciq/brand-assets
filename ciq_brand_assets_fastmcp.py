@@ -58,6 +58,34 @@ async def fetch_image_as_base64(url: str) -> Optional[str]:
         print(f"Failed to fetch image from {url}: {e}")
         return None
 
+def determine_logo_type(request: str) -> str:
+    """Determine which type of logo the user is requesting"""
+    request_lower = request.lower()
+    
+    # Check for specific product logos
+    product_keywords = [
+        'rlc', 'rlc hardened', 'rlc ai', 'rocky linux', 'rocky linux from ciq',
+        'warewulf', 'fuzzball', 'apptainer', 'product logo', 'application logo'
+    ]
+    
+    if any(keyword in request_lower for keyword in product_keywords):
+        return 'product'
+    
+    # Check for main CIQ logo indicators
+    main_logo_keywords = [
+        'ciq logo', 'company logo', 'our logo', 'main logo', 'ciq brand',
+        'corporate logo', 'brand logo'
+    ]
+    
+    if any(keyword in request_lower for keyword in main_logo_keywords):
+        return 'ciq_main'
+    
+    # If they just say "logo" without specifics, it's probably the main CIQ logo
+    if request_lower.strip() in ['logo', 'a logo', 'the logo']:
+        return 'ciq_main_likely'
+    
+    return 'unclear'
+
 def get_smart_recommendation(background: str, element_type: str, design_context: str = "") -> dict:
     """Apply intelligent decision logic for logo selection"""
     context = design_context.lower() if design_context else ""
@@ -158,16 +186,38 @@ async def get_brand_asset(
     if asset_data is None:
         return "🚨 Sorry, I couldn't load the brand assets data. Please try again later."
     
-    # Check for product logos first
-    request_lower = request.lower()
-    if any(word in request_lower for word in ['product', 'application', 'app', 'software']):
+    # First, determine which logo type they want
+    logo_type = determine_logo_type(request)
+    
+    if logo_type == 'product':
+        return f"""🎨 **Product logos aren't supported yet, but coming soon!**
+
+I can help you with the **CIQ main company logo** for now.
+
+**Available product logos in the future:**
+• RLC, RLC Hardened, RLC AI
+• Rocky Linux from CIQ
+• Warewulf, Fuzzball, Apptainer
+
+Would you like the CIQ company logo instead?"""
+
+    elif logo_type == 'unclear':
         return f"""🎨 **Which logo do you need?**
 
-• 🏢 **CIQ main logo** 
-• 📦 **Product logo** (coming soon!)
+• 🏢 **CIQ company logo** (main brand logo)
+• 📦 **Product logo** (RLC, Rocky Linux, Warewulf, etc. - coming soon!)
 
-*For now, I can help you with the CIQ main logo.*"""
+*Most requests are for the CIQ company logo.*"""
+
+    elif logo_type == 'ciq_main_likely':
+        return f"""🎨 **Just to confirm - you want the CIQ company logo, right?**
+
+• ✅ **Yes, CIQ company logo**
+• 📦 **No, a product logo** (coming soon!)
+
+*I'm assuming you want the main CIQ brand logo.*"""
     
+    # If we get here, they want the CIQ main logo
     # Try to parse combined responses like "supporting, light"
     if not background or not element_type:
         parsed_element, parsed_background = parse_user_response(request)
@@ -177,7 +227,7 @@ async def get_brand_asset(
     
     # If we still need info, ask our combined question
     if not background or not element_type:
-        return f"""🎨 **Logo request: "{request}"**
+        return f"""🎨 **CIQ company logo - got it!**
 
 Is this logo going to be:
 • 🌟 **The star** (main element, hero placement)
