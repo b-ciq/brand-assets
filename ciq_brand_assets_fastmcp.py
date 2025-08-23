@@ -115,11 +115,11 @@ def parse_user_response(response: str) -> tuple[Optional[str], Optional[str]]:
     elif any(word in response for word in ['support', 'secondary', 'alongside', 'with']):
         element_type = 'supporting'
     
-    # Parse background
+    # Parse background - be more flexible with terms
     background = None
-    if 'light' in response:
+    if any(word in response for word in ['light', 'white', 'bright']):
         background = 'light'
-    elif 'dark' in response:
+    elif any(word in response for word in ['dark', 'black']):
         background = 'dark'
     
     return element_type, background
@@ -187,7 +187,7 @@ Would you like the CIQ company logo instead?"""
             element_type = parsed_element
             background = parsed_background
     
-    # If we still need info, ask our combined question
+    # If we still need info, ask our improved question
     if not background or not element_type:
         return f"""🎨 **CIQ company logo - got it!**
 
@@ -195,9 +195,11 @@ Is this logo going to be:
 • 🌟 **The star** (main element, hero placement)
 • 🏷️ **Supporting** (alongside contact info/text)
 
-And what background: **light** or **dark**?
+What COLOR is the background this logo will be placed ON?
+• ⚪ **Light/white** background (paper, websites, light colors)
+• ⚫ **Dark/black** background (dark photos, black slides, dark colors)
 
-*Example: "Supporting, light" or "Star, dark"*"""
+*Example: "Supporting, light background" or "Star, dark background"*"""
     
     # Apply smart decision logic
     recommendation = get_smart_recommendation(background, element_type, design_context or "")
@@ -310,7 +312,7 @@ async def brand_guidelines() -> str:
 
 {asset_data.get('decision_logic', {}).get('supporting_element', {}).get('description', 'Supporting elements')}:
 • Examples: {', '.join(asset_data.get('decision_logic', {}).get('supporting_element', {}).get('examples', []))}
-• **Default:** {asset_data.get('decision_logic', {}).get('supporting_element', {}).get('default', '1-color neutral')}
+• **Default:** {asset_data.get('decision_logic', {}).get('supporting_element', {}.get('default', '1-color neutral')}
 • **Alternative:** {asset_data.get('decision_logic', {}).get('supporting_element', {}).get('alternative', 'Green for minimal designs')}
 
 ## ❌ What NOT to Do
