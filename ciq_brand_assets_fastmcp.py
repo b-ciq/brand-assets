@@ -6,8 +6,9 @@ Intelligent brand asset delivery with smart logo recommendations
 
 from mcp.server.fastmcp import FastMCP
 import json
-import requests  # Changed from aiohttp to requests for better GitHub compatibility
+import requests
 from typing import Optional
+import asyncio
 
 # Asset metadata URL
 METADATA_URL = 'https://raw.githubusercontent.com/b-ciq/brand-assets/main/metadata/asset-inventory.json'
@@ -19,7 +20,7 @@ mcp = FastMCP("CIQ Brand Assets")
 asset_data = None
 
 def load_asset_data():
-    """Load asset metadata from GitHub using requests (more compatible than aiohttp)"""
+    """Load asset metadata from GitHub using requests"""
     global asset_data
     try:
         response = requests.get(METADATA_URL)
@@ -79,7 +80,7 @@ def get_smart_recommendation(background: str, element_type: str, design_context:
     }
 
 @mcp.tool()
-def get_brand_asset(
+async def get_brand_asset(
     request: str,
     background: Optional[str] = None,
     element_type: Optional[str] = None,
@@ -103,8 +104,12 @@ def get_brand_asset(
     
     # Load data if not already loaded
     if asset_data is None:
-        if not load_asset_data():
-            return "🚨 Sorry, I couldn't load the brand assets data. Please try again later."
+        # Run sync function in thread to avoid blocking
+        await asyncio.get_event_loop().run_in_executor(None, load_asset_data)
+    
+    # If we still don't have data, try once more
+    if asset_data is None:
+        return "🚨 Sorry, I couldn't load the brand assets data. Please try again later."
     
     # If we don't have enough info, ask clarifying questions
     if not background:
@@ -162,13 +167,15 @@ Which describes your use case: *"{request}"* better?"""
     return result
 
 @mcp.tool()
-def list_all_assets() -> str:
+async def list_all_assets() -> str:
     """List all available CIQ brand assets with descriptions and download links"""
     
     # Load data if not already loaded
     if asset_data is None:
-        if not load_asset_data():
-            return "🚨 Sorry, I couldn't load the brand assets data. Please try again later."
+        await asyncio.get_event_loop().run_in_executor(None, load_asset_data)
+    
+    if asset_data is None:
+        return "🚨 Sorry, I couldn't load the brand assets data. Please try again later."
     
     result = "# 🎨 CIQ Brand Assets Library\n\n"
     
@@ -214,13 +221,15 @@ I'll ask smart questions and recommend the perfect logo for your specific use ca
     return result
 
 @mcp.tool()
-def brand_guidelines() -> str:
+async def brand_guidelines() -> str:
     """Get CIQ brand guidelines and usage rules"""
     
     # Load data if not already loaded
     if asset_data is None:
-        if not load_asset_data():
-            return "🚨 Sorry, I couldn't load the brand assets data. Please try again later."
+        await asyncio.get_event_loop().run_in_executor(None, load_asset_data)
+    
+    if asset_data is None:
+        return "🚨 Sorry, I couldn't load the brand assets data. Please try again later."
     
     guidelines = asset_data.get('brand_guidelines', {})
     
