@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ciq-brand-assets"
+version = "1.0.0"
+description = "CIQ Brand Assets MCP Server - Intelligent brand asset delivery"
+authors = [
+    {name = "CIQ", email = "tech@ciq.com"}
+]
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "mcp-server-fastmcp>=0.2.0",
+    "requests>=2.25.0"
+]
+
+[project.scripts]
+ciq-brand-assets = "ciq_brand_assets.server:main"
+
+[project.urls]
+Homepage = "https://github.com/b-ciq/brand-assets"
+Repository = "https://github.com/b-ciq/brand-assets"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+ciq_brand_assets = ["*.json", "*.yaml"]
