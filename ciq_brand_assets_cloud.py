@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 CIQ Brand Assets MCP Server - FastMCP Cloud Version  
-Fixed to use proper metadata structure for ALL products
+Fixed to prioritize correct logo types (wordmark vs symbol)
 """
 
 from fastmcp import FastMCP
@@ -51,26 +51,45 @@ def find_product_assets(product_name: str) -> Dict[str, Any]:
     metadata_key = product_keys.get(product_name, f'{product_name}_logos')
     return asset_data.get(metadata_key, {})
 
-def find_matching_asset(assets: Dict[str, Any], background: str, layout: Optional[str] = None) -> Optional[Dict[str, Any]]:
-    """Find asset matching background and optionally layout using metadata fields"""
+def find_best_asset(assets: Dict[str, Any], background: str, request: str) -> Optional[Dict[str, Any]]:
+    """Find best asset based on background and request intent"""
     
-    # First pass - exact matches
+    request_lower = request.lower()
+    
+    # Determine preferred layout from request
+    preferred_layout = None
+    if any(word in request_lower for word in ['symbol', 'icon', 'just icon']):
+        preferred_layout = 'icon'
+    elif any(word in request_lower for word in ['horizontal', 'lockup', 'with text', 'wordmark', 'full logo']):
+        preferred_layout = 'horizontal'
+    elif 'vertical' in request_lower:
+        preferred_layout = 'vertical'
+    else:
+        # Default: when someone asks for "logo", prefer wordmark over symbol
+        preferred_layout = 'horizontal'  # Default to horizontal lockup
+    
+    # First pass - find assets matching background and preferred layout
+    candidates = []
+    fallback_candidates = []
+    
     for key, asset in assets.items():
         asset_bg = asset.get('background', '').lower()
         asset_layout = asset.get('layout', '').lower()
         
         if background == asset_bg:
-            if layout and layout in asset_layout:
-                return asset
-            elif not layout:  # Background match is enough
-                return asset
+            if preferred_layout and preferred_layout in asset_layout:
+                candidates.append(asset)
+            else:
+                fallback_candidates.append(asset)
     
-    # Second pass - partial matches (fallback)
-    for key, asset in assets.items():
-        if background in key.lower():
-            return asset
+    # Return best candidate
+    if candidates:
+        return candidates[0]  # First matching layout + background
+    elif fallback_candidates:
+        return fallback_candidates[0]  # First matching background
     
-    return None
+    # Last resort - any asset
+    return next(iter(assets.values())) if assets else None
 
 @mcp.tool()
 def get_brand_asset(request: str, background: Optional[str] = None) -> str:
@@ -80,7 +99,8 @@ def get_brand_asset(request: str, background: Optional[str] = None) -> str:
     Examples:
     - "CIQ logo for light background"
     - "Warewulf logo for white background"  
-    - "Fuzzball symbol for dark background"
+    - "Fuzzball full logo for dark background"
+    - "Apptainer symbol for light background"
     """
     
     if asset_data is None:
@@ -118,16 +138,18 @@ def get_brand_asset(request: str, background: Optional[str] = None) -> str:
     if not product:
         return """Which logo do you need?
 
-**Available:**
-• **CIQ** - Company logo  
-• **Fuzzball** - HPC/AI workload platform
-• **Warewulf** - HPC cluster provisioning tool
-• **Apptainer** - Container platform for HPC
-• **Ascender** - Infrastructure automation
-• **Bridge** - CentOS migration solution
-• **RLC** - Rocky Linux Commercial variants
+**Company Brand:**
+• **CIQ** - Main company logo
 
-Example: "Warewulf logo for white background" """
+**Product Brands:**
+• **Fuzzball** - HPC/AI workload management platform
+• **Warewulf** - HPC cluster provisioning tool
+• **Apptainer** - Container platform for HPC/scientific workflows
+• **Ascender** - Infrastructure automation platform
+• **Bridge** - CentOS migration solution
+• **RLC** - Rocky Linux Commercial (AI, Hardened variants)
+
+Example: "Fuzzball full logo for dark background" """
     
     # Get assets for this product
     assets = find_product_assets(product)
@@ -139,10 +161,10 @@ Example: "Warewulf logo for white background" """
     if not background:
         product_descriptions = {
             'ciq': 'Company logo',
-            'fuzzball': 'HPC/AI workload platform',
+            'fuzzball': 'HPC/AI workload management platform',
             'warewulf': 'HPC cluster provisioning tool',
-            'apptainer': 'Container platform for HPC',
-            'ascender': 'Infrastructure automation',
+            'apptainer': 'Container platform for HPC/scientific workflows',
+            'ascender': 'Infrastructure automation platform',
             'bridge': 'CentOS migration solution',
             'rlc': 'Rocky Linux Commercial variants',
             'support': 'Support division'
@@ -155,11 +177,14 @@ Example: "Warewulf logo for white background" """
 • **Light background** (black logo)
 • **Dark background** (white logo)"""
     
-    # Find matching asset using metadata
-    matching_asset = find_matching_asset(assets, background)
+    # Find best matching asset using intelligent selection
+    matching_asset = find_best_asset(assets, background, request)
     
     if matching_asset:
-        return f"""Here's your {product.title()} logo:
+        layout = matching_asset.get('layout', 'logo')
+        layout_desc = f" {layout}" if layout != 'logo' else ""
+        
+        return f"""Here's your {product.title()}{layout_desc}:
 **Download:** {matching_asset['url']}
 
 {matching_asset.get('guidance', f'{product.title()} branding for {background} backgrounds')}"""
@@ -168,7 +193,7 @@ Example: "Warewulf logo for white background" """
 
 @mcp.tool()  
 def list_all_assets() -> str:
-    """List all available brand assets"""
+    """List all available brand assets with counts"""
     
     if asset_data is None:
         if not load_asset_data():
@@ -187,8 +212,8 @@ def list_all_assets() -> str:
                 total_assets += asset_count
                 product_name = key.replace('_logos', '').replace('-', ' ').title()
                 if key == 'logos':
-                    product_name = 'CIQ'
-                product_info.append(f"• **{product_name}** ({asset_count} variants)")
+                    product_name = 'CIQ Company'
+                product_info.append(f"• **{product_name}** - {asset_count} variants")
     
     result = f"""# CIQ Brand Assets Library
 
@@ -199,13 +224,17 @@ def list_all_assets() -> str:
     
     result += """
 
-**Usage Examples:**
-- "CIQ logo for light background"
-- "Warewulf logo for white background"  
-- "Fuzzball symbol for dark background"
-- "Apptainer horizontal lockup"
+**Logo Types Available:**
+- **Symbol only** - Just the icon (tight spaces)
+- **Horizontal lockup** - Symbol + text side-by-side  
+- **Vertical lockup** - Symbol + text stacked
 
-Each product has multiple layouts and backgrounds available!"""
+**Usage Examples:**
+- "Fuzzball full logo for dark background" (gets horizontal lockup)
+- "Fuzzball symbol for tight space" (gets icon only)
+- "Warewulf vertical logo for presentation"
+
+Specify "symbol", "horizontal", "vertical", or "full logo" for best results!"""
     
     return result
 
