@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 CIQ Brand Assets MCP Server - FastMCP Cloud Version  
-Fixed to work with actual metadata structure
+Fixed to use proper metadata structure for ALL products
 """
 
 from fastmcp import FastMCP
@@ -31,6 +31,47 @@ def load_asset_data():
         print(f"❌ Failed to load asset data: {e}")
         return False
 
+def find_product_assets(product_name: str) -> Dict[str, Any]:
+    """Find assets for a product using proper metadata keys"""
+    if not asset_data:
+        return {}
+    
+    # Product mapping to metadata keys
+    product_keys = {
+        'ciq': 'logos',
+        'fuzzball': 'fuzzball_logos', 
+        'warewulf': 'warewulf-pro_logos',
+        'apptainer': 'apptainer_logos',
+        'ascender': 'ascender-pro_logos', 
+        'bridge': 'bridge_logos',
+        'rlc': 'rlcx_logos',
+        'support': 'ciq-support_logos'
+    }
+    
+    metadata_key = product_keys.get(product_name, f'{product_name}_logos')
+    return asset_data.get(metadata_key, {})
+
+def find_matching_asset(assets: Dict[str, Any], background: str, layout: Optional[str] = None) -> Optional[Dict[str, Any]]:
+    """Find asset matching background and optionally layout using metadata fields"""
+    
+    # First pass - exact matches
+    for key, asset in assets.items():
+        asset_bg = asset.get('background', '').lower()
+        asset_layout = asset.get('layout', '').lower()
+        
+        if background == asset_bg:
+            if layout and layout in asset_layout:
+                return asset
+            elif not layout:  # Background match is enough
+                return asset
+    
+    # Second pass - partial matches (fallback)
+    for key, asset in assets.items():
+        if background in key.lower():
+            return asset
+    
+    return None
+
 @mcp.tool()
 def get_brand_asset(request: str, background: Optional[str] = None) -> str:
     """
@@ -55,86 +96,27 @@ def get_brand_asset(request: str, background: Optional[str] = None) -> str:
         elif 'dark' in request_lower or 'black' in request_lower:
             background = 'dark'
     
-    # Handle CIQ company logo
+    # Determine product
+    product = None
     if 'ciq' in request_lower and not any(word in request_lower for word in ['support', 'bridge']):
-        if not background:
-            return """CIQ logo - got it!
-
-**Background:**
-• **Light background** (dark logo)
-• **Dark background** (light logo)"""
-        
-        # Find CIQ asset - try multiple keys since metadata structure varies
-        ciq_assets = asset_data.get('logos', {})
-        
-        # Look for assets matching background
-        for key, asset in ciq_assets.items():
-            asset_bg = asset.get('background', '')
-            if background in asset_bg or background in key:
-                return f"""Here's your CIQ logo:
-**Download:** {asset['url']}
-
-{asset.get('guidance', 'Clean CIQ company branding')}"""
-        
-        return f"Sorry, couldn't find CIQ logo for {background} background."
-    
-    # Handle Warewulf - use correct key from metadata
+        product = 'ciq'
     elif 'warewulf' in request_lower:
-        if not background:
-            return """Warewulf logo - HPC cluster provisioning tool!
-
-**Background:**
-• **Light background** (black logo)
-• **Dark background** (white logo)"""
-        
-        # Use correct metadata key
-        warewulf_assets = asset_data.get('warewulf-pro_logos', {})
-        
-        # Find asset matching background
-        for key, asset in warewulf_assets.items():
-            asset_bg = asset.get('background', '')
-            if background == asset_bg:
-                return f"""Here's your Warewulf logo:
-**Download:** {asset['url']}
-
-{asset.get('guidance', 'HPC cluster provisioning tool branding')}"""
-        
-        return f"Sorry, couldn't find Warewulf logo for {background} background."
-    
-    # Handle other products
+        product = 'warewulf'
     elif 'fuzzball' in request_lower:
-        if not background:
-            return """Fuzzball - HPC/AI workload platform!
-
-**Background:**
-• **Light background** (black logo)
-• **Dark background** (white logo)"""
-        
-        fuzzball_assets = asset_data.get('fuzzball_logos', {})
-        for key, asset in fuzzball_assets.items():
-            if background == asset.get('background', ''):
-                return f"""Here's your Fuzzball logo:
-**Download:** {asset['url']}
-
-{asset.get('guidance', 'HPC/AI workload management platform')}"""
-    
+        product = 'fuzzball'
     elif 'apptainer' in request_lower:
-        if not background:
-            return """Apptainer - Container platform for HPC!
-
-**Background:**
-• **Light background** (black logo)
-• **Dark background** (white logo)"""
-        
-        apptainer_assets = asset_data.get('apptainer_logos', {})
-        for key, asset in apptainer_assets.items():
-            if background == asset.get('background', ''):
-                return f"""Here's your Apptainer logo:
-**Download:** {asset['url']}
-
-{asset.get('guidance', 'Container platform for HPC/scientific workflows')}"""
+        product = 'apptainer'
+    elif 'ascender' in request_lower:
+        product = 'ascender'
+    elif 'bridge' in request_lower:
+        product = 'bridge'
+    elif any(word in request_lower for word in ['rlc', 'rocky']):
+        product = 'rlc'
+    elif 'support' in request_lower:
+        product = 'support'
     
-    return """Which logo do you need?
+    if not product:
+        return """Which logo do you need?
 
 **Available:**
 • **CIQ** - Company logo  
@@ -143,8 +125,46 @@ def get_brand_asset(request: str, background: Optional[str] = None) -> str:
 • **Apptainer** - Container platform for HPC
 • **Ascender** - Infrastructure automation
 • **Bridge** - CentOS migration solution
+• **RLC** - Rocky Linux Commercial variants
 
 Example: "Warewulf logo for white background" """
+    
+    # Get assets for this product
+    assets = find_product_assets(product)
+    
+    if not assets:
+        return f"Sorry, no {product.title()} logos found in metadata."
+    
+    # Ask for background if not provided
+    if not background:
+        product_descriptions = {
+            'ciq': 'Company logo',
+            'fuzzball': 'HPC/AI workload platform',
+            'warewulf': 'HPC cluster provisioning tool',
+            'apptainer': 'Container platform for HPC',
+            'ascender': 'Infrastructure automation',
+            'bridge': 'CentOS migration solution',
+            'rlc': 'Rocky Linux Commercial variants',
+            'support': 'Support division'
+        }
+        
+        desc = product_descriptions.get(product, f'{product} product')
+        return f"""{product.title()} - {desc}!
+
+**Background:**
+• **Light background** (black logo)
+• **Dark background** (white logo)"""
+    
+    # Find matching asset using metadata
+    matching_asset = find_matching_asset(assets, background)
+    
+    if matching_asset:
+        return f"""Here's your {product.title()} logo:
+**Download:** {matching_asset['url']}
+
+{matching_asset.get('guidance', f'{product.title()} branding for {background} backgrounds')}"""
+    
+    return f"Sorry, couldn't find {product.title()} logo for {background} background."
 
 @mcp.tool()  
 def list_all_assets() -> str:
@@ -154,27 +174,40 @@ def list_all_assets() -> str:
         if not load_asset_data():
             return "Sorry, couldn't load brand assets data."
     
-    # Show what's actually available from metadata
-    available_categories = list(asset_data.keys())
+    # Count actual assets in metadata
+    total_products = 0
+    total_assets = 0
     
-    return f"""# CIQ Brand Assets
+    product_info = []
+    for key, category in asset_data.items():
+        if key.endswith('_logos') or key == 'logos':
+            total_products += 1
+            if isinstance(category, dict):
+                asset_count = len(category)
+                total_assets += asset_count
+                product_name = key.replace('_logos', '').replace('-', ' ').title()
+                if key == 'logos':
+                    product_name = 'CIQ'
+                product_info.append(f"• **{product_name}** ({asset_count} variants)")
+    
+    result = f"""# CIQ Brand Assets Library
 
-**Available Categories:** {len(available_categories)}
+**{total_products} Products, {total_assets} Total Assets**
 
-**Products:**
-• **CIQ** - Company brand
-• **Fuzzball** - HPC/AI workload platform  
-• **Warewulf-Pro** - HPC cluster provisioning tool
-• **Apptainer** - Container platform for HPC
-• **Ascender-Pro** - Infrastructure automation
-• **Bridge** - CentOS migration solution
+"""
+    result += '\n'.join(product_info)
+    
+    result += """
 
-**Usage:**
+**Usage Examples:**
 - "CIQ logo for light background"
 - "Warewulf logo for white background"  
-- "Fuzzball logo for dark background"
+- "Fuzzball symbol for dark background"
+- "Apptainer horizontal lockup"
 
-Found {len(available_categories)} asset categories in metadata."""
+Each product has multiple layouts and backgrounds available!"""
+    
+    return result
 
 # Load data on startup
 load_asset_data()
