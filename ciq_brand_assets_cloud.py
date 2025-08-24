@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-CIQ Brand Assets MCP Server - Cloud Deployment Version
+CIQ Brand Assets MCP Server - FastMCP Cloud Version
 Intelligent brand asset delivery with smart logo recommendations for all products
-Optimized for FastMCP Cloud hosting
+Optimized for FastMCP Cloud serverless deployment
 """
 
 from mcp.server.fastmcp import FastMCP
@@ -13,8 +13,8 @@ import asyncio
 import os
 import logging
 
-# Setup logging
-logging.basicConfig(level=logging.INFO)
+# Setup logging for cloud environment
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 # Asset metadata URL
@@ -41,12 +41,14 @@ mcp = FastMCP(
 # Global asset data cache
 asset_data = None
 
-def load_asset_data():
-    """Load asset metadata from GitHub using requests"""
+async def load_asset_data_async():
+    """Load asset metadata from GitHub asynchronously"""
     global asset_data
     try:
         logger.info("Loading asset metadata from GitHub...")
-        response = requests.get(METADATA_URL, timeout=10)
+        # Use asyncio-compatible approach for requests
+        loop = asyncio.get_event_loop()
+        response = await loop.run_in_executor(None, lambda: requests.get(METADATA_URL, timeout=10))
         response.raise_for_status()
         asset_data = response.json()
         logger.info(f"Loaded metadata for {len(asset_data)} asset categories")
@@ -168,7 +170,7 @@ async def get_brand_asset(
     
     # Load data if not already loaded
     if asset_data is None:
-        await asyncio.get_event_loop().run_in_executor(None, load_asset_data)
+        await load_asset_data_async()
     
     if asset_data is None:
         return "Sorry, I couldn't load the brand assets data. Please try again later."
@@ -332,7 +334,7 @@ async def list_all_assets() -> str:
     
     # Load data if not already loaded
     if asset_data is None:
-        await asyncio.get_event_loop().run_in_executor(None, load_asset_data)
+        await load_asset_data_async()
     
     if asset_data is None:
         return "Sorry, I couldn't load the brand assets data. Please try again later."
@@ -384,7 +386,7 @@ async def brand_guidelines() -> str:
     
     # Load data if not already loaded
     if asset_data is None:
-        await asyncio.get_event_loop().run_in_executor(None, load_asset_data)
+        await load_asset_data_async()
     
     if asset_data is None:
         return "Sorry, I couldn't load the brand assets data. Please try again later."
@@ -434,21 +436,32 @@ async def brand_guidelines() -> str:
 
 Need help choosing? Just describe what you need: "Apptainer logo", "Warewulf symbol", etc."""
 
+# FastMCP Cloud serverless entry point
+# This is called by FastMCP Cloud's serverless infrastructure
+async def app():
+    """FastMCP Cloud serverless entry point"""
+    logger.info("Starting CIQ Brand Assets MCP Server in serverless mode...")
+    
+    # Pre-load asset data for faster responses
+    await load_asset_data_async()
+    
+    return mcp
+
+# For local testing (not used in FastMCP Cloud)
 if __name__ == "__main__":
-    # Load asset data on startup
-    logger.info("Starting CIQ Brand Assets MCP Server for FastMCP Cloud...")
-    load_asset_data()
+    logger.info("Starting CIQ Brand Assets MCP Server locally...")
     
-    # Cloud deployment: Use streamable-http transport
-    # FastMCP Cloud expects this transport type
-    port = int(os.getenv("PORT", 8080))
+    # For local development only
+    import asyncio
     
-    logger.info(f"Server starting on port {port} with streamable-http transport")
+    async def run_server():
+        await load_asset_data_async()
+        # Use async run for local testing
+        await mcp.run_async(
+            transport="streamable-http",
+            host="127.0.0.1",
+            port=8080,
+            path="/mcp"
+        )
     
-    # Run with cloud-optimized settings
-    mcp.run(
-        transport="streamable-http",
-        host="0.0.0.0",  # Required for cloud deployment
-        port=port,
-        path="/mcp"  # Standard MCP endpoint
-    )
+    asyncio.run(run_server())
