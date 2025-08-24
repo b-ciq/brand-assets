@@ -1,217 +1,187 @@
-# CIQ Brand Assets MCP Server
+# 🎨 CIQ Brand Assets MCP Server
 
-[![FastMCP 2.0](https://img.shields.io/badge/FastMCP-2.0-blue.svg)](https://gofastmcp.com/)
+**✅ PRODUCTION READY** - Cloud-hosted intelligent brand asset delivery for your CIQ design team
+
+[![FastMCP 2.0](https://img.shields.io/badge/FastMCP-2.0-blue.svg)](https://github.com/jlowin/fastmcp)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 
-**Intelligent brand asset delivery for your CIQ design team** - Get the perfect logo recommendation through natural language conversation with Claude!
+**Get the perfect logo recommendation through natural language conversation with Claude!**
 
-## 🚀 Quick Start
+---
 
-### Installation
+## 🚀 **Quick Team Setup**
 
-1. **Install FastMCP 2.0** (recommended with uv):
-```bash
-uv add fastmcp>=2.0.0 httpx
-```
+### **For Team Members (Zero Installation Required):**
 
-Or with pip:
-```bash
-pip install -r requirements.txt
-```
-
-2. **Test the server**:
-```bash
-python ciq_brand_assets_fastmcp.py
-```
-
-3. **Connect to Claude** (see installation guide below)
-
-## 🎯 What This Server Does
-
-- **Smart Logo Recommendations**: Just describe what you need - no complex decision trees
-- **Natural Language Interface**: "I need a logo for an email signature"
-- **Context-Aware**: Understands colorful vs minimal designs, main vs supporting elements
-- **Brand Guidelines**: Built-in brand compliance and usage rules
-
-## 💬 Example Conversations
-
-```
-You: "I need a logo for our homepage header"
-
-Server: "What background will this logo be placed on?
-• Light background (white, light gray, light colors)
-• Dark background (black, dark gray, dark colors)"
-
-You: "Light background"
-
-Server: "For light backgrounds, is this logo the main element or supporting element?
-🌟 Main - Logo is the hero/star (recommended for homepage headers)
-🏷️ Supporting - Logo is secondary/background"
-
-You: "Main element"
-
-Server: "✅ Perfect! Here's your CIQ logo:
-🎨 Two color (neutral + green) logo for light backgrounds
-📎 Download: [direct GitHub link]
-💡 Why: Two-color version provides maximum brand recognition for main design elements"
-```
-
-## 🧠 Smart Decision Logic
-
-The server implements your design team's decision logic:
-
-- **Main elements** (hero/star) → **Always 2-color** for maximum brand recognition
-- **Supporting elements** → **1-color neutral** (safe default)
-- **Colorful/busy designs** → **1-color neutral** (won't compete)
-- **Minimal + advertising** → **Green version** (helps logo pop)
-- **When in doubt** → **Neutral** (safest choice)
-
-## 🛠 Available Tools
-
-### `get_brand_asset`
-Get intelligent logo recommendations based on context
-- Natural language requests
-- Smart clarifying questions
-- Context-aware recommendations
-
-### `list_all_assets`
-Browse all available logos with direct download links
-
-### `get_brand_guidelines`
-Access CIQ brand guidelines and usage specifications
-
-## 📁 Assets Available
-
-- **CIQ-Logo-1color-light.png** - Neutral logo for light backgrounds
-- **CIQ-Logo-1color-dark.png** - Neutral logo for dark backgrounds  
-- **CIQ-Logo-2color-light.png** - Two-color logo for light backgrounds
-- **CIQ-Logo-2color-dark.png** - Two-color logo for dark backgrounds
-- **CIQ-Logo-green-light.png** - Green accent for light backgrounds
-- **CIQ-Logo-green-dark.png** - Green accent for dark backgrounds
-
-All assets include:
-- Direct GitHub raw URLs for immediate download
-- Usage guidelines and context recommendations
-- Brand compliance information
-
-## 🔧 Installation for Claude Desktop
-
-### Method 1: FastMCP CLI (Recommended)
-```bash
-# Install globally
-fastmcp install ciq_brand_assets_fastmcp.py
-
-# Or for development
-fastmcp dev ciq_brand_assets_fastmcp.py
-```
-
-### Method 2: Manual Configuration
-
-Add to your Claude Desktop config file:
-
-**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-**Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
-
+**1. Add to Claude Desktop config:**
 ```json
 {
   "mcpServers": {
     "ciq-brand-assets": {
-      "command": "python",
-      "args": ["/path/to/ciq_brand_assets_fastmcp.py"],
-      "env": {}
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://brand-asset-server.fastmcp.app/mcp"
+      ]
     }
   }
 }
 ```
 
-## 🔧 Installation for Cursor
+**2. Restart Claude Desktop**
 
-```bash
-# Install globally
-fastmcp install ciq_brand_assets_fastmcp.py --cursor
+**3. Start using:**
+- *"I need a CIQ logo"*
+- *"Fuzzball horizontal lockup for dark background"*
+- *"Warewulf symbol for email signature"*
 
-# Or add to Cursor settings manually
-```
-
-## 🧪 Testing
-
-Test your server with the FastMCP client:
-
-```python
-from fastmcp.client import FastMCPClient
-
-async def test_server():
-    client = FastMCPClient()
-    await client.connect("stdio", ["python", "ciq_brand_assets_fastmcp.py"])
-    
-    # Test the smart recommendation
-    result = await client.call_tool("get_brand_asset", {
-        "request": "I need a logo for an email signature",
-        "background": "light", 
-        "element_type": "supporting"
-    })
-    
-    print(result)
-```
-
-## 🎨 Design Team Workflow
-
-1. **Team members ask in natural language**: "I need a logo for..."
-2. **Server asks smart questions**: background type, element role, design context
-3. **Get instant recommendations**: perfect logo with reasoning
-4. **Direct download links**: immediate access to assets
-5. **Brand compliance**: automatic guidelines and usage rules
-
-## 📊 Usage Analytics
-
-The server tracks:
-- Most requested logo types
-- Common use cases
-- Design contexts
-- Brand guideline compliance
-
-## 🔄 Updates & Maintenance
-
-- **Auto-updating**: Server fetches latest metadata from GitHub
-- **Asset additions**: Add new logos to `/CIQ-logos/` and update metadata
-- **Logic updates**: Modify decision logic in `asset-inventory.json`
-- **Simple maintenance**: Pure Python, easy to modify
-
-## 🆘 Troubleshooting
-
-**Server won't start?**
-```bash
-python --version  # Ensure Python 3.8+
-pip install fastmcp httpx  # Install dependencies
-python ciq_brand_assets_fastmcp.py  # Test directly
-```
-
-**Claude can't find server?**
-- Check your `claude_desktop_config.json` file path
-- Restart Claude Desktop after config changes
-- Test server runs independently first
-
-**Wrong logo recommendations?**
-- Provide more context in your request
-- Use the `design_context` parameter
-- Check the decision logic in `metadata/asset-inventory.json`
-
-## 🤝 Team Adoption
-
-**For your 20-person team:**
-- Share this repo link
-- Install via FastMCP CLI for easy setup  
-- Standardize on natural language requests
-- Reference brand guidelines tool for compliance
-
-## 📈 Future Enhancements
-
-- [ ] Usage analytics dashboard
-- [ ] Custom brand asset categories  
-- [ ] Integration with design tools
-- [ ] Batch logo processing
-- [ ] Advanced context detection
+**That's it!** ✅ No Python, no FastMCP, no local server needed.
 
 ---
 
-**Built with ❤️ using FastMCP 2.0** | **30 years of UX design experience** | **Copy/paste friendly for easy team adoption**
+## 🎯 **What This Server Does**
+
+### **Intelligent Logo Recommendations**
+- **CIQ Company Brand:** 1-color (standard) vs 2-color (hero) selection
+- **Product Brands:** Symbol, horizontal lockup, or vertical lockup options
+- **Smart Questions:** Guides you to the perfect variant for your use case
+- **Brand Compliance:** Built-in usage guidelines and best practices
+
+### **Natural Language Interface**
+```
+You: "I need a logo for our homepage header"
+Server: "CIQ logo - got it! Do you want 1-color (standard) or 2-color (hero) version?"
+You: "Hero version for light background"  
+Server: "Perfect! Here's your CIQ 2-color logo: [download link]"
+```
+
+---
+
+## 📦 **Available Products**
+
+### **CIQ (Company Brand)**
+- **Structure:** 1-color and 2-color versions only
+- **Use:** Main company branding
+
+### **Product Brands**
+Each has symbol-only, horizontal lockup, and vertical lockup variants:
+
+- **Fuzzball** - HPC/AI workload management platform
+- **Warewulf** - HPC cluster provisioning tool  
+- **Apptainer** - Container platform for HPC/scientific workflows
+- **Ascender** - Infrastructure automation platform (Ansible alternative)
+- **Bridge** - CentOS 7 migration solution
+- **RLC(X)** - Rocky Linux Commercial variants (RLC-AI, RLC-Hardened)
+- **CIQ-Support** - Support division branding
+
+---
+
+## 🔧 **For Administrators**
+
+### **Adding New Assets:**
+```bash
+# 1. Add logo files to appropriate directory following naming convention
+# 2. Regenerate metadata
+python generate_metadata.py
+
+# 3. Push to GitHub (auto-deploys to team)
+git add . && git commit -m "Add new assets" && git push
+```
+
+### **Adding New Products:**
+```bash
+# 1. Create NewProduct-logos/ directory
+# 2. Add logo files following naming patterns
+# 3. Auto-discover and deploy
+python generate_metadata.py
+git add . && git commit -m "Add NewProduct" && git push
+```
+
+### **Local Development:**
+```bash
+# Run local server for development
+python ciq_brand_assets_fastmcp.py
+
+# Test with Claude Desktop (local config):
+{
+  "mcpServers": {
+    "ciq-brand-assets-local": {
+      "command": "python",
+      "args": ["/path/to/ciq_brand_assets_fastmcp.py"]
+    }
+  }
+}
+```
+
+---
+
+## 💬 **Example Conversations**
+
+### **CIQ Company Logo:**
+```
+You: "CIQ logo for presentation slide"
+Claude: "CIQ logo - got it! 1-color (standard) or 2-color (hero)?"
+You: "Hero version for white background"
+Claude: "Here's your CIQ 2-color logo: [download] - Maximum brand recognition"
+```
+
+### **Product Logos:**
+```
+You: "Fuzzball logo for business card"
+Claude: "Fuzzball - HPC/AI platform. Symbol only, horizontal, or vertical lockup?"
+You: "Horizontal for light background"
+Claude: "Here's your Fuzzball horizontal lockup: [download]"
+```
+
+---
+
+## 🏗️ **Architecture**
+
+### **Cloud Infrastructure:**
+- **FastMCP Cloud** hosts the server at `brand-asset-server.fastmcp.app`
+- **Auto-deployment** from GitHub main branch
+- **Auto-discovery** generates metadata from file structure
+- **60+ assets** across 8+ products served via API
+
+### **Local Development:**
+- **Auto-discovery script** (`generate_metadata.py`) scans directories
+- **Intelligent parsing** of filename conventions
+- **GitHub integration** for asset URLs
+- **Brand guidelines** embedded in responses
+
+---
+
+## 📋 **Key Files**
+
+### **Production (Keep These):**
+- `server.py` - **Active cloud server** ⭐
+- `ciq_brand_assets_fastmcp.py` - Local development server
+- `generate_metadata.py` - **Essential auto-discovery** ⭐
+- `TEAM_SETUP.md` - **Team configuration guide** ⭐
+
+### **Asset Structure:**
+- `CIQ-logos/` - Company brand assets
+- `Fuzzball-logos/`, `Warewulf-Pro-logos/`, etc. - Product assets
+- `metadata/` - Auto-generated inventory
+
+---
+
+## 🎉 **Team Benefits**
+
+### **For Designers:**
+- ✅ **Instant access** to all brand assets through conversation
+- ✅ **Smart recommendations** based on use case
+- ✅ **Brand compliance** automatically enforced
+- ✅ **Always current** assets via cloud deployment
+
+### **For Administrators:**
+- ✅ **Auto-discovery** - no manual metadata editing
+- ✅ **Auto-deployment** - push to GitHub = instant team updates
+- ✅ **Scalable** - unlimited products/assets supported
+- ✅ **Zero server management** - FastMCP Cloud handles infrastructure
+
+---
+
+**🚀 Your team now has enterprise-grade brand asset delivery through natural language!**
+
+For questions or issues, see `TEAM_SETUP.md` or contact the repository administrator.
