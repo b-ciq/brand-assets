@@ -35,14 +35,13 @@ def determine_logo_type(request: str) -> str:
     """Determine which type of logo the user is requesting"""
     request_lower = request.lower()
     
-    # Check for specific product logos
-    product_keywords = [
-        'rlc', 'rlc hardened', 'rlc ai', 'rocky linux', 'rocky linux from ciq',
-        'warewulf', 'fuzzball', 'apptainer', 'product logo', 'application logo'
+    # Check for Fuzzball-specific keywords
+    fuzzball_keywords = [
+        'fuzzball', 'fuzz ball', 'product logo', 'application logo'
     ]
     
-    if any(keyword in request_lower for keyword in product_keywords):
-        return 'product'
+    if any(keyword in request_lower for keyword in fuzzball_keywords):
+        return 'fuzzball'
     
     # Check for main CIQ logo indicators
     main_logo_keywords = [
@@ -56,8 +55,57 @@ def determine_logo_type(request: str) -> str:
     # Generic requests should ask for clarification, not assume
     return 'unclear'
 
+def get_fuzzball_layout_recommendation(request: str, design_context: str = "") -> str:
+    """Determine best Fuzzball layout based on use case"""
+    request_lower = request.lower()
+    context = design_context.lower() if design_context else ""
+    combined = f"{request_lower} {context}"
+    
+    # Icon indicators - small/tight spaces
+    icon_keywords = ['favicon', 'app icon', 'avatar', 'small space', 'tight space', 'icon', 'symbol only']
+    if any(keyword in combined for keyword in icon_keywords):
+        return 'icon'
+    
+    # Vertical indicators - tall/narrow spaces
+    vertical_keywords = [
+        'social media', 'profile', 'mobile', 'mobile layout', 'tall banner', 'vertical',
+        'narrow', 'poster', 'instagram', 'linkedin profile', 'facebook profile'
+    ]
+    if any(keyword in combined for keyword in vertical_keywords):
+        return 'vertical'
+    
+    # Horizontal indicators - wide spaces (default for most professional use)
+    horizontal_keywords = [
+        'business card', 'letterhead', 'email signature', 'header', 'website header',
+        'horizontal', 'banner', 'wide', 'professional'
+    ]
+    if any(keyword in combined for keyword in horizontal_keywords):
+        return 'horizontal'
+    
+    # Default to horizontal for professional/business contexts
+    return 'horizontal'
+
+def get_size_recommendation(request: str, layout: str, design_context: str = "") -> str:
+    """Determine appropriate size based on usage"""
+    request_lower = request.lower()
+    context = design_context.lower() if design_context else ""
+    combined = f"{request_lower} {context}"
+    
+    # Large size indicators
+    large_keywords = ['hero', 'main', 'primary', 'large', 'big', 'homepage', 'poster', 'billboard']
+    if any(keyword in combined for keyword in large_keywords):
+        return 'large'
+    
+    # Small size indicators  
+    small_keywords = ['small', 'compact', 'favicon', 'tiny', 'footer', 'corner']
+    if any(keyword in combined for keyword in small_keywords):
+        return 'small'
+    
+    # Default to medium for most use cases
+    return 'medium'
+
 def get_smart_recommendation(background: str, element_type: str, design_context: str = "") -> dict:
-    """Apply intelligent decision logic for logo selection"""
+    """Apply intelligent decision logic for CIQ logo selection"""
     context = design_context.lower() if design_context else ""
     
     # Main element = always use 2-color for maximum brand recognition
@@ -104,8 +152,8 @@ def get_smart_recommendation(background: str, element_type: str, design_context:
         'reasoning': 'When in doubt, neutral is the safest choice'
     }
 
-def parse_user_response(response: str) -> tuple[Optional[str], Optional[str]]:
-    """Parse user response for element_type and background"""
+def parse_user_response(response: str) -> tuple[Optional[str], Optional[str], Optional[str]]:
+    """Parse user response for element_type, background, and layout (for Fuzzball)"""
     response = response.lower()
     
     # Parse element type - enhanced with logo color specifications
@@ -132,7 +180,16 @@ def parse_user_response(response: str) -> tuple[Optional[str], Optional[str]]:
     elif 'dark mode' in response:
         background = 'dark'   # dark mode interface = dark background
     
-    return element_type, background
+    # Parse Fuzzball layout
+    layout = None
+    if 'icon' in response or 'symbol' in response:
+        layout = 'icon'
+    elif 'horizontal' in response or 'wide' in response:
+        layout = 'horizontal'
+    elif 'vertical' in response or 'tall' in response:
+        layout = 'vertical'
+    
+    return element_type, background, layout
 
 @mcp.tool()
 async def get_brand_asset(
@@ -149,6 +206,7 @@ async def get_brand_asset(
     - "Logo for a PowerPoint footer" 
     - "Small logo for a magazine ad"
     - "Hero logo for our homepage"
+    - "Fuzzball logo for my app icon"
     
     Args:
         request: What kind of logo or brand asset do you need?
@@ -169,24 +227,71 @@ async def get_brand_asset(
     # First, determine which logo type they want
     logo_type = determine_logo_type(request)
     
-    if logo_type == 'product':
-        return f"""Product logos aren't supported yet, but coming soon!
-
-I can help you with the **CIQ main company logo** for now.
-
-Would you like the CIQ company logo instead?"""
-
-    elif logo_type == 'unclear':
+    if logo_type == 'unclear':
         return """Great, I can find that for you. Tell me more about how it will be used:
 
-Will it be on a **dark** or **light** background?
+Is this for **CIQ** (company) or **Fuzzball** (product)?
 
-Do you want the **1 color version** (standard) or the **2 color version** (when it is the hero and main visual element)?"""
+**Background**: Will it be on a **dark** or **light** background?"""
+
+    elif logo_type == 'fuzzball':
+        # Handle Fuzzball logo requests
+        return await handle_fuzzball_request(request, background, design_context)
     
-    # If we get here, they want the CIQ main logo
+    # Handle CIQ logo requests
+    return await handle_ciq_request(request, background, element_type, design_context)
+
+async def handle_fuzzball_request(request: str, background: Optional[str], design_context: str = "") -> str:
+    """Handle Fuzzball logo requests with layout-based selection"""
+    
+    # Try to parse combined responses
+    parsed_element, parsed_background, parsed_layout = parse_user_response(request)
+    if parsed_background:
+        background = parsed_background
+    
+    # Determine layout if not specified
+    layout = get_fuzzball_layout_recommendation(request, design_context)
+    
+    # Ask for missing information
+    if not background:
+        return f"""Fuzzball logo - got it!
+
+I recommend the **{layout}** layout for your use case.
+
+What **background** will this logo sit on?
+• **Light background** - we'll give you a black logo
+• **Dark background** - we'll give you a white logo"""
+    
+    # Determine size 
+    size = get_size_recommendation(request, layout, design_context)
+    
+    # Build the asset key
+    color = 'blk' if background == 'light' else 'wht'
+    
+    if layout == 'icon':
+        asset_key = f'icon-{color}-{size}'
+    else:
+        asset_key = f'{layout}-{color}-{size}'
+    
+    # Get the asset
+    asset = asset_data['fuzzball_logos'].get(asset_key)
+    if not asset:
+        return f"Sorry, I couldn't find the Fuzzball {layout} logo for {background} backgrounds. Please try again or contact the design team."
+    
+    # Provide the recommendation
+    result = f"""Here's your Fuzzball logo:
+**Download:** {asset['url']}
+
+**Layout:** {layout.title()} - {asset.get('guidance', 'Perfect for your use case!')}"""
+    
+    return result
+
+async def handle_ciq_request(request: str, background: Optional[str], element_type: Optional[str], design_context: str = "") -> str:
+    """Handle CIQ logo requests with color-variant selection"""
+    
     # Try to parse combined responses like "supporting, light" OR "2 color logo, white background" OR "1 color for dark mode"
     if not background or not element_type:
-        parsed_element, parsed_background = parse_user_response(request)
+        parsed_element, parsed_background, parsed_layout = parse_user_response(request)
         if parsed_element and parsed_background:
             element_type = parsed_element
             background = parsed_background
@@ -218,7 +323,7 @@ What **background** will this logo sit on?
     
     asset = asset_data['logos'].get(recommendation['key'])
     if not asset:
-        return "Sorry, I couldn't find the appropriate asset. Please try again or contact the design team."
+        return "Sorry, I couldn't find the appropriate CIQ asset. Please try again or contact the design team."
     
     # Clean delivery - just link and brief reasoning
     result = f"""Here's your CIQ logo:
@@ -241,6 +346,9 @@ async def list_all_assets() -> str:
     
     result = "# CIQ Brand Assets Library\n\n"
     
+    # CIQ Logos
+    result += "## CIQ Company Logos\n\n"
+    
     # Group by background type for better organization
     light_assets = []
     dark_assets = []
@@ -253,11 +361,38 @@ async def list_all_assets() -> str:
         else:
             dark_assets.append(asset_info)
     
-    result += "## Light Background Versions\n\n"
+    result += "### Light Background Versions\n\n"
     result += "\n\n".join(light_assets)
     
-    result += "\n\n## Dark Background Versions\n\n"
+    result += "\n\n### Dark Background Versions\n\n"
     result += "\n\n".join(dark_assets)
+    
+    # Fuzzball Logos
+    result += "\n\n## Fuzzball Product Logos\n\n"
+    
+    # Group by layout
+    icon_assets = []
+    horizontal_assets = []
+    vertical_assets = []
+    
+    for key, asset in asset_data['fuzzball_logos'].items():
+        asset_info = f"• **{asset['filename']}** - {asset['description']}\n  {asset['url']}"
+        
+        if asset['layout'] == 'icon':
+            icon_assets.append(asset_info)
+        elif asset['layout'] == 'horizontal':
+            horizontal_assets.append(asset_info)
+        elif asset['layout'] == 'vertical':
+            vertical_assets.append(asset_info)
+    
+    result += "### Icon Versions (Symbol Only)\n\n"
+    result += "\n\n".join(icon_assets[:6])  # Show first 6 for brevity
+    
+    result += "\n\n### Horizontal Versions (Wide Layouts)\n\n"
+    result += "\n\n".join(horizontal_assets[:6])  # Show first 6 for brevity
+    
+    result += "\n\n### Vertical Versions (Tall Layouts)\n\n"
+    result += "\n\n".join(vertical_assets[:6])  # Show first 6 for brevity
     
     result += f"""
 
@@ -265,20 +400,28 @@ async def list_all_assets() -> str:
 
 Instead of choosing manually, just tell me what you need! For example:
 
+**CIQ logos:**
 • "I need a logo for an email signature"
 • "Logo for a PowerPoint footer" 
-• "Small logo for a magazine ad"
 • "Hero logo for our homepage"
-• "Watermark for a colorful brochure"
+
+**Fuzzball logos:**
+• "Fuzzball logo for my app icon"
+• "Fuzzball horizontal logo for business cards"
+• "Fuzzball for social media profile"
 
 I'll ask smart questions and recommend the perfect logo for your specific use case!
 
 ## Quick Decision Guide
 
-**Main elements** (logo is the star) - Always **2-color** for maximum brand recognition  
-**Supporting elements** - **1-color neutral** (safe default) or **green** (minimal ads)  
-**Colorful designs** - **1-color neutral** (won't compete)  
-**Minimal + advertising** - **Green** (helps logo pop)"""
+**CIQ Logos:**
+- **Main elements** (logo is the star) - Always **2-color** for maximum brand recognition  
+- **Supporting elements** - **1-color neutral** (safe default) or **green** (minimal ads)  
+
+**Fuzzball Logos:**
+- **Icon** - Tight spaces, favicons, app icons
+- **Horizontal** - Wide spaces, business cards, headers
+- **Vertical** - Tall spaces, social media profiles, mobile layouts"""
     
     return result
 
@@ -316,16 +459,28 @@ async def brand_guidelines() -> str:
 • Light backgrounds: {guidelines.get('neutral_colors', {}).get('light_background', 'Dark grey')}
 • Dark backgrounds: {guidelines.get('neutral_colors', {}).get('dark_background', 'Light grey')}
 
-## Smart Usage Logic
+## CIQ Logo Logic
 
-{asset_data.get('decision_logic', {}).get('main_element', {}).get('description', 'Main elements')}:
-• Examples: {', '.join(asset_data.get('decision_logic', {}).get('main_element', {}).get('examples', []))}
-• **Recommended:** {asset_data.get('decision_logic', {}).get('main_element', {}).get('recommended', '2-color version')}
+{asset_data.get('decision_logic', {}).get('ciq', {}).get('main_element', {}).get('description', 'Main elements')}:
+• Examples: {', '.join(['homepage headers', 'business cards', 'presentation title slides'])}
+• **Recommended:** {asset_data.get('decision_logic', {}).get('ciq', {}).get('main_element', {}).get('recommended', '2-color version')}
 
-{asset_data.get('decision_logic', {}).get('supporting_element', {}).get('description', 'Supporting elements')}:
-• Examples: {', '.join(asset_data.get('decision_logic', {}).get('supporting_element', {}).get('examples', []))}
-• **Default:** {asset_data.get('decision_logic', {}).get('supporting_element', {}).get('default', '1-color neutral')}
-• **Alternative:** {asset_data.get('decision_logic', {}).get('supporting_element', {}).get('alternative', 'Green for minimal designs')}
+{asset_data.get('decision_logic', {}).get('ciq', {}).get('supporting_element', {}).get('description', 'Supporting elements')}:
+• Examples: {', '.join(['footers', 'watermarks', 'corner branding'])}
+• **Default:** {asset_data.get('decision_logic', {}).get('ciq', {}).get('supporting_element', {}).get('default', '1-color neutral')}
+• **Alternative:** {asset_data.get('decision_logic', {}).get('ciq', {}).get('supporting_element', {}).get('alternative', 'Green for minimal designs')}
+
+## Fuzzball Logo Logic
+
+**Layout Selection:**
+• **Icon:** Just the symbol - for favicons, app icons, tight spaces
+• **Horizontal:** Symbol + text side-by-side - for headers, business cards, wide banners
+• **Vertical:** Symbol + text stacked - for social media, mobile layouts, tall spaces
+
+**Size Selection:**
+• **Small:** Compact usage, small spaces
+• **Medium:** Standard usage, most common
+• **Large:** Hero placement, high-impact usage
 
 ## What NOT to Do
 • Don't alter the logo colors, fonts, or proportions
