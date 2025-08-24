@@ -1,6 +1,6 @@
-# 👥 Team Setup Instructions
+# 👥 Team Setup Instructions - WORKING VERSION
 
-**For CIQ team members:** Add this to your Claude Desktop configuration
+**✅ CONFIRMED WORKING** - Add this to your Claude Desktop configuration
 
 ---
 
@@ -14,15 +14,15 @@ Add this to your `claude_desktop_config.json` file:
     "ciq-brand-assets": {
       "command": "npx",
       "args": [
-        "@modelcontextprotocol/server-http",
-        "https://ciq-brand-assets.fastmcp.app/mcp"
+        "mcp-remote",
+        "https://brand-asset-server.fastmcp.app/mcp"
       ]
     }
   }
 }
 ```
 
-**That's it!** No installation required.
+**✅ CONFIRMED: This configuration works!**
 
 ---
 
@@ -49,6 +49,7 @@ Once configured, just ask Claude:
 - *"Apptainer logo"*
 - *"Show me all available brand assets"*
 - *"What are the brand guidelines?"*
+- *"Warewulf logo for light background"*
 
 Claude will guide you through the best options automatically!
 
@@ -68,9 +69,10 @@ Claude will guide you through the best options automatically!
 ## **🔧 Troubleshooting**
 
 **If it doesn't work:**
-1. **Restart Claude Desktop** after adding config
+1. **Restart Claude Desktop** after adding config (Command/Ctrl + R)
 2. **Check JSON syntax** (use a JSON validator)
 3. **Verify file location** (see paths above)
+4. **Ensure Node.js 18+** is installed
 
 **Still having issues?** Contact the admin who set up the server.
 
@@ -79,3 +81,21 @@ Claude will guide you through the best options automatically!
 ## **🎉 That's It!**
 
 You now have **instant access** to all CIQ brand assets through Claude with **zero technical setup**! 🚀
+
+**✅ No Python installation required**  
+**✅ No FastMCP installation required**  
+**✅ No local server management required**  
+**✅ Just one config file edit + restart Claude Desktop**
+
+---
+
+## **🎯 Example Usage:**
+
+After setup, you can have conversations like:
+
+**You:** "I need a logo for our new product brochure"  
+**Claude:** "What background will this logo be on - light or dark?"  
+**You:** "Light background, and it's the main visual element"  
+**Claude:** "Perfect! Here's your CIQ 2-color logo: [download link]"
+
+**The magic of natural language brand asset access!** ⚡
