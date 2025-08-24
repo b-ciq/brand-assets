@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-CIQ Brand Assets MCP Server - Intelligent Logo Selection Logic
-Smart defaults with context-aware recommendations using rich metadata
+CIQ Brand Assets MCP Server - Intelligent Logo Selection with Multi-Asset Recommendations
+Smart defaults with context-aware recommendations and multiple options for ambiguous requests
 """
 
 from fastmcp import FastMCP
@@ -33,7 +33,7 @@ def load_asset_data():
         return False
 
 class BrandAssetMatcher:
-    """Intelligent brand asset matching with context-aware selection"""
+    """Intelligent brand asset matching with context-aware selection and multi-asset recommendations"""
     
     def __init__(self, asset_data: Dict):
         self.asset_data = asset_data
@@ -285,6 +285,77 @@ class BrandAssetMatcher:
         
         return score, " + ".join(reasons)
     
+    def assess_confidence(self, scored_assets: List[Tuple[int, Dict, str]], intent: Dict) -> str:
+        """Assess confidence level based on scoring patterns and user specificity"""
+        
+        if len(scored_assets) == 1:
+            return 'high'
+        
+        top_score = scored_assets[0][0]
+        second_score = scored_assets[1][0] if len(scored_assets) > 1 else 0
+        
+        # High confidence indicators
+        high_confidence_factors = 0
+        
+        # User was very specific
+        if intent.get('layout_type') and intent.get('background'):
+            high_confidence_factors += 2
+        elif intent.get('layout_type') or intent.get('background'):
+            high_confidence_factors += 1
+        
+        # Clear winner in scoring
+        score_gap = top_score - second_score
+        if score_gap >= 50:  # Significant scoring gap
+            high_confidence_factors += 2
+        elif score_gap >= 25:
+            high_confidence_factors += 1
+        
+        # Top score is very high (near perfect match)
+        if top_score >= 200:
+            high_confidence_factors += 2
+        elif top_score >= 150:
+            high_confidence_factors += 1
+        
+        # Determine confidence level
+        if high_confidence_factors >= 4:
+            return 'high'
+        elif high_confidence_factors >= 2:
+            return 'medium'
+        else:
+            return 'low'
+    
+    def get_selection_guidance(self, assets: List[Tuple[int, Dict, str]], intent: Dict) -> str:
+        """Provide guidance on how to choose between options"""
+        
+        # Analyze the options to give smart guidance
+        layouts = [asset[1].get('layout', '') for asset in assets]
+        formats = [asset[1].get('format', '') for asset in assets]
+        
+        guidance = "**💡 How to choose:**\n"
+        
+        # Layout guidance
+        if 'horizontal' in layouts and 'vertical' in layouts:
+            guidance += "• **Horizontal** for wide spaces (headers, business cards, emails)\n"
+            guidance += "• **Vertical** for tall/square spaces (social media, mobile apps)\n"
+        
+        if 'icon' in layouts:
+            guidance += "• **Symbol** for tight spaces where brand is already established\n"
+        
+        # Format guidance
+        if 'svg' in formats:
+            guidance += "• **SVG** format scales perfectly for any size\n"
+        if 'png' in formats:
+            guidance += "• **PNG** format for standard web/print use\n"
+        
+        # Context-specific advice
+        context = intent.get('context')
+        if context == 'wide_format':
+            guidance += "• For your wide layout use case, **horizontal** is typically best\n"
+        elif context == 'square_format':
+            guidance += "• For your square/mobile use case, **vertical or symbol** works well\n"
+        
+        return guidance
+    
     def generate_alternatives(self, product_id: str, chosen_asset: Dict) -> str:
         """Generate alternative suggestions"""
         product_info = self.product_info[product_id]
@@ -322,8 +393,8 @@ class BrandAssetMatcher:
         
         return base_guidance
     
-    def find_best_asset(self, product_id: str, intent: Dict[str, Optional[str]]) -> Optional[Dict]:
-        """Find the best matching asset for the user's intent"""
+    def find_best_assets(self, product_id: str, intent: Dict[str, Optional[str]], max_results: int = 3) -> Optional[Dict]:
+        """Enhanced version that can return multiple assets with confidence scoring"""
         product_info = self.product_info[product_id]
         asset_key = product_info['asset_key']
         product_assets = self.asset_data.get(asset_key, {})
@@ -331,15 +402,12 @@ class BrandAssetMatcher:
         if not product_assets:
             return None
         
-        # Determine target layout
+        # Determine target layout and background
         target_layout = intent['layout_type']
         if not target_layout:
             target_layout = self.get_smart_default_layout(product_id, intent.get('context'))
         
-        # Determine target background
-        target_background = intent['background']
-        if not target_background:
-            target_background = 'light'  # Default to light background
+        target_background = intent['background'] or 'light'
         
         # Score all assets
         scored_assets = []
@@ -348,16 +416,81 @@ class BrandAssetMatcher:
             if score > 0:
                 scored_assets.append((score, asset, reasons))
         
-        # Return best match
-        if scored_assets:
-            scored_assets.sort(key=lambda x: x[0], reverse=True)
-            return {
-                'asset': scored_assets[0][1],
-                'score': scored_assets[0][0],
-                'reasoning': scored_assets[0][2]
-            }
+        if not scored_assets:
+            return None
         
-        return None
+        # Sort by score (highest first)
+        scored_assets.sort(key=lambda x: x[0], reverse=True)
+        
+        # Determine confidence level
+        confidence_level = self.assess_confidence(scored_assets, intent)
+        
+        # Return single asset if high confidence, multiple if low/medium confidence
+        if confidence_level == 'high' or len(scored_assets) == 1:
+            return {
+                'single_asset': True,
+                'confidence': confidence_level,
+                'assets': [scored_assets[0]],
+                'primary': scored_assets[0]
+            }
+        else:
+            # Return top options for user to choose from
+            top_assets = scored_assets[:min(max_results, len(scored_assets))]
+            return {
+                'single_asset': False,
+                'confidence': confidence_level,
+                'assets': top_assets,
+                'primary': scored_assets[0]
+            }
+    
+    def format_multi_asset_response(self, product_info: Dict, result: Dict, intent: Dict) -> str:
+        """Format response when returning multiple asset options"""
+        
+        if result['single_asset']:
+            # Use existing single-asset format
+            asset_data = result['primary']
+            score, asset, reasoning = asset_data
+            
+            layout_desc = asset.get('layout', 'logo').replace('icon', 'symbol')
+            enhanced_guidance = self.enhance_guidance(asset, product_info, intent.get('context'))
+            alternatives = self.generate_alternatives(product_info['name'].lower(), asset)
+            
+            return f"""**{product_info['name']} {layout_desc}:**
+**Download:** {asset['url']}
+
+**Selection reasoning:** {reasoning}
+
+**Usage guidance:** {enhanced_guidance}{alternatives}"""
+        
+        else:
+            # Multi-asset format
+            response = f"""**{product_info['name']} Logo Options:**
+
+I found several good options for your request. Here are the top recommendations:
+
+"""
+            
+            for i, (score, asset, reasoning) in enumerate(result['assets'], 1):
+                layout_desc = asset.get('layout', 'logo').replace('icon', 'symbol')
+                size_info = asset.get('size', '')
+                format_info = asset.get('format', '').upper()
+                
+                # Create option header
+                response += f"""**Option {i}: {layout_desc.title()}**
+• **Download:** {asset['url']}
+• **Best for:** {asset.get('guidance', 'General use')}"""
+                
+                if format_info:
+                    response += f"\n• **Format:** {format_info}"
+                    if size_info and size_info != 'unknown':
+                        response += f" ({size_info})"
+                
+                response += f"\n• **Why this option:** {reasoning}\n\n"
+            
+            # Add guidance for choosing
+            response += self.get_selection_guidance(result['assets'], intent)
+            
+            return response
 
 def get_available_options(product_id: str, matcher: BrandAssetMatcher) -> str:
     """Generate available options for a product"""
@@ -416,14 +549,18 @@ def get_available_options(product_id: str, matcher: BrandAssetMatcher) -> str:
         return options_text
 
 @mcp.tool()
-def get_brand_asset(request: str, background: Optional[str] = None) -> str:
+def get_brand_asset(request: str, background: Optional[str] = None, 
+                   show_alternatives: bool = True) -> str:
     """
-    Get CIQ brand assets with intelligent recommendations.
+    Get CIQ brand assets with intelligent recommendations and multiple options when uncertain.
+    
+    Parameters:
+    - show_alternatives: If True, shows multiple options when confidence is low
     
     Examples:
     - "CIQ logo for light background"
-    - "Fuzzball logo" (defaults to horizontal lockup)
-    - "Warewulf symbol for email signature" 
+    - "Fuzzball logo" (may show multiple options)
+    - "Warewulf symbol for email signature" (high confidence, single result)
     - "Apptainer vertical logo for presentation"
     - "Bridge logo for dark background"
     - "RLC logo for business card"
@@ -457,7 +594,7 @@ def get_brand_asset(request: str, background: Optional[str] = None) -> str:
 
 **Quick Examples:**
 • "CIQ logo" → Company brand
-• "Fuzzball logo" → Horizontal lockup (default)
+• "Fuzzball logo" → May show horizontal + vertical options
 • "Warewulf symbol" → Icon only
 • "Apptainer logo for dark background" → White logo
 
@@ -469,38 +606,20 @@ Which brand asset do you need?"""
     if background:
         intent['background'] = background
     
-    # Find best matching asset
-    result = matcher.find_best_asset(product_id, intent)
+    # Find best assets (single or multiple based on confidence)
+    max_results = 3 if show_alternatives else 1
+    result = matcher.find_best_assets(product_id, intent, max_results)
     
     if not result:
         # Fallback - show available options
         return get_available_options(product_id, matcher)
     
-    asset = result['asset']
-    reasoning = result['reasoning']
-    product_info = matcher.product_info[product_id]
-    
-    # Generate response with intelligent context
-    layout_desc = asset.get('layout', 'logo').replace('icon', 'symbol')
-    enhanced_guidance = matcher.enhance_guidance(asset, product_info, intent.get('context'))
-    alternatives = matcher.generate_alternatives(product_id, asset)
-    
-    response = f"""**{product_info['name']} {layout_desc}:**
-**Download:** {asset['url']}
-
-**Selection reasoning:** {reasoning}
-
-**Usage guidance:** {enhanced_guidance}{alternatives}"""
-    
-    # Add format and size info if relevant
-    format_info = asset.get('format', '').upper()
-    size_info = asset.get('size', '')
-    if format_info or size_info:
-        response += f"\n**Format:** {format_info}"
-        if size_info and size_info != 'unknown':
-            response += f" ({size_info})"
-    
-    return response
+    # Format response
+    return matcher.format_multi_asset_response(
+        matcher.product_info[product_id], 
+        result, 
+        intent
+    )
 
 @mcp.tool()
 def validate_asset_selection(request: str, expected_product: Optional[str] = None, 
@@ -560,9 +679,19 @@ def validate_asset_selection(request: str, expected_product: Optional[str] = Non
     
     # Show what asset would be selected
     if product_id:
-        result = matcher.find_best_asset(product_id, intent)
+        result = matcher.find_best_assets(product_id, intent)
         if result:
-            debug_info += f"\n\n**Selected Asset:**\n• **Score:** {result['score']}\n• **Asset:** {result['asset'].get('filename', 'Unknown')}\n• **Reasoning:** {result['reasoning']}"
+            debug_info += f"\n\n**Selection Result:**"
+            debug_info += f"\n• **Confidence:** {result['confidence']}"
+            debug_info += f"\n• **Multi-asset:** {not result['single_asset']}"
+            if result['single_asset']:
+                debug_info += f"\n• **Asset:** {result['assets'][0][1].get('filename', 'Unknown')}"
+                debug_info += f"\n• **Score:** {result['assets'][0][0]}"
+                debug_info += f"\n• **Reasoning:** {result['assets'][0][2]}"
+            else:
+                debug_info += f"\n• **Options provided:** {len(result['assets'])}"
+                for i, (score, asset, reasoning) in enumerate(result['assets'], 1):
+                    debug_info += f"\n  - Option {i}: {asset.get('layout', 'unknown')} (score: {score})"
     
     return debug_info
 
@@ -578,18 +707,18 @@ def list_all_assets() -> str:
     
     result = """# 🎨 CIQ Brand Assets Library
 
-## **Smart Logo Selection**
-Just ask for what you need - the system will intelligently choose the best format:
+## **Smart Logo Selection with Multi-Asset Recommendations**
+The system intelligently provides single or multiple options based on request clarity:
 
-**Simple Requests:**
+**Simple Requests (may show multiple options):**
 • **"CIQ logo"** → Standard 1-color company logo
-• **"Fuzzball logo"** → Horizontal lockup (symbol + text)
-• **"Warewulf logo for email"** → Horizontal format for wide space
-• **"Apptainer symbol"** → Icon only for tight spaces
+• **"Fuzzball logo"** → Horizontal + vertical options with guidance
+• **"Warewulf logo for email"** → Single horizontal result (high confidence)
+• **"Apptainer symbol"** → Single icon result (explicit request)
 
-**Specific Requests:**
-• **"CIQ 2-color logo for dark background"** → Hero company brand
-• **"Fuzzball vertical logo for social media"** → Stacked layout
+**Specific Requests (single result):**
+• **"CIQ 2-color logo for dark background"** → Exact hero company brand
+• **"Fuzzball vertical logo for social media"** → Exact stacked layout
 • **"Warewulf logo for presentation"** → Vector format when available
 
 ---
@@ -617,11 +746,17 @@ Each product has: **Symbol** (icon only) + **Horizontal** (side-by-side) + **Ver
     result += """
 ---
 
-## **💡 Pro Tips**
-• **Default behavior:** Product logos default to horizontal lockup (best brand recognition)
-• **Explicit overrides:** Say "symbol" for icon-only, "vertical" for stacked layout
-• **Background intelligence:** System detects light/dark preferences from context
-• **Vector preference:** SVG format provided when available for scalability
+## **💡 Enhanced Features**
+• **Smart defaults:** Product logos default to horizontal lockup (best brand recognition)
+• **Multi-asset recommendations:** Shows 2-3 options when request is ambiguous
+• **Context intelligence:** Detects use case from phrases like "email signature", "social media"
+• **Selection guidance:** Explains how to choose between options
+• **Confidence assessment:** Returns single result for clear requests, multiple for ambiguous ones
+
+**Examples of multi-asset responses:**
+- "Fuzzball logo" → Shows horizontal + vertical options with choosing guidance
+- "Warewulf logo for presentation" → May show vector + PNG options for flexibility
+- "Apptainer logo" → Multiple layouts with use case recommendations
 
 **Need help?** Just describe what you're creating: "logo for business card", "icon for mobile app", "presentation header", etc."""
     
