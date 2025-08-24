@@ -1,60 +1,33 @@
 #!/usr/bin/env python3
 """
-CIQ Brand Assets MCP Server - FastMCP Cloud Version
-Intelligent brand asset delivery with smart logo recommendations for all products
-Optimized for FastMCP Cloud serverless deployment
+CIQ Brand Assets MCP Server - Simple FastMCP Cloud Version
+Intelligent brand asset delivery with smart logo recommendations
 """
 
 from mcp.server.fastmcp import FastMCP
 import json
 import requests
 from typing import Optional, Dict, Any
-import asyncio
-import os
-import logging
-
-# Setup logging for cloud environment
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
 
 # Asset metadata URL
 METADATA_URL = 'https://raw.githubusercontent.com/b-ciq/brand-assets/main/metadata/asset-inventory.json'
 
-# Initialize FastMCP server with cloud-optimized settings
-mcp = FastMCP(
-    name="CIQ Brand Assets",
-    instructions="""
-    I provide intelligent brand asset delivery for all CIQ products with smart logo recommendations.
-    
-    Available products: CIQ, Fuzzball, Apptainer, Warewulf-Pro, Ascender-Pro, Bridge, RLC(X), CIQ-Support
-    
-    Just describe what you need:
-    - "CIQ logo for email signature" 
-    - "Fuzzball symbol for dark background"
-    - "Apptainer logo"
-    - "Warewulf symbol"
-    
-    I'll guide you through the best options with brand compliance built-in.
-    """
-)
+# Initialize FastMCP server - simple version for cloud
+mcp = FastMCP("CIQ Brand Assets")
 
 # Global asset data cache
 asset_data = None
 
-async def load_asset_data_async():
-    """Load asset metadata from GitHub asynchronously"""
+def load_asset_data():
+    """Load asset metadata from GitHub"""
     global asset_data
     try:
-        logger.info("Loading asset metadata from GitHub...")
-        # Use asyncio-compatible approach for requests
-        loop = asyncio.get_event_loop()
-        response = await loop.run_in_executor(None, lambda: requests.get(METADATA_URL, timeout=10))
+        response = requests.get(METADATA_URL, timeout=10)
         response.raise_for_status()
         asset_data = response.json()
-        logger.info(f"Loaded metadata for {len(asset_data)} asset categories")
         return True
     except Exception as e:
-        logger.error(f"Failed to load asset data: {e}")
+        print(f"Failed to load asset data: {e}")
         return False
 
 def get_all_products() -> list[str]:
@@ -103,7 +76,6 @@ def determine_logo_type(request: str) -> str:
             if any(keyword in request_lower for keyword in keywords):
                 return product
     
-    # Generic request should ask for clarification
     return 'unclear'
 
 def get_product_assets(product: str) -> Dict[str, Any]:
@@ -118,39 +90,11 @@ def get_product_assets(product: str) -> Dict[str, Any]:
     else:
         return asset_data.get(f'{product}_logos', {})
 
-def parse_user_response(response: str) -> tuple[Optional[str], Optional[str], Optional[str]]:
-    """Parse user response for background, version type, and logo type"""
-    response_lower = response.lower()
-    
-    # Parse background
-    background = None
-    if any(word in response_lower for word in ['light', 'light background', 'white']):
-        background = 'light'
-    elif any(word in response_lower for word in ['dark', 'dark background', 'black']):
-        background = 'dark'
-    
-    # Parse CIQ version type
-    ciq_version = None
-    if '2 color' in response_lower or 'two color' in response_lower or 'hero' in response_lower:
-        ciq_version = '2color'
-    elif '1 color' in response_lower or 'one color' in response_lower or 'standard' in response_lower:
-        ciq_version = '1color'
-    
-    # Parse logo type (symbol vs logotype)
-    logo_type = None
-    if 'symbol' in response_lower or 'icon' in response_lower or 'just symbol' in response_lower:
-        logo_type = 'symbol'
-    elif 'logotype' in response_lower or 'full logo' in response_lower or 'text' in response_lower or 'lockup' in response_lower:
-        logo_type = 'logotype'
-    
-    return background, ciq_version, logo_type
-
 @mcp.tool()
-async def get_brand_asset(
+def get_brand_asset(
     request: str,
     background: Optional[str] = None,
-    element_type: Optional[str] = None,
-    design_context: Optional[str] = None
+    element_type: Optional[str] = None
 ) -> str:
     """
     Get CIQ brand assets with intelligent recommendations.
@@ -160,17 +104,11 @@ async def get_brand_asset(
     - "Fuzzball logo"
     - "Apptainer symbol for dark background"
     - "Warewulf logo"
-    
-    Args:
-        request: What logo do you need?
-        background: What background? ('light' or 'dark') 
-        element_type: For CIQ - standard or hero? For others - symbol or full logotype?
-        design_context: Optional context (not used for decisions)
     """
     
     # Load data if not already loaded
     if asset_data is None:
-        await load_asset_data_async()
+        load_asset_data()
     
     if asset_data is None:
         return "Sorry, I couldn't load the brand assets data. Please try again later."
@@ -187,281 +125,88 @@ Available products: **{product_list}**
 
 For example: "CIQ logo", "Fuzzball logo", "Apptainer logo", "Warewulf logo" """
 
-    # Handle the request for the specific product
-    return await handle_product_request(product, request, background, element_type)
+    # Simple CIQ handling
+    if product == 'ciq':
+        if not background:
+            return """CIQ logo - got it!
 
-async def handle_product_request(product: str, request: str, background: Optional[str], logo_type: Optional[str]) -> str:
-    """Handle logo requests for any product"""
+What **background**:
+• **Light background** (dark logo)
+• **Dark background** (light logo)"""
+        
+        # Find CIQ asset
+        product_assets = get_product_assets('ciq')
+        for key, asset in product_assets.items():
+            if background in key and '2color' in key:  # Prefer 2color
+                return f"""Here's your CIQ logo:
+**Download:** {asset['url']}
+
+Maximum brand recognition - perfect for primary branding"""
+        
+        # Fallback to any matching background
+        for key, asset in product_assets.items():
+            if background in key:
+                return f"""Here's your CIQ logo:
+**Download:** {asset['url']}
+
+Clean and professional CIQ branding"""
     
-    # Get assets for this product
+    # Handle other products
     product_assets = get_product_assets(product)
-    
     if not product_assets:
         return f"Sorry, I don't have {product.title()} logos available yet."
     
-    # Parse from request if not provided
-    parsed_background, parsed_ciq_version, parsed_logo_type = parse_user_response(request)
-    if parsed_background:
-        background = parsed_background
-    if parsed_logo_type:
-        logo_type = parsed_logo_type
-    elif parsed_ciq_version and product == 'ciq':
-        logo_type = parsed_ciq_version
-    
-    # Handle CIQ specially (has unique 1color/2color system)
-    if product == 'ciq':
-        return await handle_ciq_request(request, background, logo_type, product_assets)
-    
-    # Handle all other products (symbol vs logotype)
-    return await handle_generic_product_request(product, request, background, logo_type, product_assets)
-
-async def handle_ciq_request(request: str, background: Optional[str], version_type: Optional[str], assets: Dict[str, Any]) -> str:
-    """Handle CIQ logo requests with 1color/2color logic"""
-    
-    # Ask for missing information
-    if not background and not version_type:
-        return """CIQ logo - got it!
-
-Do you want:
-• **1-color** - Standard version
-• **2-color** - Hero version (main branding)
-
-And what **background**:
-• **Light background** (dark logo)
-• **Dark background** (light logo)"""
-    
-    elif not background:
-        version_desc = "1-color" if version_type == "1color" else "2-color"
-        return f"""CIQ {version_desc} - got it!
-
-What **background**:
-• **Light background** (dark logo)
-• **Dark background** (light logo)"""
-        
-    elif not version_type:
-        bg_desc = "light" if background == "light" else "dark"
-        return f"""CIQ for {bg_desc} background - got it!
-
-Do you want:
-• **1-color** - Standard version
-• **2-color** - Hero version (main branding)"""
-    
-    # Find the right asset
-    asset_key = f'{version_type}-{background}'
-    
-    # Find matching asset (may need to search through assets)
-    matching_asset = None
-    for key, asset in assets.items():
-        if version_type in key and background in key:
-            matching_asset = asset
-            break
-    
-    if not matching_asset:
-        return f"Sorry, I couldn't find the CIQ {version_type} logo for {background} backgrounds."
-    
-    reasoning = 'Maximum brand recognition - use when logo is the primary element' if version_type == '2color' else 'Clean and professional - works in most contexts'
-    
-    return f"""Here's your CIQ logo:
-**Download:** {matching_asset['url']}
-
-{reasoning}"""
-
-async def handle_generic_product_request(product: str, request: str, background: Optional[str], logo_type: Optional[str], assets: Dict[str, Any]) -> str:
-    """Handle logo requests for all non-CIQ products"""
-    
-    # Ask for missing information
-    if not background and not logo_type:
+    if not background:
         return f"""{product.title()} logo - got it!
 
-Do you want:
-• **Symbol only** - Just the icon
-• **Full logotype** - Symbol + text lockup
-
-And what **background**:
-• **Light background** (black logo)
-• **Dark background** (white logo)"""
-    
-    elif not background:
-        logo_desc = "symbol" if logo_type == "symbol" else "full logotype"
-        return f"""{product.title()} {logo_desc} - got it!
-
 What **background**:
 • **Light background** (black logo)
 • **Dark background** (white logo)"""
-        
-    elif not logo_type:
-        bg_desc = "light" if background == "light" else "dark"
-        return f"""{product.title()} for {bg_desc} background - got it!
-
-Do you want:
-• **Symbol only** - Just the icon  
-• **Full logotype** - Symbol + text lockup"""
     
-    # Find matching asset
-    target_layout = 'icon' if logo_type == 'symbol' else 'horizontal'  # Default to horizontal for logotype
+    # Find best matching asset
     target_color = 'black' if background == 'light' else 'white'
     
-    # Search for best matching asset
-    best_match = None
-    for key, asset in assets.items():
-        if (asset.get('layout') == target_layout and 
-            asset.get('color') == target_color and
-            asset.get('size') in ['medium', 'large']):  # Prefer medium or large
-            best_match = asset
-            break
-    
-    # Fallback to any asset with right background
-    if not best_match:
-        for key, asset in assets.items():
-            if (asset.get('background') == background and 
-                asset.get('layout', '').lower() != 'unknown'):
-                best_match = asset
-                break
-    
-    if not best_match:
-        return f"Sorry, I couldn't find the {product.title()} logo for {background} backgrounds."
-    
-    logo_desc = "symbol" if logo_type == "symbol" else "logotype"
-    
-    return f"""Here's your {product.title()} {logo_desc}:
-**Download:** {best_match['url']}
+    for key, asset in product_assets.items():
+        if target_color in asset.get('color', '') or target_color in key:
+            return f"""Here's your {product.title()} logo:
+**Download:** {asset['url']}
 
-{best_match.get('guidance', f'Perfect {product.title()} branding!')}"""
+Perfect {product.title()} branding for {background} backgrounds"""
+    
+    # Fallback
+    first_asset = next(iter(product_assets.values()))
+    return f"""Here's your {product.title()} logo:
+**Download:** {first_asset['url']}
+
+{product.title()} branding asset"""
 
 @mcp.tool()
-async def list_all_assets() -> str:
-    """List all available CIQ brand assets with descriptions and download links"""
-    
-    # Load data if not already loaded
-    if asset_data is None:
-        await load_asset_data_async()
+def list_all_assets() -> str:
+    """List all available CIQ brand assets"""
     
     if asset_data is None:
-        return "Sorry, I couldn't load the brand assets data. Please try again later."
+        load_asset_data()
+    
+    if asset_data is None:
+        return "Sorry, I couldn't load the brand assets data."
     
     result = "# CIQ Brand Assets Library\n\n"
-    
-    # Get all products dynamically
     all_products = get_all_products()
     
     for product in all_products:
         product_assets = get_product_assets(product)
-        
         if product_assets:
-            result += f"## {product.title().replace('-', ' ').replace('_', ' ')} Logos\n\n"
-            
-            # Show a few key assets for each product (not all - too many!)
-            asset_count = 0
-            for key, asset in product_assets.items():
-                if asset_count < 3:  # Show max 3 per product
-                    result += f"• **{asset['filename']}** - {asset['description']}\n  {asset['url']}\n\n"
-                    asset_count += 1
-            
-            if len(product_assets) > 3:
-                result += f"• *...and {len(product_assets) - 3} more {product.title()} variants*\n\n"
+            result += f"## {product.title().replace('-', ' ')} Logos\n"
+            result += f"Available: {len(product_assets)} variants\n\n"
     
-    result += f"""## Quick Reference
+    result += f"""## Available Products
+{', '.join([p.title() for p in all_products])}
 
-**Available Products:** {', '.join([p.title() for p in all_products])}
-
-**For CIQ:**
-- **1-color** - Standard version 
-- **2-color** - Hero version for primary branding
-
-**For All Other Products:**  
-- **Symbol only** - Just the icon (tight spaces)
-- **Full logotype** - Symbol + text (primary branding)
-
-**All products available for:**
-- **Light background** (black logo)
-- **Dark background** (white logo)
-
-Just tell me what you need: "Apptainer logo", "Warewulf symbol for dark background", etc."""
+Just ask: "CIQ logo", "Fuzzball symbol", "Apptainer logo", etc."""
     
     return result
 
-@mcp.tool()
-async def brand_guidelines() -> str:
-    """Get CIQ brand guidelines and usage rules"""
-    
-    # Load data if not already loaded
-    if asset_data is None:
-        await load_asset_data_async()
-    
-    if asset_data is None:
-        return "Sorry, I couldn't load the brand assets data. Please try again later."
-    
-    guidelines = asset_data.get('brand_guidelines', {})
-    available_products = get_all_products()
-    
-    return f"""# CIQ Brand Guidelines
-
-## Available Products
-
-**{len(available_products)} Products Available:** {', '.join([p.title() for p in available_products])}
-
-## Logo Usage Rules
-
-**Clear Space:**
-• Maintain clear space equal to **{guidelines.get('clear_space', '1/4 the height of the Q')}**
-• Never place text, images, or other elements within this protected area
-
-**Minimum Size:**
-• **Digital:** {guidelines.get('minimum_size', '70px height')}
-• Never scale smaller than minimum requirements
-• Always maintain aspect ratio - never stretch or compress
-
-## Brand Colors
-
-**Primary Green:** `{guidelines.get('primary_green', '#229529')}` (PMS 347)
-
-## Logo Selection Guide
-
-**CIQ Logos:**
-• **1-color** - Standard version for most applications
-• **2-color** - Hero version when logo is the primary visual element
-
-**All Other Product Logos:**
-• **Symbol only** - Use when space is limited or you need just the recognizable icon
-• **Full logotype** - Use for primary branding when you want symbol + text
-
-**Background Selection (All Products):**
-• Light background = black logo, Dark background = white logo
-
-## What NOT to Do
-• Don't alter logo colors, fonts, or proportions
-• Don't place logos on busy backgrounds without proper contrast  
-• Don't ignore minimum size requirements
-• Don't use outdated logo versions
-
-Need help choosing? Just describe what you need: "Apptainer logo", "Warewulf symbol", etc."""
-
-# FastMCP Cloud serverless entry point
-# This is called by FastMCP Cloud's serverless infrastructure
-async def app():
-    """FastMCP Cloud serverless entry point"""
-    logger.info("Starting CIQ Brand Assets MCP Server in serverless mode...")
-    
-    # Pre-load asset data for faster responses
-    await load_asset_data_async()
-    
-    return mcp
-
-# For local testing (not used in FastMCP Cloud)
+# Simple startup for FastMCP Cloud
 if __name__ == "__main__":
-    logger.info("Starting CIQ Brand Assets MCP Server locally...")
-    
-    # For local development only
-    import asyncio
-    
-    async def run_server():
-        await load_asset_data_async()
-        # Use async run for local testing
-        await mcp.run_async(
-            transport="streamable-http",
-            host="127.0.0.1",
-            port=8080,
-            path="/mcp"
-        )
-    
-    asyncio.run(run_server())
+    load_asset_data()
+    mcp.run()
