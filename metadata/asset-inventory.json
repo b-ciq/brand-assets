@@ -55,6 +55,206 @@
       "guidance": "Use in neutral/minimal designs when you need the logo to jump out"
     }
   },
+  "fuzzball_logos": {
+    "icon-blk-light": {
+      "filename": "Fuzzball-Icon_blk_L.png",
+      "description": "Fuzzball icon (black) for light backgrounds - Large",
+      "layout": "icon",
+      "color": "black",
+      "background": "light",
+      "size": "L",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball-Icon_blk_L.png",
+      "use_cases": ["favicon", "app_icon", "small_spaces", "avatars"],
+      "guidance": "Perfect for tight spaces where you need just the Fuzzball symbol"
+    },
+    "icon-blk-medium": {
+      "filename": "Fuzzball-Icon_blk_M.png",
+      "description": "Fuzzball icon (black) for light backgrounds - Medium",
+      "layout": "icon",
+      "color": "black", 
+      "background": "light",
+      "size": "M",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball-Icon_blk_M.png",
+      "use_cases": ["favicon", "app_icon", "small_spaces", "avatars"],
+      "guidance": "Perfect for tight spaces where you need just the Fuzzball symbol"
+    },
+    "icon-blk-small": {
+      "filename": "Fuzzball-Icon_blk_S.png", 
+      "description": "Fuzzball icon (black) for light backgrounds - Small",
+      "layout": "icon",
+      "color": "black",
+      "background": "light",
+      "size": "S", 
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball-Icon_blk_S.png",
+      "use_cases": ["favicon", "app_icon", "small_spaces", "avatars"],
+      "guidance": "Perfect for tight spaces where you need just the Fuzzball symbol"
+    },
+    "icon-wht-light": {
+      "filename": "Fuzzball-Icon_wht_L.png",
+      "description": "Fuzzball icon (white) for dark backgrounds - Large",
+      "layout": "icon",
+      "color": "white",
+      "background": "dark",
+      "size": "L",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball-Icon_wht_L.png",
+      "use_cases": ["favicon", "app_icon", "small_spaces", "avatars"],
+      "guidance": "Perfect for tight spaces where you need just the Fuzzball symbol"
+    },
+    "icon-wht-medium": {
+      "filename": "Fuzzball-Icon_wht_M.png",
+      "description": "Fuzzball icon (white) for dark backgrounds - Medium",
+      "layout": "icon",
+      "color": "white",
+      "background": "dark", 
+      "size": "M",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball-Icon_wht_M.png",
+      "use_cases": ["favicon", "app_icon", "small_spaces", "avatars"],
+      "guidance": "Perfect for tight spaces where you need just the Fuzzball symbol"
+    },
+    "icon-wht-small": {
+      "filename": "Fuzzball-Icon_wht_S.png",
+      "description": "Fuzzball icon (white) for dark backgrounds - Small", 
+      "layout": "icon",
+      "color": "white",
+      "background": "dark",
+      "size": "S",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball-Icon_wht_S.png",
+      "use_cases": ["favicon", "app_icon", "small_spaces", "avatars"],
+      "guidance": "Perfect for tight spaces where you need just the Fuzzball symbol"
+    },
+    "horizontal-blk-large": {
+      "filename": "Fuzzball_logo_logo_h-blk_L.png",
+      "description": "Fuzzball horizontal logo (black) for light backgrounds - Large",
+      "layout": "horizontal",
+      "color": "black",
+      "background": "light",
+      "size": "L",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball_logo_logo_h-blk_L.png",
+      "use_cases": ["headers", "business_cards", "letterhead", "wide_banners"],
+      "guidance": "Best for wide spaces - business cards, website headers, email signatures"
+    },
+    "horizontal-blk-medium": {
+      "filename": "Fuzzball_logo_logo_h-blk_M.png",
+      "description": "Fuzzball horizontal logo (black) for light backgrounds - Medium",
+      "layout": "horizontal",
+      "color": "black", 
+      "background": "light",
+      "size": "M",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball_logo_logo_h-blk_M.png",
+      "use_cases": ["headers", "business_cards", "letterhead", "wide_banners"],
+      "guidance": "Best for wide spaces - business cards, website headers, email signatures"
+    },
+    "horizontal-blk-small": {
+      "filename": "Fuzzball_logo_logo_h-blk_S.png",
+      "description": "Fuzzball horizontal logo (black) for light backgrounds - Small",
+      "layout": "horizontal",
+      "color": "black",
+      "background": "light",
+      "size": "S",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball_logo_logo_h-blk_S.png",
+      "use_cases": ["headers", "business_cards", "letterhead", "wide_banners"],
+      "guidance": "Best for wide spaces - business cards, website headers, email signatures"
+    },
+    "horizontal-wht-large": {
+      "filename": "Fuzzball_logo_logo_h-wht_L.png",
+      "description": "Fuzzball horizontal logo (white) for dark backgrounds - Large",
+      "layout": "horizontal",
+      "color": "white",
+      "background": "dark",
+      "size": "L",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball_logo_logo_h-wht_L.png",
+      "use_cases": ["headers", "business_cards", "letterhead", "wide_banners"],
+      "guidance": "Best for wide spaces - business cards, website headers, email signatures"
+    },
+    "horizontal-wht-medium": {
+      "filename": "Fuzzball_logo_logo_h-wht_M.png",
+      "description": "Fuzzball horizontal logo (white) for dark backgrounds - Medium",
+      "layout": "horizontal",
+      "color": "white",
+      "background": "dark",
+      "size": "M",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball_logo_logo_h-wht_M.png", 
+      "use_cases": ["headers", "business_cards", "letterhead", "wide_banners"],
+      "guidance": "Best for wide spaces - business cards, website headers, email signatures"
+    },
+    "horizontal-wht-small": {
+      "filename": "Fuzzball_logo_logo_h-wht_S.png",
+      "description": "Fuzzball horizontal logo (white) for dark backgrounds - Small",
+      "layout": "horizontal",
+      "color": "white",
+      "background": "dark",
+      "size": "S",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball_logo_logo_h-wht_S.png",
+      "use_cases": ["headers", "business_cards", "letterhead", "wide_banners"],
+      "guidance": "Best for wide spaces - business cards, website headers, email signatures"
+    },
+    "vertical-blk-large": {
+      "filename": "Fuzzball_logo_logo_v-blk_L.png",
+      "description": "Fuzzball vertical logo (black) for light backgrounds - Large",
+      "layout": "vertical",
+      "color": "black",
+      "background": "light",
+      "size": "L",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball_logo_logo_v-blk_L.png",
+      "use_cases": ["tall_banners", "social_media_profile", "mobile_layout", "poster"],
+      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts"
+    },
+    "vertical-blk-medium": {
+      "filename": "Fuzzball_logo_logo_v-blk_M.png", 
+      "description": "Fuzzball vertical logo (black) for light backgrounds - Medium",
+      "layout": "vertical",
+      "color": "black",
+      "background": "light",
+      "size": "M",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball_logo_logo_v-blk_M.png",
+      "use_cases": ["tall_banners", "social_media_profile", "mobile_layout", "poster"],
+      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts"
+    },
+    "vertical-blk-small": {
+      "filename": "Fuzzball_logo_logo_v-blk_S.png",
+      "description": "Fuzzball vertical logo (black) for light backgrounds - Small",
+      "layout": "vertical", 
+      "color": "black",
+      "background": "light",
+      "size": "S", 
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball_logo_logo_v-blk_S.png",
+      "use_cases": ["tall_banners", "social_media_profile", "mobile_layout", "poster"],
+      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts"
+    },
+    "vertical-wht-large": {
+      "filename": "Fuzzball_logo_logo_v-wht_L.png",
+      "description": "Fuzzball vertical logo (white) for dark backgrounds - Large",
+      "layout": "vertical",
+      "color": "white",
+      "background": "dark",
+      "size": "L",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball_logo_logo_v-wht_L.png",
+      "use_cases": ["tall_banners", "social_media_profile", "mobile_layout", "poster"],
+      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts"
+    },
+    "vertical-wht-medium": {
+      "filename": "Fuzzball_logo_logo_v-wht_M.png",
+      "description": "Fuzzball vertical logo (white) for dark backgrounds - Medium",
+      "layout": "vertical",
+      "color": "white",
+      "background": "dark",
+      "size": "M",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball_logo_logo_v-wht_M.png",
+      "use_cases": ["tall_banners", "social_media_profile", "mobile_layout", "poster"],
+      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts"
+    },
+    "vertical-wht-small": {
+      "filename": "Fuzzball_logo_logo_v-wht_S.png",
+      "description": "Fuzzball vertical logo (white) for dark backgrounds - Small",
+      "layout": "vertical",
+      "color": "white", 
+      "background": "dark",
+      "size": "S",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball_logo_logo_v-wht_S.png",
+      "use_cases": ["tall_banners", "social_media_profile", "mobile_layout", "poster"],
+      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts"
+    }
+  },
   "brand_guidelines": {
     "clear_space": "Equal to 1/4 the height of the 'Q' in the logo",
     "minimum_size": "70px height for digital applications",
@@ -65,16 +265,42 @@
     }
   },
   "decision_logic": {
-    "main_element": {
-      "description": "Logo is the hero/star of the design",
-      "examples": ["homepage headers", "business cards", "presentation title slides"],
-      "recommended": "2color (most recognizable branding)"
+    "ciq": {
+      "main_element": {
+        "description": "Logo is the hero/star of the design",
+        "examples": ["homepage headers", "business cards", "presentation title slides"],
+        "recommended": "2color (most recognizable branding)"
+      },
+      "supporting_element": {
+        "description": "Logo is secondary/background element", 
+        "examples": ["footers", "watermarks", "corner branding"],
+        "default": "1color neutral (when in doubt)",
+        "alternative": "green (for neutral designs where logo needs to pop)"
+      }
     },
-    "supporting_element": {
-      "description": "Logo is secondary/background element", 
-      "examples": ["footers", "watermarks", "corner branding"],
-      "default": "1color neutral (when in doubt)",
-      "alternative": "green (for neutral designs where logo needs to pop)"
+    "fuzzball": {
+      "layout_selection": {
+        "icon": {
+          "description": "Just the symbol - most compact",
+          "examples": ["favicons", "app icons", "avatars", "tight spaces"],
+          "when_to_use": "Space is very limited or you need just the recognizable symbol"
+        },
+        "horizontal": {
+          "description": "Symbol + text side-by-side", 
+          "examples": ["business cards", "headers", "email signatures", "letterhead"],
+          "when_to_use": "Wide spaces, professional documents, primary branding"
+        },
+        "vertical": {
+          "description": "Symbol + text stacked",
+          "examples": ["social media profiles", "mobile layouts", "tall banners", "posters"], 
+          "when_to_use": "Tall/narrow spaces, mobile-first designs"
+        }
+      },
+      "size_selection": {
+        "small": "Compact usage, small spaces",
+        "medium": "Standard usage, most common", 
+        "large": "Hero placement, high-impact usage"
+      }
     }
   }
 }
