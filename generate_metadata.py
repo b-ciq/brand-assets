@@ -152,6 +152,119 @@ def parse_fuzzball_filename(filename: str) -> Dict[str, Any]:
         "format": filename.split('.')[-1] if '.' in filename else "unknown"
     }
 
+def parse_generic_filename(filename: str, product: str) -> Dict[str, Any]:
+    """
+    Parse generic product logo filename patterns for new products:
+    - {Product}-Icon_{color}_{size}.{ext} (icon pattern)
+    - {Product}-Logo_{color}_{layout}_{size}.{ext} (new logo pattern)  
+    - {Product}_logo_{layout}-{color}.{ext} (SVG logo pattern)
+    - {Product}_icon_{color}.{ext} (SVG icon pattern)
+    """
+    
+    # Icon pattern: Product-Icon_blk_L.png (like Apptainer-Icon_blk_L.png)
+    icon_pattern = rf'{re.escape(product.title())}-Icon_(\w+)_([LMS])\.(\w+)'
+    match = re.match(icon_pattern, filename, re.IGNORECASE)
+    
+    if match:
+        color, size, ext = match.groups()
+        background = 'light' if color.lower() == 'blk' else 'dark'
+        size_full = {'L': 'large', 'M': 'medium', 'S': 'small'}[size.upper()]
+        
+        return {
+            "filename": filename,
+            "description": f"{product.title()} icon ({color}) for {background} backgrounds - {size_full.title()}",
+            "layout": "icon",
+            "color": "black" if color.lower() == 'blk' else "white",
+            "background": background,
+            "size": size_full,
+            "use_cases": ["favicon", "app_icon", "small_spaces", "avatars"],
+            "guidance": f"Perfect for tight spaces where you need just the {product.title()} symbol",
+            "format": ext
+        }
+    
+    # Logo pattern: Product-Logo_blk_v_L.png (like Apptainer-Logo_blk_v_L.png)
+    logo_pattern = rf'{re.escape(product.title())}-Logo_(\w+)_([hv])_([LMS])\.(\w+)'
+    match = re.match(logo_pattern, filename, re.IGNORECASE)
+    
+    if match:
+        color, layout_code, size, ext = match.groups()
+        layout = 'horizontal' if layout_code.lower() == 'h' else 'vertical'
+        background = 'light' if color.lower() == 'blk' else 'dark'
+        size_full = {'L': 'large', 'M': 'medium', 'S': 'small'}[size.upper()]
+        
+        if layout == 'horizontal':
+            use_cases = ["headers", "business_cards", "letterhead", "wide_banners"]
+            guidance = f"Best for wide spaces - business cards, website headers, email signatures"
+        else:  # vertical
+            use_cases = ["tall_banners", "social_media_profile", "mobile_layout", "poster"]
+            guidance = f"Perfect for tall/narrow spaces - social media profiles, mobile layouts"
+        
+        return {
+            "filename": filename,
+            "description": f"{product.title()} {layout} logo ({color}) for {background} backgrounds - {size_full.title()}",
+            "layout": layout,
+            "color": "black" if color.lower() == 'blk' else "white",
+            "background": background,
+            "size": size_full,
+            "use_cases": use_cases,
+            "guidance": guidance,
+            "format": ext
+        }
+    
+    # SVG logo pattern: Product_logo_h-blk.svg (like Apptainer_logo_h-blk.svg)
+    svg_logo_pattern = rf'{re.escape(product.title())}_logo_([hv])-(\w+)\.(\w+)'
+    match = re.match(svg_logo_pattern, filename, re.IGNORECASE)
+    
+    if match:
+        layout_code, color, ext = match.groups()
+        layout = 'horizontal' if layout_code.lower() == 'h' else 'vertical'
+        background = 'light' if color.lower() == 'blk' else 'dark'
+        
+        return {
+            "filename": filename,
+            "description": f"{product.title()} {layout} logo ({color}) for {background} backgrounds - SVG",
+            "layout": layout,
+            "color": "black" if color.lower() == 'blk' else "white",
+            "background": background,
+            "size": "vector",
+            "use_cases": ["scalable", "web", "print"],
+            "guidance": f"Vector format - scales to any size perfectly",
+            "format": ext
+        }
+    
+    # SVG icon pattern: Product_icon_blk.svg (like Apptainer_icon_blk.svg)
+    svg_icon_pattern = rf'{re.escape(product.title())}_icon_(\w+)\.(\w+)'
+    match = re.match(svg_icon_pattern, filename, re.IGNORECASE)
+    
+    if match:
+        color, ext = match.groups()
+        background = 'light' if color.lower() == 'blk' else 'dark'
+        
+        return {
+            "filename": filename,
+            "description": f"{product.title()} icon ({color}) for {background} backgrounds - SVG",
+            "layout": "icon",
+            "color": "black" if color.lower() == 'blk' else "white",
+            "background": background,
+            "size": "vector",
+            "use_cases": ["scalable", "favicon", "app_icon"],
+            "guidance": f"Vector format - scales to any size perfectly",
+            "format": ext
+        }
+    
+    # Fallback - basic file info
+    return {
+        "filename": filename,
+        "description": f"{product.title()} logo variant: {filename}",
+        "layout": "unknown",
+        "color": "unknown", 
+        "background": "unknown",
+        "size": "unknown",
+        "use_cases": ["general"],
+        "guidance": f"{product.title()} logo variant",
+        "format": filename.split('.')[-1] if '.' in filename else "unknown"
+    }
+
 def scan_directory(base_path: str, product: str, asset_type: str) -> Dict[str, Any]:
     """Scan a directory and parse all asset files"""
     directory_path = Path(base_path) / product / asset_type
@@ -171,12 +284,8 @@ def scan_directory(base_path: str, product: str, asset_type: str) -> Dict[str, A
             elif product == 'fuzzball':
                 metadata = parse_fuzzball_filename(filename)
             else:
-                # Generic fallback for new products
-                metadata = {
-                    "filename": filename,
-                    "description": f"{product.title()} {asset_type} - {filename}",
-                    "format": filename.split('.')[-1] if '.' in filename else "unknown"
-                }
+                # Use generic parser for new products
+                metadata = parse_generic_filename(filename, product)
             
             if metadata:
                 # Add URL
@@ -186,12 +295,13 @@ def scan_directory(base_path: str, product: str, asset_type: str) -> Dict[str, A
                 # Generate asset key for current structure
                 if product == 'ciq':
                     asset_key = f"{metadata['variant']}-{metadata['background']}"
-                elif product == 'fuzzball':
+                elif metadata.get('layout') and metadata.get('background') and metadata.get('size'):
                     if metadata['layout'] == 'icon':
                         asset_key = f"icon-{metadata['color'][:3]}-{metadata['size']}"
                     else:
                         asset_key = f"{metadata['layout']}-{metadata['color'][:3]}-{metadata['size']}"
                 else:
+                    # Fallback key
                     asset_key = filename.replace('.', '_').replace('-', '_').lower()
                 
                 assets[asset_key] = metadata
@@ -263,12 +373,7 @@ def main():
     print(f"🔍 Scanning asset directories in: {args.base_path}")
     
     # Build complete metadata structure
-    metadata = {
-        "logos": {},
-        "fuzzball_logos": {},
-        "brand_guidelines": generate_brand_guidelines(),
-        "decision_logic": generate_decision_logic()
-    }
+    all_product_logos = {}
     
     # Scan each product
     for product in args.products:
@@ -276,53 +381,83 @@ def main():
         
         # For current directory structure, check both old and new paths
         if args.base_path == '.':
-            # Check old structure first: /CIQ-logos, /fuzzball-logos  
-            old_path = Path(f"{product.upper()}-logos" if product == 'ciq' else f"{product}-logos")
-            if old_path.exists():
-                print(f"   Found old structure: {old_path}")
-                assets = {}
-                for file_path in old_path.glob("*"):
-                    if file_path.is_file() and not file_path.name.startswith('.'):
-                        filename = file_path.name
-                        
-                        if product == 'ciq':
-                            asset_metadata = parse_ciq_filename(filename)
-                        else:
-                            asset_metadata = parse_fuzzball_filename(filename)
-                        
-                        if asset_metadata:
-                            # Use old URL path for now
-                            asset_metadata["url"] = f"{BASE_URL}/{old_path}/{filename}"
+            # Check old structure first: /CIQ-logos, /fuzzball-logos, /Product-logos
+            old_dirs = []
+            if product == 'ciq':
+                old_dirs = ['CIQ-logos']
+            elif product == 'fuzzball':
+                old_dirs = ['fuzzball-logos'] 
+            else:
+                # For new products, try multiple possible directory names
+                old_dirs = [
+                    f"{product.title()}-logos",
+                    f"{product}-logos", 
+                    f"{product.upper()}-logos",
+                    f"{product.title().replace('-', ' ').replace(' ', '-')}-logos"
+                ]
+            
+            assets_found = {}
+            for dir_name in old_dirs:
+                old_path = Path(dir_name)
+                if old_path.exists():
+                    print(f"   Found old structure: {old_path}")
+                    for file_path in old_path.glob("*"):
+                        if file_path.is_file() and not file_path.name.startswith('.'):
+                            filename = file_path.name
                             
-                            # Generate key
                             if product == 'ciq':
-                                key = f"{asset_metadata['variant']}-{asset_metadata['background']}"
-                                metadata["logos"][key] = asset_metadata
+                                asset_metadata = parse_ciq_filename(filename)
+                            elif product == 'fuzzball':
+                                asset_metadata = parse_fuzzball_filename(filename)
                             else:
-                                if asset_metadata['layout'] == 'icon':
-                                    key = f"icon-{asset_metadata['color'][:3]}-{asset_metadata['size']}"
+                                asset_metadata = parse_generic_filename(filename, product)
+                            
+                            if asset_metadata:
+                                # Use old URL path for now
+                                asset_metadata["url"] = f"{BASE_URL}/{old_path}/{filename}"
+                                
+                                # Generate key
+                                if product == 'ciq':
+                                    key = f"{asset_metadata['variant']}-{asset_metadata['background']}"
+                                elif asset_metadata.get('layout') and asset_metadata.get('background') and asset_metadata.get('size'):
+                                    if asset_metadata['layout'] == 'icon':
+                                        key = f"icon-{asset_metadata['color'][:3]}-{asset_metadata['size']}"
+                                    else:
+                                        key = f"{asset_metadata['layout']}-{asset_metadata['color'][:3]}-{asset_metadata['size']}"
                                 else:
-                                    key = f"{asset_metadata['layout']}-{asset_metadata['color'][:3]}-{asset_metadata['size']}"
-                                metadata["fuzzball_logos"][key] = asset_metadata
+                                    key = filename.replace('.', '_').replace('-', '_').lower()
+                                
+                                assets_found[key] = asset_metadata
             
             # Also check new structure: /assets/{product}/logos
             new_path = Path("assets") / product / "logos"
             if new_path.exists():
                 print(f"   Found new structure: {new_path}")
                 new_assets = scan_directory("assets", product, "logos")
-                
-                if product == 'ciq':
-                    metadata["logos"].update(new_assets)
-                else:
-                    metadata["fuzzball_logos"].update(new_assets)
+                assets_found.update(new_assets)
+            
+            all_product_logos[product] = assets_found
         else:
             # Scan new structure
             assets = scan_directory(args.base_path, product, "logos")
-            
-            if product == 'ciq':
-                metadata["logos"].update(assets)
-            else:
-                metadata["fuzzball_logos"].update(assets)
+            all_product_logos[product] = assets
+    
+    # Build final metadata structure
+    metadata = {
+        "brand_guidelines": generate_brand_guidelines(),
+        "decision_logic": generate_decision_logic()
+    }
+    
+    # Add product-specific logos
+    if 'ciq' in all_product_logos:
+        metadata["logos"] = all_product_logos['ciq']
+    if 'fuzzball' in all_product_logos:
+        metadata["fuzzball_logos"] = all_product_logos['fuzzball']
+    
+    # Add other products as separate categories
+    for product, assets in all_product_logos.items():
+        if product not in ['ciq', 'fuzzball'] and assets:
+            metadata[f"{product}_logos"] = assets
     
     # Create output directory if it doesn't exist
     output_path = Path(args.output)
@@ -334,14 +469,20 @@ def main():
     
     # Print summary
     print(f"\n✅ Generated metadata: {args.output}")
-    print(f"   CIQ logos: {len(metadata['logos'])}")
-    print(f"   Fuzzball logos: {len(metadata['fuzzball_logos'])}")
-    print(f"   Total assets: {len(metadata['logos']) + len(metadata['fuzzball_logos'])}")
+    total_assets = 0
+    for product, assets in all_product_logos.items():
+        if assets:
+            print(f"   {product.title()} logos: {len(assets)}")
+            total_assets += len(assets)
+    print(f"   Total assets: {total_assets}")
     
     print(f"\n🚀 Next steps:")
     print(f"   1. Review generated metadata: {args.output}")
     print(f"   2. Restart your MCP server to use new metadata")
     print(f"   3. Test with: 'I need a CIQ logo' or 'Fuzzball logo'")
+    
+    if total_assets > 30:
+        print(f"\n🎉 Great! Found {total_assets} total assets - much better!")
 
 if __name__ == "__main__":
     main()
