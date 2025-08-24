@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
 CIQ Brand Assets MCP Server
-Intelligent brand asset delivery with smart logo recommendations
+Intelligent brand asset delivery with smart logo recommendations for all products
 """
 
 from mcp.server.fastmcp import FastMCP
 import json
 import requests
-from typing import Optional
+from typing import Optional, Dict, Any
 import asyncio
 
 # Asset metadata URL
@@ -31,28 +31,66 @@ def load_asset_data():
         print(f"Failed to load asset data: {e}")
         return False
 
+def get_all_products() -> list[str]:
+    """Get list of all available products from metadata"""
+    if not asset_data:
+        return []
+    
+    products = []
+    
+    # Add standard products
+    if 'logos' in asset_data:
+        products.append('ciq')
+    if 'fuzzball_logos' in asset_data:
+        products.append('fuzzball')
+    
+    # Add all other products (ending with _logos)
+    for key in asset_data.keys():
+        if key.endswith('_logos') and key not in ['fuzzball_logos']:
+            product_name = key.replace('_logos', '')
+            products.append(product_name)
+    
+    return products
+
 def determine_logo_type(request: str) -> str:
-    """Determine which type of logo the user is requesting"""
+    """Determine which product logo the user is requesting"""
     request_lower = request.lower()
     
-    # Check for Fuzzball-specific keywords
-    fuzzball_keywords = [
-        'fuzzball', 'fuzz ball'
-    ]
+    # Get all available products
+    available_products = get_all_products()
     
-    if any(keyword in request_lower for keyword in fuzzball_keywords):
-        return 'fuzzball'
+    # Check for specific product keywords
+    product_keywords = {
+        'ciq': ['ciq', 'company logo', 'main logo', 'brand logo'],
+        'fuzzball': ['fuzzball', 'fuzz ball'],
+        'apptainer': ['apptainer'],
+        'warewulf-pro': ['warewulf', 'warewulf pro', 'warewulf-pro'],
+        'ascender-pro': ['ascender', 'ascender pro', 'ascender-pro'],
+        'bridge': ['bridge'],
+        'rlcx': ['rlc', 'rocky linux', 'rocky', 'rlc-ai', 'rlc ai', 'rlc hardened', 'rlc-hardened'],
+        'ciq-support': ['ciq support', 'ciq-support', 'support']
+    }
     
-    # Check for main CIQ logo indicators
-    main_logo_keywords = [
-        'ciq logo', 'ciq', 'company logo', 'main logo', 'brand logo'
-    ]
+    # Check each product
+    for product, keywords in product_keywords.items():
+        if product in available_products:
+            if any(keyword in request_lower for keyword in keywords):
+                return product
     
-    if any(keyword in request_lower for keyword in main_logo_keywords):
-        return 'ciq'
-    
-    # Generic requests should ask for clarification
+    # Generic request should ask for clarification
     return 'unclear'
+
+def get_product_assets(product: str) -> Dict[str, Any]:
+    """Get assets for a specific product"""
+    if not asset_data:
+        return {}
+    
+    if product == 'ciq':
+        return asset_data.get('logos', {})
+    elif product == 'fuzzball':
+        return asset_data.get('fuzzball_logos', {})
+    else:
+        return asset_data.get(f'{product}_logos', {})
 
 def parse_user_response(response: str) -> tuple[Optional[str], Optional[str], Optional[str]]:
     """Parse user response for background, version type, and logo type"""
@@ -72,14 +110,14 @@ def parse_user_response(response: str) -> tuple[Optional[str], Optional[str], Op
     elif '1 color' in response_lower or 'one color' in response_lower or 'standard' in response_lower:
         ciq_version = '1color'
     
-    # Parse Fuzzball type
-    fuzzball_type = None
+    # Parse logo type (symbol vs logotype)
+    logo_type = None
     if 'symbol' in response_lower or 'icon' in response_lower or 'just symbol' in response_lower:
-        fuzzball_type = 'symbol'
+        logo_type = 'symbol'
     elif 'logotype' in response_lower or 'full logo' in response_lower or 'text' in response_lower or 'lockup' in response_lower:
-        fuzzball_type = 'logotype'
+        logo_type = 'logotype'
     
-    return background, ciq_version, fuzzball_type
+    return background, ciq_version, logo_type
 
 @mcp.tool()
 async def get_brand_asset(
@@ -94,13 +132,13 @@ async def get_brand_asset(
     Just tell me what you need:
     - "I need a CIQ logo" 
     - "Fuzzball logo"
-    - "CIQ 2-color for light background"
-    - "Fuzzball symbol for dark background"
+    - "Apptainer symbol for dark background"
+    - "Warewulf logo"
     
     Args:
         request: What logo do you need?
         background: What background? ('light' or 'dark') 
-        element_type: For CIQ - standard or hero? For Fuzzball - symbol or full logotype?
+        element_type: For CIQ - standard or hero? For others - symbol or full logotype?
         design_context: Optional context (not used for decisions)
     """
     
@@ -111,99 +149,48 @@ async def get_brand_asset(
     if asset_data is None:
         return "Sorry, I couldn't load the brand assets data. Please try again later."
     
-    # Determine which logo type they want
-    logo_type = determine_logo_type(request)
+    # Determine which product they want
+    product = determine_logo_type(request)
     
-    if logo_type == 'unclear':
-        return """Which logo do you need?
+    if product == 'unclear':
+        available_products = get_all_products()
+        product_list = ', '.join([p.title() for p in available_products])
+        return f"""Which logo do you need?
 
-• **CIQ** - Company logo
-• **Fuzzball** - Product logo"""
+Available products: **{product_list}**
 
-    elif logo_type == 'fuzzball':
-        return await handle_fuzzball_request(request, background, element_type)
-    
-    elif logo_type == 'ciq':
-        return await handle_ciq_request(request, background, element_type)
-    
-    return "I couldn't determine which logo you need. Please specify CIQ or Fuzzball."
+For example: "CIQ logo", "Fuzzball logo", "Apptainer logo", "Warewulf logo"""
 
-async def handle_fuzzball_request(request: str, background: Optional[str], logo_type: Optional[str]) -> str:
-    """Handle Fuzzball logo requests"""
+    # Handle the request for the specific product
+    return await handle_product_request(product, request, background, element_type)
+
+async def handle_product_request(product: str, request: str, background: Optional[str], logo_type: Optional[str]) -> str:
+    """Handle logo requests for any product"""
     
-    # Try to parse from request
-    parsed_background, _, parsed_fuzzball_type = parse_user_response(request)
+    # Get assets for this product
+    product_assets = get_product_assets(product)
+    
+    if not product_assets:
+        return f"Sorry, I don't have {product.title()} logos available yet."
+    
+    # Parse from request if not provided
+    parsed_background, parsed_ciq_version, parsed_logo_type = parse_user_response(request)
     if parsed_background:
         background = parsed_background
-    if parsed_fuzzball_type:
-        logo_type = parsed_fuzzball_type
+    if parsed_logo_type:
+        logo_type = parsed_logo_type
+    elif parsed_ciq_version and product == 'ciq':
+        logo_type = parsed_ciq_version
     
-    # Ask for missing information
-    if not background and not logo_type:
-        return """Fuzzball logo - got it!
-
-Do you want:
-• **Symbol only** - Just the Fuzzball icon
-• **Full logotype** - Symbol + text lockup
-
-And what **background**:
-• **Light background** (we'll give you black)
-• **Dark background** (we'll give you white)"""
+    # Handle CIQ specially (has unique 1color/2color system)
+    if product == 'ciq':
+        return await handle_ciq_request(request, background, logo_type, product_assets)
     
-    elif not background:
-        logo_desc = "symbol" if logo_type == "symbol" else "full logotype"
-        return f"""Fuzzball {logo_desc} - got it!
+    # Handle all other products (symbol vs logotype)
+    return await handle_generic_product_request(product, request, background, logo_type, product_assets)
 
-What **background**:
-• **Light background** (black logo)
-• **Dark background** (white logo)"""
-        
-    elif not logo_type:
-        bg_desc = "light" if background == "light" else "dark"
-        return f"""Fuzzball for {bg_desc} background - got it!
-
-Do you want:
-• **Symbol only** - Just the Fuzzball icon  
-• **Full logotype** - Symbol + text lockup"""
-    
-    # Build asset key and get logo
-    color = 'blk' if background == 'light' else 'wht'
-    
-    if logo_type == 'symbol':
-        # Icon version
-        asset_key = f'icon-{color}-medium'  # Default to medium size
-        asset = asset_data['fuzzball_logos'].get(asset_key)
-        
-        if not asset:
-            return f"Sorry, I couldn't find the Fuzzball symbol for {background} backgrounds."
-        
-        return f"""Here's your Fuzzball symbol:
-**Download:** {asset['url']}
-
-Perfect for tight spaces where you need just the recognizable Fuzzball icon."""
-    
-    else:  # logotype
-        # Default to horizontal layout, medium size
-        asset_key = f'horizontal-{color}-medium'
-        asset = asset_data['fuzzball_logos'].get(asset_key)
-        
-        if not asset:
-            return f"Sorry, I couldn't find the Fuzzball logotype for {background} backgrounds."
-        
-        return f"""Here's your Fuzzball logotype:
-**Download:** {asset['url']}
-
-Full logo with symbol + text lockup - perfect for primary branding."""
-
-async def handle_ciq_request(request: str, background: Optional[str], version_type: Optional[str]) -> str:
-    """Handle CIQ logo requests"""
-    
-    # Try to parse from request
-    parsed_background, parsed_ciq_version, _ = parse_user_response(request)
-    if parsed_background:
-        background = parsed_background
-    if parsed_ciq_version:
-        version_type = parsed_ciq_version
+async def handle_ciq_request(request: str, background: Optional[str], version_type: Optional[str], assets: Dict[str, Any]) -> str:
+    """Handle CIQ logo requests with 1color/2color logic"""
     
     # Ask for missing information
     if not background and not version_type:
@@ -233,22 +220,87 @@ Do you want:
 • **1-color** - Standard version
 • **2-color** - Hero version (main branding)"""
     
-    # Build asset key and get logo
-    if version_type == '2color':
-        asset_key = f'2color-{background}'
-        reasoning = 'Maximum brand recognition - use when logo is the primary element'
-    else:  # 1color
-        asset_key = f'1color-{background}'
-        reasoning = 'Clean and professional - works in most contexts'
+    # Find the right asset
+    asset_key = f'{version_type}-{background}'
     
-    asset = asset_data['logos'].get(asset_key)
-    if not asset:
+    # Find matching asset (may need to search through assets)
+    matching_asset = None
+    for key, asset in assets.items():
+        if version_type in key and background in key:
+            matching_asset = asset
+            break
+    
+    if not matching_asset:
         return f"Sorry, I couldn't find the CIQ {version_type} logo for {background} backgrounds."
     
+    reasoning = 'Maximum brand recognition - use when logo is the primary element' if version_type == '2color' else 'Clean and professional - works in most contexts'
+    
     return f"""Here's your CIQ logo:
-**Download:** {asset['url']}
+**Download:** {matching_asset['url']}
 
 {reasoning}"""
+
+async def handle_generic_product_request(product: str, request: str, background: Optional[str], logo_type: Optional[str], assets: Dict[str, Any]) -> str:
+    """Handle logo requests for all non-CIQ products"""
+    
+    # Ask for missing information
+    if not background and not logo_type:
+        return f"""{product.title()} logo - got it!
+
+Do you want:
+• **Symbol only** - Just the icon
+• **Full logotype** - Symbol + text lockup
+
+And what **background**:
+• **Light background** (black logo)
+• **Dark background** (white logo)"""
+    
+    elif not background:
+        logo_desc = "symbol" if logo_type == "symbol" else "full logotype"
+        return f"""{product.title()} {logo_desc} - got it!
+
+What **background**:
+• **Light background** (black logo)
+• **Dark background** (white logo)"""
+        
+    elif not logo_type:
+        bg_desc = "light" if background == "light" else "dark"
+        return f"""{product.title()} for {bg_desc} background - got it!
+
+Do you want:
+• **Symbol only** - Just the icon  
+• **Full logotype** - Symbol + text lockup"""
+    
+    # Find matching asset
+    target_layout = 'icon' if logo_type == 'symbol' else 'horizontal'  # Default to horizontal for logotype
+    target_color = 'black' if background == 'light' else 'white'
+    
+    # Search for best matching asset
+    best_match = None
+    for key, asset in assets.items():
+        if (asset.get('layout') == target_layout and 
+            asset.get('color') == target_color and
+            asset.get('size') in ['medium', 'large']):  # Prefer medium or large
+            best_match = asset
+            break
+    
+    # Fallback to any asset with right background
+    if not best_match:
+        for key, asset in assets.items():
+            if (asset.get('background') == background and 
+                asset.get('layout', '').lower() != 'unknown'):
+                best_match = asset
+                break
+    
+    if not best_match:
+        return f"Sorry, I couldn't find the {product.title()} logo for {background} backgrounds."
+    
+    logo_desc = "symbol" if logo_type == "symbol" else "logotype"
+    
+    return f"""Here's your {product.title()} {logo_desc}:
+**Download:** {best_match['url']}
+
+{best_match.get('guidance', f'Perfect {product.title()} branding!')}"""
 
 @mcp.tool()
 async def list_all_assets() -> str:
@@ -263,40 +315,42 @@ async def list_all_assets() -> str:
     
     result = "# CIQ Brand Assets Library\n\n"
     
-    # CIQ Logos
-    result += "## CIQ Company Logos\n\n"
+    # Get all products dynamically
+    all_products = get_all_products()
     
-    for key, asset in asset_data['logos'].items():
-        result += f"• **{asset['filename']}** - {asset['description']}\n  {asset['url']}\n\n"
+    for product in all_products:
+        product_assets = get_product_assets(product)
+        
+        if product_assets:
+            result += f"## {product.title().replace('-', ' ').replace('_', ' ')} Logos\n\n"
+            
+            # Show a few key assets for each product (not all - too many!)
+            asset_count = 0
+            for key, asset in product_assets.items():
+                if asset_count < 3:  # Show max 3 per product
+                    result += f"• **{asset['filename']}** - {asset['description']}\n  {asset['url']}\n\n"
+                    asset_count += 1
+            
+            if len(product_assets) > 3:
+                result += f"• *...and {len(product_assets) - 3} more {product.title()} variants*\n\n"
     
-    # Fuzzball Logos - show key variants
-    result += "## Fuzzball Product Logos\n\n"
-    
-    # Show just the medium size variants for clarity
-    key_fuzzball_assets = [
-        'icon-blk-medium', 'icon-wht-medium',
-        'horizontal-blk-medium', 'horizontal-wht-medium', 
-        'vertical-blk-medium', 'vertical-wht-medium'
-    ]
-    
-    for key in key_fuzzball_assets:
-        if key in asset_data['fuzzball_logos']:
-            asset = asset_data['fuzzball_logos'][key]
-            result += f"• **{asset['filename']}** - {asset['description']}\n  {asset['url']}\n\n"
-    
-    result += """## Quick Reference
+    result += f"""## Quick Reference
 
-**CIQ Logos:**
-- **1-color** - Standard version for most uses
+**Available Products:** {', '.join([p.title() for p in all_products])}
+
+**For CIQ:**
+- **1-color** - Standard version 
 - **2-color** - Hero version for primary branding
-- Choose **light** or **dark** background version
 
-**Fuzzball Logos:**  
+**For All Other Products:**  
 - **Symbol only** - Just the icon (tight spaces)
 - **Full logotype** - Symbol + text (primary branding)
-- Choose **light** or **dark** background version
 
-Just tell me what you need: "CIQ 2-color for light background" or "Fuzzball symbol for dark background" """
+**All products available for:**
+- **Light background** (black logo)
+- **Dark background** (white logo)
+
+Just tell me what you need: "Apptainer logo", "Warewulf symbol for dark background", etc."""
     
     return result
 
@@ -312,8 +366,13 @@ async def brand_guidelines() -> str:
         return "Sorry, I couldn't load the brand assets data. Please try again later."
     
     guidelines = asset_data.get('brand_guidelines', {})
+    available_products = get_all_products()
     
     return f"""# CIQ Brand Guidelines
+
+## Available Products
+
+**{len(available_products)} Products Available:** {', '.join([p.title() for p in available_products])}
 
 ## Logo Usage Rules
 
@@ -335,12 +394,13 @@ async def brand_guidelines() -> str:
 **CIQ Logos:**
 • **1-color** - Standard version for most applications
 • **2-color** - Hero version when logo is the primary visual element
-• Choose based on background: light background = dark logo, dark background = light logo
 
-**Fuzzball Logos:**
+**All Other Product Logos:**
 • **Symbol only** - Use when space is limited or you need just the recognizable icon
 • **Full logotype** - Use for primary branding when you want symbol + text
-• Choose based on background: light background = black logo, dark background = white logo
+
+**Background Selection (All Products):**
+• Light background = black logo, Dark background = white logo
 
 ## What NOT to Do
 • Don't alter logo colors, fonts, or proportions
@@ -348,7 +408,7 @@ async def brand_guidelines() -> str:
 • Don't ignore minimum size requirements
 • Don't use outdated logo versions
 
-Need help choosing? Just describe what you need: "CIQ logo" or "Fuzzball logo" and I'll help you get the right version."""
+Need help choosing? Just describe what you need: "Apptainer logo", "Warewulf symbol", etc."""
 
 if __name__ == "__main__":
     # Load asset data on startup
