@@ -8,134 +8,186 @@
       "dark_background": "light_grey"
     }
   },
+  "decision_logic": {
+    "ciq": {
+      "main_element": {
+        "description": "Logo is the hero/star of the design",
+        "examples": [
+          "homepage headers",
+          "business cards",
+          "presentation title slides"
+        ],
+        "recommended": "2color (most recognizable branding)"
+      },
+      "supporting_element": {
+        "description": "Logo is secondary/background element",
+        "examples": [
+          "footers",
+          "watermarks",
+          "corner branding"
+        ],
+        "default": "1color neutral (when in doubt)",
+        "alternative": "green (for neutral designs where logo needs to pop)"
+      }
+    },
+    "fuzzball": {
+      "layout_selection": {
+        "icon": {
+          "description": "Just the symbol - most compact",
+          "examples": [
+            "favicons",
+            "app icons",
+            "avatars",
+            "tight spaces"
+          ],
+          "when_to_use": "Space is very limited or you need just the recognizable symbol"
+        },
+        "horizontal": {
+          "description": "Symbol + text side-by-side",
+          "examples": [
+            "business cards",
+            "headers",
+            "email signatures",
+            "letterhead"
+          ],
+          "when_to_use": "Wide spaces, professional documents, primary branding"
+        },
+        "vertical": {
+          "description": "Symbol + text stacked",
+          "examples": [
+            "social media profiles",
+            "mobile layouts",
+            "tall banners",
+            "posters"
+          ],
+          "when_to_use": "Tall/narrow spaces, mobile-first designs"
+        }
+      },
+      "size_selection": {
+        "small": "Compact usage, small spaces",
+        "medium": "Standard usage, most common",
+        "large": "Hero placement, high-impact usage"
+      }
+    }
+  },
   "logos": {
-    "ciq_1color_neutral_light": {
+    "1color-light": {
       "filename": "CIQ-Logo-1color-light.png",
-      "description": "CIQ 1-color neutral logo for light backgrounds",
-      "color_type": "1color_neutral",
-      "color_mode": "light",
-      "color": "black",
+      "description": "Single color (neutral) logo for light backgrounds",
+      "use_cases": [
+        "supporting_element",
+        "footer",
+        "watermark",
+        "professional_documents"
+      ],
+      "colors": [
+        "neutral"
+      ],
       "background": "light",
-      "size": "large",
-      "use_cases": [
-        "headers",
-        "business_cards",
-        "letterhead",
-        "general_branding"
-      ],
-      "guidance": "Standard CIQ company logo for most applications",
+      "guidance": "Professional and clean - won't compete with colorful design elements",
+      "variant": "1color",
       "format": "png",
-      "product": "ciq",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/CIQ-logos/CIQ-Logo-1color-light.png",
-      "path": "CIQ-logos/CIQ-Logo-1color-light.png"
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/CIQ-logos/CIQ-Logo-1color-light.png"
     },
-    "ciq_1color_neutral_dark": {
-      "filename": "CIQ-Logo-1color-dark.png",
-      "description": "CIQ 1-color neutral logo for dark backgrounds",
-      "color_type": "1color_neutral",
-      "color_mode": "dark",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "headers",
-        "business_cards",
-        "letterhead",
-        "general_branding"
-      ],
-      "guidance": "Standard CIQ company logo for most applications",
-      "format": "png",
-      "product": "ciq",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/CIQ-logos/CIQ-Logo-1color-dark.png",
-      "path": "CIQ-logos/CIQ-Logo-1color-dark.png"
-    },
-    "ciq_1color_green_light": {
-      "filename": "CIQ-Logo-green-light.png",
-      "description": "CIQ 1-color green logo for light backgrounds",
-      "color_type": "1color_green",
-      "color_mode": "light",
-      "color": "green",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "headers",
-        "business_cards",
-        "letterhead",
-        "advertising",
-        "social_media"
-      ],
-      "guidance": "Standard+ version to be used when the logo is not the hero of the page but the surrounding elements are not visually exciting or when the branding needs an extra punch, like in some advertising and social media",
-      "format": "png",
-      "product": "ciq",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/CIQ-logos/CIQ-Logo-green-light.png",
-      "path": "CIQ-logos/CIQ-Logo-green-light.png"
-    },
-    "ciq_1color_green_dark": {
-      "filename": "CIQ-Logo-green-dark.png",
-      "description": "CIQ 1-color green logo for dark backgrounds",
-      "color_type": "1color_green",
-      "color_mode": "dark",
-      "color": "green",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "headers",
-        "business_cards",
-        "letterhead",
-        "advertising",
-        "social_media"
-      ],
-      "guidance": "Standard+ version to be used when the logo is not the hero of the page but the surrounding elements are not visually exciting or when the branding needs an extra punch, like in some advertising and social media",
-      "format": "png",
-      "product": "ciq",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/CIQ-logos/CIQ-Logo-green-dark.png",
-      "path": "CIQ-logos/CIQ-Logo-green-dark.png"
-    },
-    "ciq_2color_light": {
-      "filename": "CIQ-Logo-2color-light.png",
-      "description": "CIQ 2-color logo for light backgrounds",
-      "color_type": "2color",
-      "color_mode": "light",
-      "color": "black_green",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "hero_sections",
-        "presentations",
-        "marketing_materials",
-        "large_displays"
-      ],
-      "guidance": "Hero CIQ company logo when logo is primary visual element",
-      "format": "png",
-      "product": "ciq",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/CIQ-logos/CIQ-Logo-2color-light.png",
-      "path": "CIQ-logos/CIQ-Logo-2color-light.png"
-    },
-    "ciq_2color_dark": {
+    "2color-dark": {
       "filename": "CIQ-Logo-2color-dark.png",
-      "description": "CIQ 2-color logo for dark backgrounds",
-      "color_type": "2color",
-      "color_mode": "dark",
-      "color": "white_green",
-      "background": "dark",
-      "size": "large",
+      "description": "Two color (neutral + green) logo for dark backgrounds",
       "use_cases": [
-        "hero_sections",
-        "presentations",
-        "marketing_materials",
-        "large_displays"
+        "hero",
+        "main_element",
+        "homepage",
+        "business_cards",
+        "presentations"
       ],
-      "guidance": "Hero CIQ company logo when logo is primary visual element",
+      "colors": [
+        "neutral",
+        "PMS_347_green"
+      ],
+      "background": "dark",
+      "guidance": "Most recognizable CIQ branding - use when logo is the star of the design",
+      "variant": "2color",
       "format": "png",
-      "product": "ciq",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/CIQ-logos/CIQ-Logo-2color-dark.png",
-      "path": "CIQ-logos/CIQ-Logo-2color-dark.png"
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/CIQ-logos/CIQ-Logo-2color-dark.png"
+    },
+    "green-light": {
+      "filename": "CIQ-Logo-green-light.png",
+      "description": "Single color (green) logo for light backgrounds",
+      "use_cases": [
+        "supporting_element",
+        "minimal_designs",
+        "advertising",
+        "brand_accent"
+      ],
+      "colors": [
+        "PMS_347_green"
+      ],
+      "background": "light",
+      "guidance": "Use in neutral/minimal designs when you need the logo to jump out",
+      "variant": "green",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/CIQ-logos/CIQ-Logo-green-light.png"
+    },
+    "1color-dark": {
+      "filename": "CIQ-Logo-1color-dark.png",
+      "description": "Single color (neutral) logo for dark backgrounds",
+      "use_cases": [
+        "supporting_element",
+        "footer",
+        "watermark",
+        "professional_documents"
+      ],
+      "colors": [
+        "neutral"
+      ],
+      "background": "dark",
+      "guidance": "Professional and clean - won't compete with colorful design elements",
+      "variant": "1color",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/ciq/logos/CIQ-Logo-1color-dark.png"
+    },
+    "2color-light": {
+      "filename": "CIQ-Logo-2color-light.png",
+      "description": "Two color (neutral + green) logo for light backgrounds",
+      "use_cases": [
+        "hero",
+        "main_element",
+        "homepage",
+        "business_cards",
+        "presentations"
+      ],
+      "colors": [
+        "neutral",
+        "PMS_347_green"
+      ],
+      "background": "light",
+      "guidance": "Most recognizable CIQ branding - use when logo is the star of the design",
+      "variant": "2color",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/CIQ-logos/CIQ-Logo-2color-light.png"
+    },
+    "green-dark": {
+      "filename": "CIQ-Logo-green-dark.png",
+      "description": "Single color (green) logo for dark backgrounds",
+      "use_cases": [
+        "supporting_element",
+        "minimal_designs",
+        "advertising",
+        "brand_accent"
+      ],
+      "colors": [
+        "PMS_347_green"
+      ],
+      "background": "dark",
+      "guidance": "Use in neutral/minimal designs when you need the logo to jump out",
+      "variant": "green",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/CIQ-logos/CIQ-Logo-green-dark.png"
     }
   },
   "fuzzball_logos": {
-    "fuzzball_icon_whi_large": {
+    "icon-whi-large": {
       "filename": "Fuzzball-Icon_wht_L.png",
-      "description": "Fuzzball icon logo (white) for dark backgrounds - Large",
+      "description": "Fuzzball icon (wht) for dark backgrounds - Large",
       "layout": "icon",
       "color": "white",
       "background": "dark",
@@ -148,16 +200,48 @@
       ],
       "guidance": "Perfect for tight spaces where you need just the Fuzzball symbol",
       "format": "png",
-      "product": "fuzzball",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball-Icon_wht_L.png",
-      "path": "fuzzball-logos/Fuzzball-Icon_wht_L.png"
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball-Icon_wht_L.png"
     },
-    "fuzzball_horizontal_bla_large": {
+    "horizontal-bla-large": {
+      "filename": "Fuzzball_logo_logo_h-blk_L.png",
+      "description": "Fuzzball horizontal logo (blk) for light backgrounds - Large",
+      "layout": "horizontal",
+      "color": "black",
+      "background": "light",
+      "size": "large",
+      "use_cases": [
+        "headers",
+        "business_cards",
+        "letterhead",
+        "wide_banners"
+      ],
+      "guidance": "Best for wide spaces - business cards, website headers, email signatures",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball_logo_logo_h-blk_L.png"
+    },
+    "vertical-bla-large": {
+      "filename": "Fuzzball_logo_logo_v-blk_L.png",
+      "description": "Fuzzball vertical logo (blk) for light backgrounds - Large",
+      "layout": "vertical",
+      "color": "black",
+      "background": "light",
+      "size": "large",
+      "use_cases": [
+        "tall_banners",
+        "social_media_profile",
+        "mobile_layout",
+        "poster"
+      ],
+      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball_logo_logo_v-blk_L.png"
+    },
+    "horizontal-whi-large": {
       "filename": "Fuzzball_logo_logo_h-wht_L.png",
-      "description": "Fuzzball horizontal logo (black) for light backgrounds - Large",
+      "description": "Fuzzball horizontal logo (wht) for dark backgrounds - Large",
       "layout": "horizontal",
-      "color": "black",
-      "background": "light",
+      "color": "white",
+      "background": "dark",
       "size": "large",
       "use_cases": [
         "headers",
@@ -167,32 +251,11 @@
       ],
       "guidance": "Best for wide spaces - business cards, website headers, email signatures",
       "format": "png",
-      "product": "fuzzball",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball_logo_logo_h-wht_L.png",
-      "path": "fuzzball-logos/Fuzzball_logo_logo_h-wht_L.png"
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball_logo_logo_h-wht_L.png"
     },
-    "fuzzball_vertical_bla_large": {
-      "filename": "Fuzzball_logo_logo_v-wht_L.png",
-      "description": "Fuzzball vertical logo (black) for light backgrounds - Large",
-      "layout": "vertical",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "tall_banners",
-        "social_media_profile",
-        "mobile_layout",
-        "poster"
-      ],
-      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
-      "format": "png",
-      "product": "fuzzball",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball_logo_logo_v-wht_L.png",
-      "path": "fuzzball-logos/Fuzzball_logo_logo_v-wht_L.png"
-    },
-    "fuzzball_icon_bla_large": {
+    "icon-bla-large": {
       "filename": "Fuzzball-Icon_blk_L.png",
-      "description": "Fuzzball icon logo (black) for light backgrounds - Large",
+      "description": "Fuzzball icon (blk) for light backgrounds - Large",
       "layout": "icon",
       "color": "black",
       "background": "light",
@@ -205,15 +268,11 @@
       ],
       "guidance": "Perfect for tight spaces where you need just the Fuzzball symbol",
       "format": "png",
-      "product": "fuzzball",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball-Icon_blk_L.png",
-      "path": "fuzzball-logos/Fuzzball-Icon_blk_L.png"
-    }
-  },
-  "apptainer_logos": {
-    "apptainer_vertical_whi_large": {
-      "filename": "Apptainer-Logo_wht_v_L.png",
-      "description": "Apptainer vertical logo (white) for dark backgrounds - Large",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/fuzzball/logos/Fuzzball-Icon_blk_L.png"
+    },
+    "vertical-whi-large": {
+      "filename": "Fuzzball_logo_logo_v-wht_L.png",
+      "description": "Fuzzball vertical logo (wht) for dark backgrounds - Large",
       "layout": "vertical",
       "color": "white",
       "background": "dark",
@@ -226,747 +285,7 @@
       ],
       "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
       "format": "png",
-      "product": "apptainer",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Apptainer-logos/Apptainer-Logo_wht_v_L.png",
-      "path": "Apptainer-logos/Apptainer-Logo_wht_v_L.png"
-    },
-    "apptainer_icon_bla_large": {
-      "filename": "Apptainer-Icon_blk_L.png",
-      "description": "Apptainer icon logo (black) for light backgrounds - Large",
-      "layout": "icon",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the Apptainer symbol",
-      "format": "png",
-      "product": "apptainer",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Apptainer-logos/Apptainer-Icon_blk_L.png",
-      "path": "Apptainer-logos/Apptainer-Icon_blk_L.png"
-    },
-    "apptainer_vertical_bla_large": {
-      "filename": "Apptainer-Logo_blk_v_L.png",
-      "description": "Apptainer vertical logo (black) for light backgrounds - Large",
-      "layout": "vertical",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "tall_banners",
-        "social_media_profile",
-        "mobile_layout",
-        "poster"
-      ],
-      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
-      "format": "png",
-      "product": "apptainer",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Apptainer-logos/Apptainer-Logo_blk_v_L.png",
-      "path": "Apptainer-logos/Apptainer-Logo_blk_v_L.png"
-    },
-    "apptainer_icon_whi_large": {
-      "filename": "Apptainer-Icon_wht_L.png",
-      "description": "Apptainer icon logo (white) for dark backgrounds - Large",
-      "layout": "icon",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the Apptainer symbol",
-      "format": "png",
-      "product": "apptainer",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Apptainer-logos/Apptainer-Icon_wht_L.png",
-      "path": "Apptainer-logos/Apptainer-Icon_wht_L.png"
-    }
-  },
-  "warewulf_pro_logos": {
-    "warewulf_pro_horizontal_bla_large": {
-      "filename": "WarewulfPro-Logo_blk_h_L.png",
-      "description": "Warewulf-Pro horizontal logo (black) for light backgrounds - Large",
-      "layout": "horizontal",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "headers",
-        "business_cards",
-        "letterhead",
-        "wide_banners"
-      ],
-      "guidance": "Best for wide spaces - business cards, website headers, email signatures",
-      "format": "png",
-      "product": "warewulf-pro",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Warewulf-Pro-logos/WarewulfPro-Logo_blk_h_L.png",
-      "path": "Warewulf-Pro-logos/WarewulfPro-Logo_blk_h_L.png"
-    },
-    "warewulf_pro_icon_bla_large": {
-      "filename": "Warewulf_icon_blk_L.png",
-      "description": "Warewulf-Pro icon logo (black) for light backgrounds - Large",
-      "layout": "icon",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the Warewulf-Pro symbol",
-      "format": "png",
-      "product": "warewulf-pro",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Warewulf-Pro-logos/Warewulf_icon_blk_L.png",
-      "path": "Warewulf-Pro-logos/Warewulf_icon_blk_L.png"
-    },
-    "warewulf_pro_vertical_bla_large": {
-      "filename": "WarewulfPro-Logo_blk_v_L.png",
-      "description": "Warewulf-Pro vertical logo (black) for light backgrounds - Large",
-      "layout": "vertical",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "tall_banners",
-        "social_media_profile",
-        "mobile_layout",
-        "poster"
-      ],
-      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
-      "format": "png",
-      "product": "warewulf-pro",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Warewulf-Pro-logos/WarewulfPro-Logo_blk_v_L.png",
-      "path": "Warewulf-Pro-logos/WarewulfPro-Logo_blk_v_L.png"
-    },
-    "warewulf_pro_icon_whi_large": {
-      "filename": "Warewulf_icon_wht_L.png",
-      "description": "Warewulf-Pro icon logo (white) for dark backgrounds - Large",
-      "layout": "icon",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the Warewulf-Pro symbol",
-      "format": "png",
-      "product": "warewulf-pro",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Warewulf-Pro-logos/Warewulf_icon_wht_L.png",
-      "path": "Warewulf-Pro-logos/Warewulf_icon_wht_L.png"
-    },
-    "warewulf_pro_horizontal_whi_large": {
-      "filename": "WarewulfPro-Logo_wht_h_L.png",
-      "description": "Warewulf-Pro horizontal logo (white) for dark backgrounds - Large",
-      "layout": "horizontal",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "headers",
-        "business_cards",
-        "letterhead",
-        "wide_banners"
-      ],
-      "guidance": "Best for wide spaces - business cards, website headers, email signatures",
-      "format": "png",
-      "product": "warewulf-pro",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Warewulf-Pro-logos/WarewulfPro-Logo_wht_h_L.png",
-      "path": "Warewulf-Pro-logos/WarewulfPro-Logo_wht_h_L.png"
-    },
-    "warewulf_pro_vertical_whi_large": {
-      "filename": "WarewulfPro-Logo_wht_v_L.png",
-      "description": "Warewulf-Pro vertical logo (white) for dark backgrounds - Large",
-      "layout": "vertical",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "tall_banners",
-        "social_media_profile",
-        "mobile_layout",
-        "poster"
-      ],
-      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
-      "format": "png",
-      "product": "warewulf-pro",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Warewulf-Pro-logos/WarewulfPro-Logo_wht_v_L.png",
-      "path": "Warewulf-Pro-logos/WarewulfPro-Logo_wht_v_L.png"
-    }
-  },
-  "ascender_pro_logos": {
-    "ascender_pro_horizontal_bla_large": {
-      "filename": "AscenderPro_logo_h-blk_L.png",
-      "description": "Ascender-Pro horizontal logo (black) for light backgrounds - Large",
-      "layout": "horizontal",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "headers",
-        "business_cards",
-        "letterhead",
-        "wide_banners"
-      ],
-      "guidance": "Best for wide spaces - business cards, website headers, email signatures",
-      "format": "png",
-      "product": "ascender-pro",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Ascender-Pro-logos/AscenderPro_logo_h-blk_L.png",
-      "path": "Ascender-Pro-logos/AscenderPro_logo_h-blk_L.png"
-    },
-    "ascender_pro_vertical_bla_large": {
-      "filename": "AscenderPro_logo_v-blk_L.png",
-      "description": "Ascender-Pro vertical logo (black) for light backgrounds - Large",
-      "layout": "vertical",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "tall_banners",
-        "social_media_profile",
-        "mobile_layout",
-        "poster"
-      ],
-      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
-      "format": "png",
-      "product": "ascender-pro",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Ascender-Pro-logos/AscenderPro_logo_v-blk_L.png",
-      "path": "Ascender-Pro-logos/AscenderPro_logo_v-blk_L.png"
-    },
-    "ascender_pro_icon_whi_large": {
-      "filename": "AscenderPro-Icon_wht_L.png",
-      "description": "Ascender-Pro icon logo (white) for dark backgrounds - Large",
-      "layout": "icon",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the Ascender-Pro symbol",
-      "format": "png",
-      "product": "ascender-pro",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Ascender-Pro-logos/AscenderPro-Icon_wht_L.png",
-      "path": "Ascender-Pro-logos/AscenderPro-Icon_wht_L.png"
-    },
-    "ascender_pro_icon_bla_large": {
-      "filename": "AscenderPro-Icon_blk_L.png",
-      "description": "Ascender-Pro icon logo (black) for light backgrounds - Large",
-      "layout": "icon",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the Ascender-Pro symbol",
-      "format": "png",
-      "product": "ascender-pro",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Ascender-Pro-logos/AscenderPro-Icon_blk_L.png",
-      "path": "Ascender-Pro-logos/AscenderPro-Icon_blk_L.png"
-    }
-  },
-  "bridge_logos": {
-    "bridge_icon_whi_large": {
-      "filename": "CIQ-Bridge_icon_wht_L.png",
-      "description": "Bridge icon logo (white) for dark backgrounds - Large",
-      "layout": "icon",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the Bridge symbol",
-      "format": "png",
-      "product": "bridge",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Bridge-logos/CIQ-Bridge_icon_wht_L.png",
-      "path": "Bridge-logos/CIQ-Bridge_icon_wht_L.png"
-    },
-    "bridge_icon_bla_large": {
-      "filename": "CIQ-Bridge_icon_blk_L.png",
-      "description": "Bridge icon logo (black) for light backgrounds - Large",
-      "layout": "icon",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the Bridge symbol",
-      "format": "png",
-      "product": "bridge",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Bridge-logos/CIQ-Bridge_icon_blk_L.png",
-      "path": "Bridge-logos/CIQ-Bridge_icon_blk_L.png"
-    },
-    "bridge_vertical_bla_large": {
-      "filename": "CIQ-Bridge_logo_v-blk_L.png",
-      "description": "Bridge vertical logo (black) for light backgrounds - Large",
-      "layout": "vertical",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "tall_banners",
-        "social_media_profile",
-        "mobile_layout",
-        "poster"
-      ],
-      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
-      "format": "png",
-      "product": "bridge",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Bridge-logos/CIQ-Bridge_logo_v-blk_L.png",
-      "path": "Bridge-logos/CIQ-Bridge_logo_v-blk_L.png"
-    },
-    "bridge_horizontal_bla_large": {
-      "filename": "CIQ-Bridge-logo_h_blk_L.png",
-      "description": "Bridge horizontal logo (black) for light backgrounds - Large",
-      "layout": "horizontal",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "headers",
-        "business_cards",
-        "letterhead",
-        "wide_banners"
-      ],
-      "guidance": "Best for wide spaces - business cards, website headers, email signatures",
-      "format": "png",
-      "product": "bridge",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Bridge-logos/CIQ-Bridge-logo_h_blk_L.png",
-      "path": "Bridge-logos/CIQ-Bridge-logo_h_blk_L.png"
-    },
-    "bridge_horizontal_whi_large": {
-      "filename": "CIQ-Bridge-logo_h_wht_L.png",
-      "description": "Bridge horizontal logo (white) for dark backgrounds - Large",
-      "layout": "horizontal",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "headers",
-        "business_cards",
-        "letterhead",
-        "wide_banners"
-      ],
-      "guidance": "Best for wide spaces - business cards, website headers, email signatures",
-      "format": "png",
-      "product": "bridge",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Bridge-logos/CIQ-Bridge-logo_h_wht_L.png",
-      "path": "Bridge-logos/CIQ-Bridge-logo_h_wht_L.png"
-    }
-  },
-  "ciq_support_logos": {
-    "ciq_support_horizontal_bla_large": {
-      "filename": "CIQ-Support_logo_h-wht_L.png",
-      "description": "CIQ-Support horizontal logo (black) for light backgrounds - Large",
-      "layout": "horizontal",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "headers",
-        "business_cards",
-        "letterhead",
-        "wide_banners"
-      ],
-      "guidance": "Best for wide spaces - business cards, website headers, email signatures",
-      "format": "png",
-      "product": "ciq-support",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/CIQ-Support-logos/CIQ-Support_logo_h-wht_L.png",
-      "path": "CIQ-Support-logos/CIQ-Support_logo_h-wht_L.png"
-    },
-    "ciq_support_icon_bla_large": {
-      "filename": "CIQ-Support_icon_blk_L.png",
-      "description": "CIQ-Support icon logo (black) for light backgrounds - Large",
-      "layout": "icon",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the CIQ-Support symbol",
-      "format": "png",
-      "product": "ciq-support",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/CIQ-Support-logos/CIQ-Support_icon_blk_L.png",
-      "path": "CIQ-Support-logos/CIQ-Support_icon_blk_L.png"
-    },
-    "ciq_support_icon_whi_large": {
-      "filename": "CIQ-Support_icon_wht_L.png",
-      "description": "CIQ-Support icon logo (white) for dark backgrounds - Large",
-      "layout": "icon",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the CIQ-Support symbol",
-      "format": "png",
-      "product": "ciq-support",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/CIQ-Support-logos/CIQ-Support_icon_wht_L.png",
-      "path": "CIQ-Support-logos/CIQ-Support_icon_wht_L.png"
-    }
-  },
-  "rlc_logos": {
-    "rlc_vertical_bla_large": {
-      "filename": "RLC_logo_v-wht_L.png",
-      "description": "RLC vertical logo (black) for light backgrounds - Large",
-      "layout": "vertical",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "tall_banners",
-        "social_media_profile",
-        "mobile_layout",
-        "poster"
-      ],
-      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
-      "format": "png",
-      "product": "rlc",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/rlc_logos/RLC_logo_v-wht_L.png",
-      "path": "rlc_logos/RLC_logo_v-wht_L.png"
-    },
-    "rlc_horizontal_whi_large": {
-      "filename": "RLC_Logo_wht_h_L.png",
-      "description": "RLC horizontal logo (white) for dark backgrounds - Large",
-      "layout": "horizontal",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "headers",
-        "business_cards",
-        "letterhead",
-        "wide_banners"
-      ],
-      "guidance": "Best for wide spaces - business cards, website headers, email signatures",
-      "format": "png",
-      "product": "rlc",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/rlc_logos/RLC_Logo_wht_h_L.png",
-      "path": "rlc_logos/RLC_Logo_wht_h_L.png"
-    },
-    "rlc_horizontal_bla_large": {
-      "filename": "RLC_Logo_blk_h_L.png",
-      "description": "RLC horizontal logo (black) for light backgrounds - Large",
-      "layout": "horizontal",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "headers",
-        "business_cards",
-        "letterhead",
-        "wide_banners"
-      ],
-      "guidance": "Best for wide spaces - business cards, website headers, email signatures",
-      "format": "png",
-      "product": "rlc",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/rlc_logos/RLC_Logo_blk_h_L.png",
-      "path": "rlc_logos/RLC_Logo_blk_h_L.png"
-    },
-    "rlc_icon_bla_large": {
-      "filename": "RLC_icon_blk_L.png",
-      "description": "RLC icon logo (black) for light backgrounds - Large",
-      "layout": "icon",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the RLC symbol",
-      "format": "png",
-      "product": "rlc",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/rlc_logos/RLC_icon_blk_L.png",
-      "path": "rlc_logos/RLC_icon_blk_L.png"
-    },
-    "rlc_icon_whi_large": {
-      "filename": "RLC_icon_wht_L.png",
-      "description": "RLC icon logo (white) for dark backgrounds - Large",
-      "layout": "icon",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the RLC symbol",
-      "format": "png",
-      "product": "rlc",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/rlc_logos/RLC_icon_wht_L.png",
-      "path": "rlc_logos/RLC_icon_wht_L.png"
-    }
-  },
-  "rlc_ai_logos": {
-    "rlc_ai_horizontal_bla_large": {
-      "filename": "RLC-AI_logo_h-blk_L.png",
-      "description": "RLC-AI horizontal logo (black) for light backgrounds - Large",
-      "layout": "horizontal",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "headers",
-        "business_cards",
-        "letterhead",
-        "wide_banners"
-      ],
-      "guidance": "Best for wide spaces - business cards, website headers, email signatures",
-      "format": "png",
-      "product": "rlc-ai",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/rlc_ai_logos/RLC-AI_logo_h-blk_L.png",
-      "path": "rlc_ai_logos/RLC-AI_logo_h-blk_L.png"
-    },
-    "rlc_ai_vertical_bla_large": {
-      "filename": "RLC-AI_logo_v-blk_L.png",
-      "description": "RLC-AI vertical logo (black) for light backgrounds - Large",
-      "layout": "vertical",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "tall_banners",
-        "social_media_profile",
-        "mobile_layout",
-        "poster"
-      ],
-      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
-      "format": "png",
-      "product": "rlc-ai",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/rlc_ai_logos/RLC-AI_logo_v-blk_L.png",
-      "path": "rlc_ai_logos/RLC-AI_logo_v-blk_L.png"
-    },
-    "rlc_ai_icon_bla_large": {
-      "filename": "RLC-AI_icon_blk_L.png",
-      "description": "RLC-AI icon logo (black) for light backgrounds - Large",
-      "layout": "icon",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the RLC-AI symbol",
-      "format": "png",
-      "product": "rlc-ai",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/rlc_ai_logos/RLC-AI_icon_blk_L.png",
-      "path": "rlc_ai_logos/RLC-AI_icon_blk_L.png"
-    },
-    "rlc_ai_icon_whi_large": {
-      "filename": "RLC-AI_icon_wht_L.png",
-      "description": "RLC-AI icon logo (white) for dark backgrounds - Large",
-      "layout": "icon",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the RLC-AI symbol",
-      "format": "png",
-      "product": "rlc-ai",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/rlc_ai_logos/RLC-AI_icon_wht_L.png",
-      "path": "rlc_ai_logos/RLC-AI_icon_wht_L.png"
-    }
-  },
-  "rlc_hardened_logos": {
-    "rlc_hardened_vertical_whi_large": {
-      "filename": "RLC-H-Logo_v_wht_L.png",
-      "description": "RLC-Hardened vertical logo (white) for dark backgrounds - Large",
-      "layout": "vertical",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "tall_banners",
-        "social_media_profile",
-        "mobile_layout",
-        "poster"
-      ],
-      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
-      "format": "png",
-      "product": "rlc-hardened",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/rlc_hardened_logos/RLC-H-Logo_v_wht_L.png",
-      "path": "rlc_hardened_logos/RLC-H-Logo_v_wht_L.png"
-    },
-    "rlc_hardened_horizontal_whi_large": {
-      "filename": "RLC-H-logo_h_wht_L.png",
-      "description": "RLC-Hardened horizontal logo (white) for dark backgrounds - Large",
-      "layout": "horizontal",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "headers",
-        "business_cards",
-        "letterhead",
-        "wide_banners"
-      ],
-      "guidance": "Best for wide spaces - business cards, website headers, email signatures",
-      "format": "png",
-      "product": "rlc-hardened",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/rlc_hardened_logos/RLC-H-logo_h_wht_L.png",
-      "path": "rlc_hardened_logos/RLC-H-logo_h_wht_L.png"
-    },
-    "rlc_hardened_vertical_bla_large": {
-      "filename": "RLC-H-Logo_v_blk_L.png",
-      "description": "RLC-Hardened vertical logo (black) for light backgrounds - Large",
-      "layout": "vertical",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "tall_banners",
-        "social_media_profile",
-        "mobile_layout",
-        "poster"
-      ],
-      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
-      "format": "png",
-      "product": "rlc-hardened",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/rlc_hardened_logos/RLC-H-Logo_v_blk_L.png",
-      "path": "rlc_hardened_logos/RLC-H-Logo_v_blk_L.png"
-    },
-    "rlc_hardened_horizontal_bla_large": {
-      "filename": "RLC-H-logo_h_blk_L.png",
-      "description": "RLC-Hardened horizontal logo (black) for light backgrounds - Large",
-      "layout": "horizontal",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "headers",
-        "business_cards",
-        "letterhead",
-        "wide_banners"
-      ],
-      "guidance": "Best for wide spaces - business cards, website headers, email signatures",
-      "format": "png",
-      "product": "rlc-hardened",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/rlc_hardened_logos/RLC-H-logo_h_blk_L.png",
-      "path": "rlc_hardened_logos/RLC-H-logo_h_blk_L.png"
-    },
-    "rlc_hardened_icon_bla_large": {
-      "filename": "RLC-H-Icon_blk_L.png",
-      "description": "RLC-Hardened icon logo (black) for light backgrounds - Large",
-      "layout": "icon",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the RLC-Hardened symbol",
-      "format": "png",
-      "product": "rlc-hardened",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/rlc_hardened_logos/RLC-H-Icon_blk_L.png",
-      "path": "rlc_hardened_logos/RLC-H-Icon_blk_L.png"
-    },
-    "rlc_hardened_icon_whi_large": {
-      "filename": "RLC-H-Icon_wht_L.png",
-      "description": "RLC-Hardened icon logo (white) for dark backgrounds - Large",
-      "layout": "icon",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the RLC-Hardened symbol",
-      "format": "png",
-      "product": "rlc-hardened",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/rlc_hardened_logos/RLC-H-Icon_wht_L.png",
-      "path": "rlc_hardened_logos/RLC-H-Icon_wht_L.png"
-    }
-  },
-  "rlc_lts_logos": {
-    "rlc_lts_vertical_bla_large": {
-      "filename": "RLC-LTS_logo_v-blk_L.png",
-      "description": "RLC-LTS vertical logo (black) for light backgrounds - Large",
-      "layout": "vertical",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "tall_banners",
-        "social_media_profile",
-        "mobile_layout",
-        "poster"
-      ],
-      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
-      "format": "png",
-      "product": "rlc-lts",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/rlc_lts_logos/RLC-LTS_logo_v-blk_L.png",
-      "path": "rlc_lts_logos/RLC-LTS_logo_v-blk_L.png"
-    },
-    "rlc_lts_horizontal_bla_large": {
-      "filename": "RLC-LTS_logo_h-blk_L.png",
-      "description": "RLC-LTS horizontal logo (black) for light backgrounds - Large",
-      "layout": "horizontal",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "headers",
-        "business_cards",
-        "letterhead",
-        "wide_banners"
-      ],
-      "guidance": "Best for wide spaces - business cards, website headers, email signatures",
-      "format": "png",
-      "product": "rlc-lts",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/rlc_lts_logos/RLC-LTS_logo_h-blk_L.png",
-      "path": "rlc_lts_logos/RLC-LTS_logo_h-blk_L.png"
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball_logo_logo_v-wht_L.png"
     }
   }
 }
