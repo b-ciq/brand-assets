@@ -184,7 +184,7 @@ class AssetMatcher:
                 'name': 'Ascender',
                 'description': 'Infrastructure automation platform',
                 'structure_type': 'product',
-                'asset_key': 'ascender_pro_logos'
+                'asset_key': 'ascender_logos'
             },
             'bridge': {
                 'name': 'Bridge',
