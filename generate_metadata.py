@@ -244,6 +244,35 @@ def parse_generic_filename(filename: str, product: str) -> Dict[str, Any]:
             "format": ext
         }
     
+    # PNG logo pattern: Product_logo_h-blk_L.png (like AscenderPro_logo_h-blk_L.png)
+    png_logo_pattern = rf'{re.escape(product.title())}_logo_([hv])-(\w+)_([LMS])\.(\w+)'
+    match = re.match(png_logo_pattern, filename, re.IGNORECASE)
+    
+    if match:
+        layout_code, color, size, ext = match.groups()
+        layout = 'horizontal' if layout_code.lower() == 'h' else 'vertical'
+        background = 'light' if color.lower() == 'blk' else 'dark'
+        size_full = {'L': 'large', 'M': 'medium', 'S': 'small'}[size.upper()]
+        
+        if layout == 'horizontal':
+            use_cases = ["headers", "business_cards", "letterhead", "wide_banners"]
+            guidance = f"Best for wide spaces - business cards, website headers, email signatures"
+        else:  # vertical
+            use_cases = ["tall_banners", "social_media_profile", "mobile_layout", "poster"]
+            guidance = f"Perfect for tall/narrow spaces - social media profiles, mobile layouts"
+        
+        return {
+            "filename": filename,
+            "description": f"{product.title()} {layout} logo ({color}) for {background} backgrounds - {size_full.title()}",
+            "layout": layout,
+            "color": "black" if color.lower() == 'blk' else "white",
+            "background": background,
+            "size": size_full,
+            "use_cases": use_cases,
+            "guidance": guidance,
+            "format": ext
+        }
+
     # SVG logo pattern: Product_logo_h-blk.svg (like Apptainer_logo_h-blk.svg)
     svg_logo_pattern = rf'{re.escape(product.title())}_logo_([hv])-(\w+)\.(\w+)'
     match = re.match(svg_logo_pattern, filename, re.IGNORECASE)
