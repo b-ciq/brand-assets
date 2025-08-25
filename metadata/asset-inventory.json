@@ -288,80 +288,10 @@
       "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/fuzzball/logos/Fuzzball_logo_logo_v-wht_L.png"
     }
   },
-  "apptainer_logos": {
-    "vertical-whi-large": {
-      "filename": "Apptainer-Logo_wht_v_L.png",
-      "description": "Apptainer vertical logo (wht) for dark backgrounds - Large",
-      "layout": "vertical",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "tall_banners",
-        "social_media_profile",
-        "mobile_layout",
-        "poster"
-      ],
-      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/apptainer/logos/Apptainer-Logo_wht_v_L.png"
-    },
-    "icon-bla-large": {
-      "filename": "Apptainer-Icon_blk_L.png",
-      "description": "Apptainer icon (blk) for light backgrounds - Large",
-      "layout": "icon",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the Apptainer symbol",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/apptainer/logos/Apptainer-Icon_blk_L.png"
-    },
-    "vertical-bla-large": {
-      "filename": "Apptainer-Logo_blk_v_L.png",
-      "description": "Apptainer vertical logo (blk) for light backgrounds - Large",
-      "layout": "vertical",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "tall_banners",
-        "social_media_profile",
-        "mobile_layout",
-        "poster"
-      ],
-      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/apptainer/logos/Apptainer-Logo_blk_v_L.png"
-    },
-    "icon-whi-large": {
-      "filename": "Apptainer-Icon_wht_L.png",
-      "description": "Apptainer icon (wht) for dark backgrounds - Large",
-      "layout": "icon",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the Apptainer symbol",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/apptainer/logos/Apptainer-Icon_wht_L.png"
-    }
-  },
-  "warewulf_logos": {
+  "bridge_logos": {
     "unknown-unk-unknown": {
-      "filename": "WarewulfPro-Logo_wht_v_L.png",
-      "description": "Warewulf logo variant: WarewulfPro-Logo_wht_v_L.png",
+      "filename": "CIQ-Bridge_logo_v-blk_L.png",
+      "description": "Bridge logo variant: CIQ-Bridge_logo_v-blk_L.png",
       "layout": "unknown",
       "color": "unknown",
       "background": "unknown",
@@ -369,25 +299,43 @@
       "use_cases": [
         "general"
       ],
-      "guidance": "Warewulf logo variant",
+      "guidance": "Bridge logo variant",
       "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/warewulf/logos/WarewulfPro-Logo_wht_v_L.png"
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/bridge/logos/CIQ-Bridge_logo_v-blk_L.png"
     },
-    "icon-whi-vector": {
-      "filename": "Warewulf_icon_wht_L.png",
-      "description": "Warewulf icon (wht_L) for dark backgrounds - SVG",
-      "layout": "icon",
+    "h-bla-large": {
+      "filename": "CIQ-Bridge-logo_h_blk_L.png",
+      "description": "Bridge logo (blk) for light backgrounds - Large",
+      "layout": "h",
+      "color": "black",
+      "background": "light",
+      "size": "large",
+      "use_cases": [
+        "tall_banners",
+        "social_media_profile",
+        "mobile_layout",
+        "poster"
+      ],
+      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/bridge/logos/CIQ-Bridge-logo_h_blk_L.png"
+    },
+    "h-whi-large": {
+      "filename": "CIQ-Bridge-logo_h_wht_L.png",
+      "description": "Bridge logo (wht) for dark backgrounds - Large",
+      "layout": "h",
       "color": "white",
       "background": "dark",
-      "size": "vector",
+      "size": "large",
       "use_cases": [
-        "scalable",
-        "favicon",
-        "app_icon"
+        "tall_banners",
+        "social_media_profile",
+        "mobile_layout",
+        "poster"
       ],
-      "guidance": "Vector format - scales to any size perfectly",
+      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
       "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/warewulf/logos/Warewulf_icon_wht_L.png"
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/bridge/logos/CIQ-Bridge-logo_h_wht_L.png"
     }
   },
   "rlc-hardened_logos": {
@@ -454,90 +402,6 @@
       "guidance": "Ascender logo variant",
       "format": "png",
       "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/ascender/logos/AscenderPro-Icon_blk_L.png"
-    }
-  },
-  "rlc-lts_logos": {
-    "vertical-whi-vector": {
-      "filename": "RLC-LTS_logo_v-blk_L.png",
-      "description": "Rlc-Lts vertical logo (blk_L) for dark backgrounds - SVG",
-      "layout": "vertical",
-      "color": "white",
-      "background": "dark",
-      "size": "vector",
-      "use_cases": [
-        "scalable",
-        "web",
-        "print"
-      ],
-      "guidance": "Vector format - scales to any size perfectly",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc-lts/logos/RLC-LTS_logo_v-blk_L.png"
-    },
-    "horizontal-whi-vector": {
-      "filename": "RLC-LTS_logo_h-blk_L.png",
-      "description": "Rlc-Lts horizontal logo (blk_L) for dark backgrounds - SVG",
-      "layout": "horizontal",
-      "color": "white",
-      "background": "dark",
-      "size": "vector",
-      "use_cases": [
-        "scalable",
-        "web",
-        "print"
-      ],
-      "guidance": "Vector format - scales to any size perfectly",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc-lts/logos/RLC-LTS_logo_h-blk_L.png"
-    }
-  },
-  "bridge_logos": {
-    "unknown-unk-unknown": {
-      "filename": "CIQ-Bridge_logo_v-blk_L.png",
-      "description": "Bridge logo variant: CIQ-Bridge_logo_v-blk_L.png",
-      "layout": "unknown",
-      "color": "unknown",
-      "background": "unknown",
-      "size": "unknown",
-      "use_cases": [
-        "general"
-      ],
-      "guidance": "Bridge logo variant",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/bridge/logos/CIQ-Bridge_logo_v-blk_L.png"
-    },
-    "h-bla-large": {
-      "filename": "CIQ-Bridge-logo_h_blk_L.png",
-      "description": "Bridge logo (blk) for light backgrounds - Large",
-      "layout": "h",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "tall_banners",
-        "social_media_profile",
-        "mobile_layout",
-        "poster"
-      ],
-      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/bridge/logos/CIQ-Bridge-logo_h_blk_L.png"
-    },
-    "h-whi-large": {
-      "filename": "CIQ-Bridge-logo_h_wht_L.png",
-      "description": "Bridge logo (wht) for dark backgrounds - Large",
-      "layout": "h",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "tall_banners",
-        "social_media_profile",
-        "mobile_layout",
-        "poster"
-      ],
-      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/bridge/logos/CIQ-Bridge-logo_h_wht_L.png"
     }
   },
   "rlc_logos": {
@@ -636,6 +500,142 @@
       "guidance": "Vector format - scales to any size perfectly",
       "format": "png",
       "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc-ai/logos/RLC-AI_icon_wht_L.png"
+    }
+  },
+  "warewulf_logos": {
+    "unknown-unk-unknown": {
+      "filename": "WarewulfPro-Logo_wht_v_L.png",
+      "description": "Warewulf logo variant: WarewulfPro-Logo_wht_v_L.png",
+      "layout": "unknown",
+      "color": "unknown",
+      "background": "unknown",
+      "size": "unknown",
+      "use_cases": [
+        "general"
+      ],
+      "guidance": "Warewulf logo variant",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/warewulf/logos/WarewulfPro-Logo_wht_v_L.png"
+    },
+    "icon-whi-vector": {
+      "filename": "Warewulf_icon_wht_L.png",
+      "description": "Warewulf icon (wht_L) for dark backgrounds - SVG",
+      "layout": "icon",
+      "color": "white",
+      "background": "dark",
+      "size": "vector",
+      "use_cases": [
+        "scalable",
+        "favicon",
+        "app_icon"
+      ],
+      "guidance": "Vector format - scales to any size perfectly",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/warewulf/logos/Warewulf_icon_wht_L.png"
+    }
+  },
+  "apptainer_logos": {
+    "vertical-whi-large": {
+      "filename": "Apptainer-Logo_wht_v_L.png",
+      "description": "Apptainer vertical logo (wht) for dark backgrounds - Large",
+      "layout": "vertical",
+      "color": "white",
+      "background": "dark",
+      "size": "large",
+      "use_cases": [
+        "tall_banners",
+        "social_media_profile",
+        "mobile_layout",
+        "poster"
+      ],
+      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/apptainer/logos/Apptainer-Logo_wht_v_L.png"
+    },
+    "icon-bla-large": {
+      "filename": "Apptainer-Icon_blk_L.png",
+      "description": "Apptainer icon (blk) for light backgrounds - Large",
+      "layout": "icon",
+      "color": "black",
+      "background": "light",
+      "size": "large",
+      "use_cases": [
+        "favicon",
+        "app_icon",
+        "small_spaces",
+        "avatars"
+      ],
+      "guidance": "Perfect for tight spaces where you need just the Apptainer symbol",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/apptainer/logos/Apptainer-Icon_blk_L.png"
+    },
+    "vertical-bla-large": {
+      "filename": "Apptainer-Logo_blk_v_L.png",
+      "description": "Apptainer vertical logo (blk) for light backgrounds - Large",
+      "layout": "vertical",
+      "color": "black",
+      "background": "light",
+      "size": "large",
+      "use_cases": [
+        "tall_banners",
+        "social_media_profile",
+        "mobile_layout",
+        "poster"
+      ],
+      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/apptainer/logos/Apptainer-Logo_blk_v_L.png"
+    },
+    "icon-whi-large": {
+      "filename": "Apptainer-Icon_wht_L.png",
+      "description": "Apptainer icon (wht) for dark backgrounds - Large",
+      "layout": "icon",
+      "color": "white",
+      "background": "dark",
+      "size": "large",
+      "use_cases": [
+        "favicon",
+        "app_icon",
+        "small_spaces",
+        "avatars"
+      ],
+      "guidance": "Perfect for tight spaces where you need just the Apptainer symbol",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/apptainer/logos/Apptainer-Icon_wht_L.png"
+    }
+  },
+  "rlc-lts_logos": {
+    "vertical-whi-vector": {
+      "filename": "RLC-LTS_logo_v-blk_L.png",
+      "description": "Rlc-Lts vertical logo (blk_L) for dark backgrounds - SVG",
+      "layout": "vertical",
+      "color": "white",
+      "background": "dark",
+      "size": "vector",
+      "use_cases": [
+        "scalable",
+        "web",
+        "print"
+      ],
+      "guidance": "Vector format - scales to any size perfectly",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc-lts/logos/RLC-LTS_logo_v-blk_L.png"
+    },
+    "horizontal-whi-vector": {
+      "filename": "RLC-LTS_logo_h-blk_L.png",
+      "description": "Rlc-Lts horizontal logo (blk_L) for dark backgrounds - SVG",
+      "layout": "horizontal",
+      "color": "white",
+      "background": "dark",
+      "size": "vector",
+      "use_cases": [
+        "scalable",
+        "web",
+        "print"
+      ],
+      "guidance": "Vector format - scales to any size perfectly",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc-lts/logos/RLC-LTS_logo_h-blk_L.png"
     }
   }
 }
