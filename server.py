@@ -328,14 +328,27 @@ class DeclarativeAssetMatcher:
             layout_groups[layout].append(asset)
         
         options = []
+        # Prefer consistent background across examples (light background = black logos)
+        preferred_background = 'light'  # Default to light backgrounds (black logos)
+        
         for layout, assets in layout_groups.items():
-            # Show one example of each layout
-            example = assets[0]
+            # Try to find an asset for the preferred background
+            example = None
+            for asset in assets:
+                if asset['background'] == preferred_background:
+                    example = asset
+                    break
+            
+            # Fallback to first asset if no preferred background found
+            if not example:
+                example = assets[0]
+                
             options.append({
                 'layout': layout,
                 'example_url': example['url'],
                 'count': len(assets),
-                'description': self._get_layout_description(layout)
+                'description': self._get_layout_description(layout),
+                'background_note': f"Showing {example['color']} version (for {example['background']} backgrounds)"
             })
         
         return {
@@ -343,7 +356,12 @@ class DeclarativeAssetMatcher:
             'product': product,
             'options': options,
             'confidence': 'low',
-            'help': f"Try being more specific: '{product} horizontal logo for light backgrounds' or '{product} icon for dark theme'"
+            'background_question': "What background will you use these on?",
+            'background_options': [
+                {"type": "light", "description": "Light backgrounds (use black logos)", "example": "white websites, documents"},
+                {"type": "dark", "description": "Dark backgrounds (use white logos)", "example": "dark mode, black presentations"}
+            ],
+            'help': f"For better recommendations, specify: '{product} horizontal logo for light backgrounds' or '{product} icon for dark theme'"
         }
 
     def _get_layout_description(self, layout: str) -> str:
