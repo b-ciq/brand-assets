@@ -152,6 +152,28 @@ def parse_fuzzball_filename(filename: str) -> Dict[str, Any]:
         "format": filename.split('.')[-1] if '.' in filename else "unknown"
     }
 
+def get_filename_prefix(product: str) -> List[str]:
+    """Get possible filename prefixes for a product directory name"""
+    prefix_map = {
+        'ascender': ['AscenderPro'],
+        'bridge': ['CIQ-Bridge'], 
+        'ciq-support': ['CIQ-Support'],
+        'rlc-ai': ['RLC-AI'],
+        'rlc-hardened': ['RLC-H'],
+        'rlc-lts': ['RLC-LTS'],
+        'rlc': ['RLC'],
+        'warewulf': ['Warewulf', 'WarewulfPro'],
+        'apptainer': ['Apptainer'],
+        'fuzzball': ['Fuzzball'],
+        'ciq': ['CIQ']
+    }
+    
+    if product in prefix_map:
+        return prefix_map[product]
+    else:
+        # Default fallbacks
+        return [product.title(), product.upper(), product]
+
 def parse_generic_filename(filename: str, product: str) -> Dict[str, Any]:
     """
     Parse generic product logo filename patterns for new products:
@@ -161,158 +183,180 @@ def parse_generic_filename(filename: str, product: str) -> Dict[str, Any]:
     - {Product}_icon_{color}.{ext} (SVG icon pattern)
     """
     
-    # CIQ-prefixed pattern: CIQ-Bridge-logo_h_wht_L.png 
-    ciq_pattern = rf'CIQ-{re.escape(product.title())}-(\w+)_(\w+)_(\w+)_([LMS])\.(\w+)'
-    match = re.match(ciq_pattern, filename, re.IGNORECASE)
+    # Get all possible filename prefixes for this product
+    possible_prefixes = get_filename_prefix(product)
     
-    if match:
-        asset_type, layout, color, size, ext = match.groups()
-        background = 'light' if color.lower() == 'blk' else 'dark'
-        size_full = {'L': 'large', 'M': 'medium', 'S': 'small'}[size.upper()]
-        final_layout = "icon" if asset_type.lower() == "icon" else layout.lower()
+    # Try each possible prefix with different patterns
+    for prefix in possible_prefixes:
+        # Icon pattern: Prefix-Icon_blk_L.png (like Apptainer-Icon_blk_L.png, AscenderPro-Icon_blk_L.png)
+        icon_pattern = rf'{re.escape(prefix)}-Icon_(\w+)_([LMS])\.(\w+)'
+        match = re.match(icon_pattern, filename, re.IGNORECASE)
         
-        # Layout-specific use cases
-        if final_layout == 'icon':
-            use_cases = ["favicon", "app_icon", "small_spaces", "avatars"]
-            guidance = "Perfect for tight spaces where you need just the symbol"
-        elif final_layout == 'horizontal':
-            use_cases = ["headers", "business_cards", "letterhead", "wide_banners"]
-            guidance = "Best for wide spaces - business cards, website headers, email signatures"
-        else:  # vertical
-            use_cases = ["tall_banners", "social_media_profile", "mobile_layout", "poster"]
-            guidance = "Perfect for tall/narrow spaces - social media profiles, mobile layouts"
+        if match:
+            color, size, ext = match.groups()
+            background = 'light' if color.lower() == 'blk' else 'dark'
+            size_full = {'L': 'large', 'M': 'medium', 'S': 'small'}[size.upper()]
+            
+            return {
+                "filename": filename,
+                "description": f"{product.title()} icon ({color}) for {background} backgrounds - {size_full.title()}",
+                "layout": "icon",
+                "color": "black" if color.lower() == 'blk' else "white",
+                "background": background,
+                "size": size_full,
+                "use_cases": ["favicon", "app_icon", "small_spaces", "avatars"],
+                "guidance": f"Perfect for tight spaces where you need just the {product.title()} symbol",
+                "format": ext
+            }
         
-        return {
-            "filename": filename,
-            "description": f"{product.title()} {asset_type} ({color}) for {background} backgrounds - {size_full.title()}",
-            "layout": final_layout,
-            "color": "black" if color.lower() == 'blk' else "white",
-            "background": background,
-            "size": size_full.lower(),
-            "use_cases": use_cases,
-            "guidance": guidance,
-            "format": ext.lower()
-        }
-    
-    # Icon pattern: Product-Icon_blk_L.png (like Apptainer-Icon_blk_L.png)
-    icon_pattern = rf'{re.escape(product.title())}-Icon_(\w+)_([LMS])\.(\w+)'
-    match = re.match(icon_pattern, filename, re.IGNORECASE)
-    
-    if match:
-        color, size, ext = match.groups()
-        background = 'light' if color.lower() == 'blk' else 'dark'
-        size_full = {'L': 'large', 'M': 'medium', 'S': 'small'}[size.upper()]
+        # Logo pattern: Prefix-Logo_blk_h_L.png (like WarewulfPro-Logo_blk_h_L.png)
+        logo_dash_pattern = rf'{re.escape(prefix)}-Logo_(\w+)_([hv])_([LMS])\.(\w+)'
+        match = re.match(logo_dash_pattern, filename, re.IGNORECASE)
         
-        return {
-            "filename": filename,
-            "description": f"{product.title()} icon ({color}) for {background} backgrounds - {size_full.title()}",
-            "layout": "icon",
-            "color": "black" if color.lower() == 'blk' else "white",
-            "background": background,
-            "size": size_full,
-            "use_cases": ["favicon", "app_icon", "small_spaces", "avatars"],
-            "guidance": f"Perfect for tight spaces where you need just the {product.title()} symbol",
-            "format": ext
-        }
-    
-    # Logo pattern: Product-Logo_blk_v_L.png (like Apptainer-Logo_blk_v_L.png)
-    logo_pattern = rf'{re.escape(product.title())}-Logo_(\w+)_([hv])_([LMS])\.(\w+)'
-    match = re.match(logo_pattern, filename, re.IGNORECASE)
-    
-    if match:
-        color, layout_code, size, ext = match.groups()
-        layout = 'horizontal' if layout_code.lower() == 'h' else 'vertical'
-        background = 'light' if color.lower() == 'blk' else 'dark'
-        size_full = {'L': 'large', 'M': 'medium', 'S': 'small'}[size.upper()]
+        if match:
+            color, layout_code, size, ext = match.groups()
+            layout = 'horizontal' if layout_code.lower() == 'h' else 'vertical'
+            background = 'light' if color.lower() == 'blk' else 'dark'
+            size_full = {'L': 'large', 'M': 'medium', 'S': 'small'}[size.upper()]
+            
+            if layout == 'horizontal':
+                use_cases = ["headers", "business_cards", "letterhead", "wide_banners"]
+                guidance = f"Best for wide spaces - business cards, website headers, email signatures"
+            else:  # vertical
+                use_cases = ["tall_banners", "social_media_profile", "mobile_layout", "poster"]
+                guidance = f"Perfect for tall/narrow spaces - social media profiles, mobile layouts"
+            
+            return {
+                "filename": filename,
+                "description": f"{product.title()} {layout} logo ({color}) for {background} backgrounds - {size_full.title()}",
+                "layout": layout,
+                "color": "black" if color.lower() == 'blk' else "white",
+                "background": background,
+                "size": size_full,
+                "use_cases": use_cases,
+                "guidance": guidance,
+                "format": ext
+            }
         
-        if layout == 'horizontal':
-            use_cases = ["headers", "business_cards", "letterhead", "wide_banners"]
-            guidance = f"Best for wide spaces - business cards, website headers, email signatures"
-        else:  # vertical
-            use_cases = ["tall_banners", "social_media_profile", "mobile_layout", "poster"]
-            guidance = f"Perfect for tall/narrow spaces - social media profiles, mobile layouts"
+        # PNG logo pattern: Prefix_logo_h-blk_L.png (like AscenderPro_logo_h-blk_L.png)
+        png_logo_pattern = rf'{re.escape(prefix)}_logo_([hv])-(\w+)_([LMS])\.(\w+)'
+        match = re.match(png_logo_pattern, filename, re.IGNORECASE)
         
-        return {
-            "filename": filename,
-            "description": f"{product.title()} {layout} logo ({color}) for {background} backgrounds - {size_full.title()}",
-            "layout": layout,
-            "color": "black" if color.lower() == 'blk' else "white",
-            "background": background,
-            "size": size_full,
-            "use_cases": use_cases,
-            "guidance": guidance,
-            "format": ext
-        }
-    
-    # PNG logo pattern: Product_logo_h-blk_L.png (like AscenderPro_logo_h-blk_L.png)
-    png_logo_pattern = rf'{re.escape(product.title())}_logo_([hv])-(\w+)_([LMS])\.(\w+)'
-    match = re.match(png_logo_pattern, filename, re.IGNORECASE)
-    
-    if match:
-        layout_code, color, size, ext = match.groups()
-        layout = 'horizontal' if layout_code.lower() == 'h' else 'vertical'
-        background = 'light' if color.lower() == 'blk' else 'dark'
-        size_full = {'L': 'large', 'M': 'medium', 'S': 'small'}[size.upper()]
-        
-        if layout == 'horizontal':
-            use_cases = ["headers", "business_cards", "letterhead", "wide_banners"]
-            guidance = f"Best for wide spaces - business cards, website headers, email signatures"
-        else:  # vertical
-            use_cases = ["tall_banners", "social_media_profile", "mobile_layout", "poster"]
-            guidance = f"Perfect for tall/narrow spaces - social media profiles, mobile layouts"
-        
-        return {
-            "filename": filename,
-            "description": f"{product.title()} {layout} logo ({color}) for {background} backgrounds - {size_full.title()}",
-            "layout": layout,
-            "color": "black" if color.lower() == 'blk' else "white",
-            "background": background,
-            "size": size_full,
-            "use_cases": use_cases,
-            "guidance": guidance,
-            "format": ext
-        }
+        if match:
+            layout_code, color, size, ext = match.groups()
+            layout = 'horizontal' if layout_code.lower() == 'h' else 'vertical'
+            background = 'light' if color.lower() == 'blk' else 'dark'
+            size_full = {'L': 'large', 'M': 'medium', 'S': 'small'}[size.upper()]
+            
+            if layout == 'horizontal':
+                use_cases = ["headers", "business_cards", "letterhead", "wide_banners"]
+                guidance = f"Best for wide spaces - business cards, website headers, email signatures"
+            else:  # vertical
+                use_cases = ["tall_banners", "social_media_profile", "mobile_layout", "poster"]
+                guidance = f"Perfect for tall/narrow spaces - social media profiles, mobile layouts"
+            
+            return {
+                "filename": filename,
+                "description": f"{product.title()} {layout} logo ({color}) for {background} backgrounds - {size_full.title()}",
+                "layout": layout,
+                "color": "black" if color.lower() == 'blk' else "white",
+                "background": background,
+                "size": size_full,
+                "use_cases": use_cases,
+                "guidance": guidance,
+                "format": ext
+            }
 
-    # SVG logo pattern: Product_logo_h-blk.svg (like Apptainer_logo_h-blk.svg)
-    svg_logo_pattern = rf'{re.escape(product.title())}_logo_([hv])-(\w+)\.(\w+)'
-    match = re.match(svg_logo_pattern, filename, re.IGNORECASE)
-    
-    if match:
-        layout_code, color, ext = match.groups()
-        layout = 'horizontal' if layout_code.lower() == 'h' else 'vertical'
-        background = 'light' if color.lower() == 'blk' else 'dark'
+        # Icon pattern with underscore: Prefix_icon_blk_L.png (like CIQ-Bridge_icon_blk_L.png)
+        underscore_icon_pattern = rf'{re.escape(prefix)}_icon_(\w+)_([LMS])\.(\w+)'
+        match = re.match(underscore_icon_pattern, filename, re.IGNORECASE)
         
-        return {
-            "filename": filename,
-            "description": f"{product.title()} {layout} logo ({color}) for {background} backgrounds - SVG",
-            "layout": layout,
-            "color": "black" if color.lower() == 'blk' else "white",
-            "background": background,
-            "size": "vector",
-            "use_cases": ["scalable", "web", "print"],
-            "guidance": f"Vector format - scales to any size perfectly",
-            "format": ext
-        }
-    
-    # SVG icon pattern: Product_icon_blk.svg (like Apptainer_icon_blk.svg)
-    svg_icon_pattern = rf'{re.escape(product.title())}_icon_(\w+)\.(\w+)'
-    match = re.match(svg_icon_pattern, filename, re.IGNORECASE)
-    
-    if match:
-        color, ext = match.groups()
-        background = 'light' if color.lower() == 'blk' else 'dark'
+        if match:
+            color, size, ext = match.groups()
+            background = 'light' if color.lower() == 'blk' else 'dark'
+            size_full = {'L': 'large', 'M': 'medium', 'S': 'small'}[size.upper()]
+            
+            return {
+                "filename": filename,
+                "description": f"{product.title()} icon ({color}) for {background} backgrounds - {size_full.title()}",
+                "layout": "icon",
+                "color": "black" if color.lower() == 'blk' else "white",
+                "background": background,
+                "size": size_full,
+                "use_cases": ["favicon", "app_icon", "small_spaces", "avatars"],
+                "guidance": f"Perfect for tight spaces where you need just the {product.title()} symbol",
+                "format": ext
+            }
         
-        return {
-            "filename": filename,
-            "description": f"{product.title()} icon ({color}) for {background} backgrounds - SVG",
-            "layout": "icon",
-            "color": "black" if color.lower() == 'blk' else "white",
-            "background": background,
-            "size": "vector",
-            "use_cases": ["scalable", "favicon", "app_icon"],
-            "guidance": f"Vector format - scales to any size perfectly",
-            "format": ext
-        }
+        # Logo pattern with underscore: Prefix_logo_h-blk_L.png (like RLC-LTS_logo_h-blk_L.png)
+        underscore_logo_pattern = rf'{re.escape(prefix)}_logo_([hv])-(\w+)_([LMS])\.(\w+)'
+        match = re.match(underscore_logo_pattern, filename, re.IGNORECASE)
+        
+        if match:
+            layout_code, color, size, ext = match.groups()
+            layout = 'horizontal' if layout_code.lower() == 'h' else 'vertical'
+            background = 'light' if color.lower() == 'blk' else 'dark'
+            size_full = {'L': 'large', 'M': 'medium', 'S': 'small'}[size.upper()]
+            
+            if layout == 'horizontal':
+                use_cases = ["headers", "business_cards", "letterhead", "wide_banners"]
+                guidance = f"Best for wide spaces - business cards, website headers, email signatures"
+            else:  # vertical
+                use_cases = ["tall_banners", "social_media_profile", "mobile_layout", "poster"]
+                guidance = f"Perfect for tall/narrow spaces - social media profiles, mobile layouts"
+            
+            return {
+                "filename": filename,
+                "description": f"{product.title()} {layout} logo ({color}) for {background} backgrounds - {size_full.title()}",
+                "layout": layout,
+                "color": "black" if color.lower() == 'blk' else "white",
+                "background": background,
+                "size": size_full,
+                "use_cases": use_cases,
+                "guidance": guidance,
+                "format": ext
+            }
+
+        # SVG logo pattern: Prefix_logo_h-blk.svg (like Apptainer_logo_h-blk.svg)
+        svg_logo_pattern = rf'{re.escape(prefix)}_logo_([hv])-(\w+)\.(\w+)'
+        match = re.match(svg_logo_pattern, filename, re.IGNORECASE)
+        
+        if match:
+            layout_code, color, ext = match.groups()
+            layout = 'horizontal' if layout_code.lower() == 'h' else 'vertical'
+            background = 'light' if color.lower() == 'blk' else 'dark'
+            
+            return {
+                "filename": filename,
+                "description": f"{product.title()} {layout} logo ({color}) for {background} backgrounds - SVG",
+                "layout": layout,
+                "color": "black" if color.lower() == 'blk' else "white",
+                "background": background,
+                "size": "vector",
+                "use_cases": ["scalable", "web", "print"],
+                "guidance": f"Vector format - scales to any size perfectly",
+                "format": ext
+            }
+        
+        # SVG icon pattern: Prefix_icon_blk.svg (like Apptainer_icon_blk.svg)
+        svg_icon_pattern = rf'{re.escape(prefix)}_icon_(\w+)\.(\w+)'
+        match = re.match(svg_icon_pattern, filename, re.IGNORECASE)
+        
+        if match:
+            color, ext = match.groups()
+            background = 'light' if color.lower() == 'blk' else 'dark'
+            
+            return {
+                "filename": filename,
+                "description": f"{product.title()} icon ({color}) for {background} backgrounds - SVG",
+                "layout": "icon",
+                "color": "black" if color.lower() == 'blk' else "white",
+                "background": background,
+                "size": "vector",
+                "use_cases": ["scalable", "favicon", "app_icon"],
+                "guidance": f"Vector format - scales to any size perfectly",
+                "format": ext
+            }
     
     # Fallback - basic file info
     return {
