@@ -1,0 +1,5 @@
+timestamp: 1756099817
+trigger: clean_structure_deployment
+assets_cleaned: true
+rlc_separated: true
+metadata_updated: pending

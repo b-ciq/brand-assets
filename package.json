@@ -1,7 +1,7 @@
 {
   "name": "@b-ciq/brand-assets-mcp",
-  "version": "1.0.0",
-  "description": "Intelligent CIQ brand asset delivery via MCP - provides smart logo recommendations with brand guidance",
+  "version": "1.0.1",
+  "description": "CIQ Brand Assets MCP Server - Clean Structure v1.0.1",
   "type": "module",
   "main": "src/index.js",
   "bin": {
