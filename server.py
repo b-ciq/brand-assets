@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Deployment trigger: 1756152145
+# Deployment trigger: 1756157892
 """
 CIQ Brand Assets MCP Server - Integrated System with Separated RLC Products
 Enhanced with confidence scoring, response templates, and clean attribute-based approach
