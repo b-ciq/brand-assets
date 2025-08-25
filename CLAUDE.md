@@ -56,11 +56,13 @@ npm run dev
 
 ### Asset Management
 ```bash
-# After adding new assets, ALWAYS run:
-python generate_metadata.py
-
-# Deploy changes (auto-deploys to team)
+# Adding new assets is now AUTOMATIC! 🎉
+# 1. Add logo files to appropriate *-logos/ directory  
+# 2. Commit and push - GitHub Actions will auto-update metadata
 git add . && git commit -m "Add new assets" && git push
+
+# Manual metadata generation (if needed):
+python3.11 generate_metadata.py
 ```
 
 ## Key Components

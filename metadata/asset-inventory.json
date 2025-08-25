@@ -287,5 +287,157 @@
       "format": "png",
       "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball_logo_logo_v-wht_L.png"
     }
+  },
+  "warewulf-pro_logos": {
+    "unknown-unk-unknown": {
+      "filename": "WarewulfPro-Logo_wht_v_L.png",
+      "description": "Warewulf-Pro logo variant: WarewulfPro-Logo_wht_v_L.png",
+      "layout": "unknown",
+      "color": "unknown",
+      "background": "unknown",
+      "size": "unknown",
+      "use_cases": [
+        "general"
+      ],
+      "guidance": "Warewulf-Pro logo variant",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Warewulf-Pro-logos/WarewulfPro-Logo_wht_v_L.png"
+    }
+  },
+  "bridge_logos": {
+    "unknown-unk-unknown": {
+      "filename": "CIQ-Bridge-logo_h_wht_L.png",
+      "description": "Bridge logo variant: CIQ-Bridge-logo_h_wht_L.png",
+      "layout": "unknown",
+      "color": "unknown",
+      "background": "unknown",
+      "size": "unknown",
+      "use_cases": [
+        "general"
+      ],
+      "guidance": "Bridge logo variant",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Bridge-logos/CIQ-Bridge-logo_h_wht_L.png"
+    }
+  },
+  "ascender-pro_logos": {
+    "unknown-unk-unknown": {
+      "filename": "AscenderPro-Icon_blk_L.png",
+      "description": "Ascender-Pro logo variant: AscenderPro-Icon_blk_L.png",
+      "layout": "unknown",
+      "color": "unknown",
+      "background": "unknown",
+      "size": "unknown",
+      "use_cases": [
+        "general"
+      ],
+      "guidance": "Ascender-Pro logo variant",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Ascender-Pro-logos/AscenderPro-Icon_blk_L.png"
+    }
+  },
+  "apptainer_logos": {
+    "vertical-whi-large": {
+      "filename": "Apptainer-Logo_wht_v_L.png",
+      "description": "Apptainer vertical logo (wht) for dark backgrounds - Large",
+      "layout": "vertical",
+      "color": "white",
+      "background": "dark",
+      "size": "large",
+      "use_cases": [
+        "tall_banners",
+        "social_media_profile",
+        "mobile_layout",
+        "poster"
+      ],
+      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Apptainer-logos/Apptainer-Logo_wht_v_L.png"
+    },
+    "icon-bla-large": {
+      "filename": "Apptainer-Icon_blk_L.png",
+      "description": "Apptainer icon (blk) for light backgrounds - Large",
+      "layout": "icon",
+      "color": "black",
+      "background": "light",
+      "size": "large",
+      "use_cases": [
+        "favicon",
+        "app_icon",
+        "small_spaces",
+        "avatars"
+      ],
+      "guidance": "Perfect for tight spaces where you need just the Apptainer symbol",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Apptainer-logos/Apptainer-Icon_blk_L.png"
+    },
+    "vertical-bla-large": {
+      "filename": "Apptainer-Logo_blk_v_L.png",
+      "description": "Apptainer vertical logo (blk) for light backgrounds - Large",
+      "layout": "vertical",
+      "color": "black",
+      "background": "light",
+      "size": "large",
+      "use_cases": [
+        "tall_banners",
+        "social_media_profile",
+        "mobile_layout",
+        "poster"
+      ],
+      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Apptainer-logos/Apptainer-Logo_blk_v_L.png"
+    },
+    "icon-whi-large": {
+      "filename": "Apptainer-Icon_wht_L.png",
+      "description": "Apptainer icon (wht) for dark backgrounds - Large",
+      "layout": "icon",
+      "color": "white",
+      "background": "dark",
+      "size": "large",
+      "use_cases": [
+        "favicon",
+        "app_icon",
+        "small_spaces",
+        "avatars"
+      ],
+      "guidance": "Perfect for tight spaces where you need just the Apptainer symbol",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Apptainer-logos/Apptainer-Icon_wht_L.png"
+    }
+  },
+  "ciq-support_logos": {
+    "horizontal-whi-vector": {
+      "filename": "CIQ-Support_logo_h-wht_L.png",
+      "description": "Ciq-Support horizontal logo (wht_L) for dark backgrounds - SVG",
+      "layout": "horizontal",
+      "color": "white",
+      "background": "dark",
+      "size": "vector",
+      "use_cases": [
+        "scalable",
+        "web",
+        "print"
+      ],
+      "guidance": "Vector format - scales to any size perfectly",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/CIQ-Support-logos/CIQ-Support_logo_h-wht_L.png"
+    },
+    "icon-whi-vector": {
+      "filename": "CIQ-Support_icon_wht_L.png",
+      "description": "Ciq-Support icon (wht_L) for dark backgrounds - SVG",
+      "layout": "icon",
+      "color": "white",
+      "background": "dark",
+      "size": "vector",
+      "use_cases": [
+        "scalable",
+        "favicon",
+        "app_icon"
+      ],
+      "guidance": "Vector format - scales to any size perfectly",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/CIQ-Support-logos/CIQ-Support_icon_wht_L.png"
+    }
   }
 }

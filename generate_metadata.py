@@ -362,13 +362,50 @@ def generate_decision_logic() -> Dict[str, Any]:
         }
     }
 
+def discover_products(base_path: str) -> List[str]:
+    """Auto-discover products by finding *-logos directories"""
+    products = []
+    path = Path(base_path)
+    
+    # Find all *-logos directories
+    for item in path.iterdir():
+        if item.is_dir() and item.name.endswith('-logos'):
+            # Extract product name
+            product_name = item.name.replace('-logos', '').lower()
+            
+            # Map directory names to product names
+            if product_name == 'ciq':
+                products.append('ciq')
+            elif product_name == 'fuzzball':
+                products.append('fuzzball')
+            elif product_name == 'apptainer':
+                products.append('apptainer')
+            elif product_name == 'bridge':
+                products.append('bridge')
+            elif product_name == 'ascender-pro':
+                products.append('ascender-pro')
+            elif product_name == 'warewulf-pro':
+                products.append('warewulf-pro')
+            elif product_name == 'ciq-support':
+                products.append('ciq-support')
+            else:
+                # Generic product
+                products.append(product_name)
+    
+    return products
+
 def main():
     parser = argparse.ArgumentParser(description='Generate asset metadata from directory structure')
     parser.add_argument('--base-path', default='.', help='Base path to scan (default: current directory)')
     parser.add_argument('--output', default='metadata/asset-inventory.json', help='Output JSON file')
-    parser.add_argument('--products', nargs='+', default=['ciq', 'fuzzball'], help='Products to scan')
+    parser.add_argument('--products', nargs='*', help='Products to scan (default: auto-discover)')
     
     args = parser.parse_args()
+    
+    # Auto-discover products if not specified
+    if not args.products:
+        args.products = discover_products(args.base_path)
+        print(f"🔍 Auto-discovered products: {', '.join(args.products)}")
     
     print(f"🔍 Scanning asset directories in: {args.base_path}")
     
@@ -387,8 +424,18 @@ def main():
                 old_dirs = ['CIQ-logos']
             elif product == 'fuzzball':
                 old_dirs = ['fuzzball-logos'] 
+            elif product == 'apptainer':
+                old_dirs = ['Apptainer-logos']
+            elif product == 'bridge':
+                old_dirs = ['Bridge-logos']
+            elif product == 'ascender-pro':
+                old_dirs = ['Ascender-Pro-logos']
+            elif product == 'warewulf-pro':
+                old_dirs = ['Warewulf-Pro-logos']
+            elif product == 'ciq-support':
+                old_dirs = ['CIQ-Support-logos']
             else:
-                # For new products, try multiple possible directory names
+                # For other products, try multiple possible directory names
                 old_dirs = [
                     f"{product.title()}-logos",
                     f"{product}-logos", 
@@ -402,7 +449,7 @@ def main():
                 if old_path.exists():
                     print(f"   Found old structure: {old_path}")
                     for file_path in old_path.glob("*"):
-                        if file_path.is_file() and not file_path.name.startswith('.'):
+                        if file_path.is_file() and not file_path.name.startswith('.') and not file_path.name.endswith('.svg'):
                             filename = file_path.name
                             
                             if product == 'ciq':
