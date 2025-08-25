@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 CIQ Brand Assets MCP Server - FastMCP Cloud Version
-Fixed: Enhanced background weighting + No vertical unless requested
+ENHANCED: Background compatibility filter + CIQ-specific logic
 """
 
 from fastmcp import FastMCP
@@ -32,7 +32,7 @@ def load_asset_data():
         return False
 
 class AttributeDetector:
-    """Intelligent attribute detection with enhanced background weighting"""
+    """Enhanced attribute detection with CIQ color_type support"""
     
     def __init__(self):
         self.product_patterns = {
@@ -56,9 +56,16 @@ class AttributeDetector:
         self.layout_patterns = {
             'icon': ['symbol', 'icon', 'favicon', 'app icon'],
             'horizontal': ['horizontal', 'wide', 'header', 'lockup', 'full logo', 'wordmark'],
-            'vertical': ['vertical', 'tall', 'stacked'],  # ONLY when explicitly requested
+            'vertical': ['vertical', 'tall', 'stacked'],
             '1color': ['1-color', '1 color', 'one color', 'standard'],
             '2color': ['2-color', '2 color', 'two color', 'hero']
+        }
+        
+        # CIQ-specific color type patterns
+        self.ciq_color_type_patterns = {
+            '1color_neutral': ['standard', 'neutral', 'basic', '1-color', '1 color'],
+            '1color_green': ['green', 'punch', 'advertising', 'social media', 'exciting'],
+            '2color': ['hero', '2-color', '2 color', 'primary visual', 'presentations']
         }
 
     def detect_attributes(self, request: str) -> Dict[str, Any]:
@@ -68,7 +75,8 @@ class AttributeDetector:
         attributes = {
             'product': self._detect_product(request_lower),
             'background': self._detect_background(request_lower), 
-            'layout': self._detect_layout(request_lower)
+            'layout': self._detect_layout(request_lower),
+            'ciq_color_type': self._detect_ciq_color_type(request_lower)
         }
         
         # Enhanced confidence calculation
@@ -76,10 +84,11 @@ class AttributeDetector:
         if attributes['product']:
             total_confidence += attributes['product']['confidence']
         if attributes['background']:
-            # ENHANCED: Background gets major confidence boost (60 instead of 30)
-            total_confidence += 60  # Background detection now worth 60 points
+            total_confidence += 60  # Background detection worth 60 points
         if attributes['layout']:
             total_confidence += attributes['layout']['confidence']
+        if attributes['ciq_color_type']:
+            total_confidence += attributes['ciq_color_type']['confidence']
         
         attributes['total_confidence'] = total_confidence
         
@@ -108,18 +117,18 @@ class AttributeDetector:
         return None
     
     def _detect_background(self, request: str) -> Optional[Dict]:
-        """Detect background preference (now 60 points for higher confidence)"""
+        """Detect background preference (60 points for higher confidence)"""
         for bg_type, patterns in self.background_patterns.items():
             for pattern in patterns:
                 if pattern in request:
                     return {
                         'value': bg_type,
-                        'confidence': 60  # ENHANCED: Higher weight for background
+                        'confidence': 60
                     }
         return None
     
     def _detect_layout(self, request: str) -> Optional[Dict]:
-        """Detect layout preference (30 points max)"""
+        """Detect layout preference (30 points max) - for products only"""
         for layout_type, patterns in self.layout_patterns.items():
             for pattern in patterns:
                 if pattern in request:
@@ -128,9 +137,20 @@ class AttributeDetector:
                         'confidence': 30
                     }
         return None
+    
+    def _detect_ciq_color_type(self, request: str) -> Optional[Dict]:
+        """Detect CIQ color type preference (40 points max)"""
+        for color_type, patterns in self.ciq_color_type_patterns.items():
+            for pattern in patterns:
+                if pattern in request:
+                    return {
+                        'value': color_type,
+                        'confidence': 40
+                    }
+        return None
 
 class AssetMatcher:
-    """Enhanced asset matching with NO vertical unless requested rule"""
+    """Enhanced asset matching with background filtering + CIQ-specific logic"""
     
     def __init__(self, asset_data: Dict):
         self.asset_data = asset_data
@@ -149,7 +169,7 @@ class AssetMatcher:
         }
 
     def match_assets(self, request: str) -> Dict[str, Any]:
-        """Match assets using attribute detection"""
+        """Match assets using enhanced attribute detection"""
         attributes = self.detector.detect_attributes(request)
         
         if not attributes['product']:
@@ -164,11 +184,17 @@ class AssetMatcher:
         if not product_assets:
             return {'error': f'No assets found for {product_info["name"]}'}
         
-        # Check if vertical was explicitly requested
-        vertical_requested = attributes['layout'] and attributes['layout']['value'] == 'vertical'
+        # RULE #1: Apply background compatibility filter BEFORE scoring
+        filtered_assets = self._apply_background_filter(product_assets, attributes)
         
-        # Score and rank assets (with vertical filtering)
-        scored_assets = self._score_assets(product_assets, attributes, vertical_requested)
+        if not filtered_assets:
+            return {'error': f'No background-compatible assets found for {product_info["name"]}'}
+        
+        # RULE #2: Use asset-type-specific scoring
+        if product_id == 'ciq':
+            scored_assets = self._score_ciq_assets(filtered_assets, attributes)
+        else:
+            scored_assets = self._score_product_assets(filtered_assets, attributes)
         
         return {
             'success': True,
@@ -176,61 +202,112 @@ class AssetMatcher:
             'attributes': attributes,
             'confidence_level': confidence_level,
             'scored_assets': scored_assets,
-            'vertical_requested': vertical_requested
+            'filtered_count': len(filtered_assets),
+            'original_count': len(product_assets)
         }
     
-    def _assess_confidence_level(self, total_confidence: int) -> str:
-        """Assess confidence level with enhanced background weighting"""
-        if total_confidence >= 110:  # Product (50) + Background (60) = 110
-            return 'high'
-        elif total_confidence >= 50:
-            return 'medium'
-        else:
-            return 'low'
+    def _apply_background_filter(self, assets: Dict, attributes: Dict) -> Dict:
+        """RULE #1: Filter assets by background compatibility BEFORE scoring"""
+        if not attributes['background']:
+            return assets  # No background specified, return all
+        
+        target_background = attributes['background']['value']
+        compatible_assets = {}
+        
+        for asset_key, asset in assets.items():
+            asset_background = asset.get('background', '').lower()
+            
+            # Only include assets compatible with target background
+            if asset_background == target_background:
+                compatible_assets[asset_key] = asset
+        
+        return compatible_assets
     
-    def _score_assets(self, product_assets: Dict, attributes: Dict, vertical_requested: bool) -> List[Tuple[int, Dict, str]]:
-        """Score assets with NO vertical unless requested rule"""
+    def _score_ciq_assets(self, assets: Dict, attributes: Dict) -> List[Tuple[int, Dict, str]]:
+        """RULE #2: CIQ-specific scoring using color_type + color_mode"""
         scored = []
         
-        for asset_key, asset in product_assets.items():
+        for asset_key, asset in assets.items():
+            score = 0
+            reasons = []
+            
+            # Perfect background match (already filtered, but score it)
+            if attributes['background']:
+                score += 80
+                bg_type = attributes['background']['value']
+                reasons.append(f"perfect {bg_type} background match")
+            
+            # CIQ Color Type Scoring
+            asset_color_type = asset.get('color_type', '')
+            
+            if attributes['ciq_color_type']:
+                target_color_type = attributes['ciq_color_type']['value']
+                if target_color_type == asset_color_type:
+                    score += 100
+                    reasons.append(f"exact {target_color_type.replace('_', ' ')} match")
+            else:
+                # Default CIQ preferences when no specific type requested
+                if asset_color_type == '1color_neutral':
+                    score += 90
+                    reasons.append("standard CIQ company logo")
+                elif asset_color_type == '2color':
+                    score += 70
+                    reasons.append("hero CIQ company logo")
+                elif asset_color_type == '1color_green':
+                    score += 60
+                    reasons.append("standard+ green version")
+            
+            # Detect hero vs standard context from request
+            request_lower = attributes.get('original_request', '').lower()
+            is_hero_context = any(term in request_lower for term in ['hero', 'presentation', 'primary', 'large display', 'marketing'])
+            
+            if is_hero_context and asset_color_type == '2color':
+                score += 20
+                reasons.append("perfect for hero context")
+            elif not is_hero_context and asset_color_type == '1color_neutral':
+                score += 20
+                reasons.append("ideal for standard applications")
+            
+            if score > 0:
+                scored.append((score, asset, " + ".join(reasons)))
+        
+        return sorted(scored, key=lambda x: x[0], reverse=True)
+    
+    def _score_product_assets(self, assets: Dict, attributes: Dict) -> List[Tuple[int, Dict, str]]:
+        """RULE #2: Product-specific scoring using layout + background (existing logic)"""
+        scored = []
+        vertical_requested = attributes['layout'] and attributes['layout']['value'] == 'vertical'
+        
+        for asset_key, asset in assets.items():
             asset_layout = asset.get('layout', '').lower()
             
-            # RULE: Skip vertical layouts unless explicitly requested
+            # Skip vertical layouts unless explicitly requested
             if 'vertical' in asset_layout and not vertical_requested:
                 continue
             
             score = 0
             reasons = []
             
-            # Layout matching
+            # Perfect background match (already filtered, but score it)
+            if attributes['background']:
+                score += 80
+                bg_type = attributes['background']['value']
+                reasons.append(f"perfect {bg_type} background match")
+            
+            # Layout matching for products
             if attributes['layout'] and attributes['layout']['value']:
                 target_layout = attributes['layout']['value']
                 if target_layout in asset_layout:
                     score += 100
                     reasons.append(f"exact {target_layout} match")
             else:
-                # Default scoring: prefer horizontal over icon
+                # Default product layout preferences
                 if 'horizontal' in asset_layout:
                     score += 80
                     reasons.append("default horizontal layout (best brand recognition)")
                 elif 'icon' in asset_layout:
                     score += 60
                     reasons.append("icon option")
-                elif '1color' in asset_layout:
-                    score += 90
-                    reasons.append("standard company logo")
-                elif '2color' in asset_layout:
-                    score += 70
-                    reasons.append("hero company logo")
-            
-            # Enhanced background matching (more weight)
-            if attributes['background']:
-                target_bg = attributes['background']['value']
-                asset_bg = asset.get('background', '').lower()
-                
-                if target_bg == asset_bg:
-                    score += 80  # Enhanced from 50 to 80
-                    reasons.append(f"perfect {target_bg} background match")
             
             # Color correctness bonus
             if attributes['background']:
@@ -249,6 +326,15 @@ class AssetMatcher:
         
         return sorted(scored, key=lambda x: x[0], reverse=True)
     
+    def _assess_confidence_level(self, total_confidence: int) -> str:
+        """Assess confidence level with enhanced background weighting"""
+        if total_confidence >= 110:  # Product (50) + Background (60) = 110
+            return 'high'
+        elif total_confidence >= 50:
+            return 'medium'
+        else:
+            return 'low'
+    
     def _generate_product_help(self) -> Dict[str, Any]:
         """Generate help when product is not detected"""
         return {
@@ -256,7 +342,7 @@ class AssetMatcher:
             'message': """**CIQ Brand Assets Available:**
 
 **Company Brand:**
-• **CIQ** - Main company logo
+• **CIQ** - Main company logo (3 color types: neutral, green, hero)
 
 **Product Brands:**
 • **Fuzzball** - HPC/AI workload management platform
@@ -272,43 +358,52 @@ class AssetMatcher:
 • **RLC-LTS** - Rocky Linux Commercial long-term support
 
 **Examples:**
-• "CIQ logo" → Company brand
-• "Fuzzball logo for light background" → Direct answer
-• "RLC-AI vertical logo" → Specific layout
-• "Warewulf symbol" → Icon only
+• \"CIQ logo for dark background\" → Direct answer
+• \"Fuzzball logo for light background\" → Direct answer
+• \"RLC-AI vertical logo\" → Specific layout
+• \"Warewulf symbol\" → Icon only
 
 Which brand asset do you need?"""
         }
 
 class ResponseFormatter:
-    """Template-based response formatting with enhanced confidence logic"""
+    """Template-based response formatting with CIQ-specific templates"""
     
     def format_response(self, match_result: Dict[str, Any]) -> str:
-        """Format response based on confidence level"""
+        """Format response based on confidence level and asset type"""
         if match_result.get('help'):
             return match_result['message']
         
         if match_result.get('error'):
             return f"❌ {match_result['error']}"
         
+        product_id = match_result['product']['name'].lower()
         confidence_level = match_result['confidence_level']
         
         if confidence_level == 'high':
-            return self._format_high_confidence(match_result)
+            return self._format_high_confidence(match_result, is_ciq=(product_id == 'ciq'))
         elif confidence_level == 'medium':
-            return self._format_medium_confidence(match_result) 
+            return self._format_medium_confidence(match_result, is_ciq=(product_id == 'ciq'))
         else:
-            return self._format_low_confidence(match_result)
+            return self._format_low_confidence(match_result, is_ciq=(product_id == 'ciq'))
     
-    def _format_high_confidence(self, result: Dict) -> str:
+    def _format_high_confidence(self, result: Dict, is_ciq: bool = False) -> str:
         """High confidence: Direct answer with single best asset"""
         best_asset = result['scored_assets'][0]
         score, asset, reasoning = best_asset
         product_info = result['product']
         
-        layout_desc = asset.get('layout', 'logo').replace('icon', 'symbol')
+        if is_ciq:
+            # CIQ-specific formatting
+            color_type = asset.get('color_type', '').replace('_', ' ')
+            color_mode = asset.get('color_mode', '')
+            desc = f"{color_type} for {color_mode} backgrounds"
+        else:
+            # Product formatting
+            layout_desc = asset.get('layout', 'logo').replace('icon', 'symbol')
+            desc = layout_desc
         
-        return f"""✅ **{product_info['name']} {layout_desc}:**
+        return f"""✅ **{product_info['name']} {desc}:**
 
 📎 **Download:** {asset['url']}
 
@@ -316,43 +411,45 @@ class ResponseFormatter:
 
 📋 **Usage guidance:** {asset.get('guidance', f'Professional {product_info["name"]} branding')}"""
     
-    def _format_medium_confidence(self, result: Dict) -> str:
-        """Medium confidence: Top choice + limited alternatives (no vertical unless requested)"""
-        scored_assets = result['scored_assets']
+    def _format_medium_confidence(self, result: Dict, is_ciq: bool = False) -> str:
+        """Medium confidence: Top choice + background-compatible alternatives"""
+        scored_assets = result['scored_assets'][:3]  # Limit to top 3
         product_info = result['product']
-        vertical_requested = result.get('vertical_requested', False)
-        
-        if not vertical_requested:
-            # Filter out vertical from alternatives
-            scored_assets = [(score, asset, reason) for score, asset, reason in scored_assets 
-                           if 'vertical' not in asset.get('layout', '').lower()]
-        
-        # Limit to top 2-3 options
-        scored_assets = scored_assets[:3]
         
         response = f"**{product_info['name']} Logo - Top Recommendation:**\n\n"
         
         # Primary choice
         best_score, best_asset, best_reasoning = scored_assets[0]
-        layout_desc = best_asset.get('layout', 'logo').replace('icon', 'symbol')
         
-        response += f"""✅ **Primary Choice: {layout_desc.title()}**
+        if is_ciq:
+            color_type = best_asset.get('color_type', '').replace('_', ' ')
+            desc = f"{color_type} logo"
+        else:
+            layout_desc = best_asset.get('layout', 'logo').replace('icon', 'symbol')
+            desc = f"{layout_desc.title()}"
+        
+        response += f"""✅ **Primary Choice: {desc}**
 • **Download:** {best_asset['url']}
 • **Why:** {best_reasoning}
 
 """
         
-        # Alternatives (limited)
+        # Background-compatible alternatives only
         if len(scored_assets) > 1:
             response += "**Alternative Options:**\n"
             for i, (score, asset, reasoning) in enumerate(scored_assets[1:], 2):
-                alt_layout = asset.get('layout', 'logo').replace('icon', 'symbol')
-                response += f"• **Option {i}:** {alt_layout} - {asset['url']}\n"
+                if is_ciq:
+                    alt_color_type = asset.get('color_type', '').replace('_', ' ')
+                    alt_desc = f"{alt_color_type}"
+                else:
+                    alt_layout = asset.get('layout', 'logo').replace('icon', 'symbol')
+                    alt_desc = alt_layout
+                response += f"• **Option {i}:** {alt_desc} - {asset['url']}\n"
         
         return response
     
-    def _format_low_confidence(self, result: Dict) -> str:
-        """Low confidence: Quick clarifying question"""
+    def _format_low_confidence(self, result: Dict, is_ciq: bool = False) -> str:
+        """Low confidence: Clarifying questions based on asset type"""
         product_info = result['product']
         attributes = result['attributes']
         
@@ -367,21 +464,32 @@ class ResponseFormatter:
 
 This helps me recommend the right color version for proper contrast."""
         
-        elif not attributes['layout'] and product_info['structure_type'] == 'product':
+        elif is_ciq and not attributes['ciq_color_type']:
+            return f"""✨ **Perfect! For CIQ company logos...**
+
+**Which type works best for your use case?**
+
+🔸 **standard** → 1-color neutral (most applications)
+🟢 **green** → 1-color green (when you need extra punch)
+🌟 **hero** → 2-color (when logo is primary visual element)
+
+What's your primary use case?"""
+        
+        elif not is_ciq and not attributes['layout']:
             return f"""✨ **Perfect! For {product_info['name']} logos...**
 
 **Which layout works best for your use case?**
 
-🔸 **horizontal** → Symbol + text side-by-side (headers, business cards, emails)
+🔸 **horizontal** → Symbol + text side-by-side (headers, business cards)
 ⚫ **symbol** → Icon only (tight spaces, favicons)
 
-💡 Need vertical? Just ask for "vertical layout" specifically!
+💡 Need vertical? Just ask for \"vertical layout\" specifically!
 
 What's your primary use case?"""
         
         else:
             # Show top options with guidance
-            return self._format_medium_confidence(result)
+            return self._format_medium_confidence(result, is_ciq)
 
 @mcp.tool()
 def get_brand_asset(request: str, background: Optional[str] = None) -> str:
@@ -404,12 +512,20 @@ def get_brand_asset(request: str, background: Optional[str] = None) -> str:
     if background:
         request = f"{request} for {background} background"
     
+    # Store original request for context detection
+    attributes_with_request = request
+    
     # Initialize components
     matcher = AssetMatcher(asset_data)
     formatter = ResponseFormatter()
     
     # Match assets and format response
     match_result = matcher.match_assets(request)
+    
+    # Add original request for context detection
+    if match_result.get('attributes'):
+        match_result['attributes']['original_request'] = request
+    
     return formatter.format_response(match_result)
 
 @mcp.tool()
@@ -467,15 +583,12 @@ def list_all_assets() -> str:
         if product.startswith('RLC'):
             result += f"• **{product}** - {count} variants\n"
     
-    result += """\n**Enhanced Behavior:**
-• "Fuzzball logo for light background" → Direct answer (HIGH confidence)
-• "Warewulf logo" → Asks for background (LOW confidence)
-• "RLC-AI symbol" → Direct icon (HIGH confidence)
-
-**New Rules:**
-• **Background specified** → High confidence, direct answer
-• **Vertical only** when explicitly requested
-• **Smart defaults:** Horizontal + symbol (no vertical unless asked)
+    result += """
+**ENHANCED Features:**
+• **Background filtering:** Only compatible assets suggested
+• **CIQ-specific logic:** Color type (neutral/green/hero) + background mode
+• **Product logic:** Layout (horizontal/vertical/icon) + background compatibility
+• **Smart defaults:** No vertical unless requested, proper contrast
 
 🧹 **Clean structure:** 46 essential assets, no duplicates"""
     
