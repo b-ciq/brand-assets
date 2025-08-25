@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Deployment trigger: 1756150512
+# Deployment trigger: 1756152145
 """
 CIQ Brand Assets MCP Server - Integrated System with Separated RLC Products
 Enhanced with confidence scoring, response templates, and clean attribute-based approach
@@ -28,6 +28,10 @@ def load_asset_data():
         response.raise_for_status()
         asset_data = response.json()
         print(f"✅ Loaded {len(asset_data)} asset categories")
+        if 'warewulf_logos' in asset_data:
+            print(f"✅ Warewulf assets found: {len(asset_data['warewulf_logos'])} logos")
+        else:
+            print("❌ Warewulf assets NOT found in metadata")
         return True
     except Exception as e:
         print(f"❌ Failed to load asset data: {e}")
