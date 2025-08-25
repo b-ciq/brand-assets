@@ -87,7 +87,7 @@
       "guidance": "Professional and clean - won't compete with colorful design elements",
       "variant": "1color",
       "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/CIQ-logos/CIQ-Logo-1color-light.png"
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/ciq/logos/CIQ-Logo-1color-light.png"
     },
     "2color-dark": {
       "filename": "CIQ-Logo-2color-dark.png",
@@ -107,7 +107,7 @@
       "guidance": "Most recognizable CIQ branding - use when logo is the star of the design",
       "variant": "2color",
       "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/CIQ-logos/CIQ-Logo-2color-dark.png"
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/ciq/logos/CIQ-Logo-2color-dark.png"
     },
     "green-light": {
       "filename": "CIQ-Logo-green-light.png",
@@ -125,7 +125,7 @@
       "guidance": "Use in neutral/minimal designs when you need the logo to jump out",
       "variant": "green",
       "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/CIQ-logos/CIQ-Logo-green-light.png"
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/ciq/logos/CIQ-Logo-green-light.png"
     },
     "1color-dark": {
       "filename": "CIQ-Logo-1color-dark.png",
@@ -163,7 +163,7 @@
       "guidance": "Most recognizable CIQ branding - use when logo is the star of the design",
       "variant": "2color",
       "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/CIQ-logos/CIQ-Logo-2color-light.png"
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/ciq/logos/CIQ-Logo-2color-light.png"
     },
     "green-dark": {
       "filename": "CIQ-Logo-green-dark.png",
@@ -181,7 +181,7 @@
       "guidance": "Use in neutral/minimal designs when you need the logo to jump out",
       "variant": "green",
       "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/CIQ-logos/CIQ-Logo-green-dark.png"
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/ciq/logos/CIQ-Logo-green-dark.png"
     }
   },
   "fuzzball_logos": {
@@ -200,7 +200,7 @@
       ],
       "guidance": "Perfect for tight spaces where you need just the Fuzzball symbol",
       "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball-Icon_wht_L.png"
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/fuzzball/logos/Fuzzball-Icon_wht_L.png"
     },
     "horizontal-bla-large": {
       "filename": "Fuzzball_logo_logo_h-blk_L.png",
@@ -217,7 +217,7 @@
       ],
       "guidance": "Best for wide spaces - business cards, website headers, email signatures",
       "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball_logo_logo_h-blk_L.png"
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/fuzzball/logos/Fuzzball_logo_logo_h-blk_L.png"
     },
     "vertical-bla-large": {
       "filename": "Fuzzball_logo_logo_v-blk_L.png",
@@ -234,7 +234,7 @@
       ],
       "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
       "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball_logo_logo_v-blk_L.png"
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/fuzzball/logos/Fuzzball_logo_logo_v-blk_L.png"
     },
     "horizontal-whi-large": {
       "filename": "Fuzzball_logo_logo_h-wht_L.png",
@@ -251,7 +251,7 @@
       ],
       "guidance": "Best for wide spaces - business cards, website headers, email signatures",
       "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball_logo_logo_h-wht_L.png"
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/fuzzball/logos/Fuzzball_logo_logo_h-wht_L.png"
     },
     "icon-bla-large": {
       "filename": "Fuzzball-Icon_blk_L.png",
@@ -285,55 +285,7 @@
       ],
       "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
       "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/fuzzball-logos/Fuzzball_logo_logo_v-wht_L.png"
-    }
-  },
-  "warewulf-pro_logos": {
-    "unknown-unk-unknown": {
-      "filename": "WarewulfPro-Logo_wht_v_L.png",
-      "description": "Warewulf-Pro logo variant: WarewulfPro-Logo_wht_v_L.png",
-      "layout": "unknown",
-      "color": "unknown",
-      "background": "unknown",
-      "size": "unknown",
-      "use_cases": [
-        "general"
-      ],
-      "guidance": "Warewulf-Pro logo variant",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Warewulf-Pro-logos/WarewulfPro-Logo_wht_v_L.png"
-    }
-  },
-  "bridge_logos": {
-    "unknown-unk-unknown": {
-      "filename": "CIQ-Bridge-logo_h_wht_L.png",
-      "description": "Bridge logo variant: CIQ-Bridge-logo_h_wht_L.png",
-      "layout": "unknown",
-      "color": "unknown",
-      "background": "unknown",
-      "size": "unknown",
-      "use_cases": [
-        "general"
-      ],
-      "guidance": "Bridge logo variant",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Bridge-logos/CIQ-Bridge-logo_h_wht_L.png"
-    }
-  },
-  "ascender-pro_logos": {
-    "unknown-unk-unknown": {
-      "filename": "AscenderPro-Icon_blk_L.png",
-      "description": "Ascender-Pro logo variant: AscenderPro-Icon_blk_L.png",
-      "layout": "unknown",
-      "color": "unknown",
-      "background": "unknown",
-      "size": "unknown",
-      "use_cases": [
-        "general"
-      ],
-      "guidance": "Ascender-Pro logo variant",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Ascender-Pro-logos/AscenderPro-Icon_blk_L.png"
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/fuzzball/logos/Fuzzball_logo_logo_v-wht_L.png"
     }
   },
   "apptainer_logos": {
@@ -352,7 +304,7 @@
       ],
       "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
       "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Apptainer-logos/Apptainer-Logo_wht_v_L.png"
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/apptainer/logos/Apptainer-Logo_wht_v_L.png"
     },
     "icon-bla-large": {
       "filename": "Apptainer-Icon_blk_L.png",
@@ -369,7 +321,7 @@
       ],
       "guidance": "Perfect for tight spaces where you need just the Apptainer symbol",
       "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Apptainer-logos/Apptainer-Icon_blk_L.png"
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/apptainer/logos/Apptainer-Icon_blk_L.png"
     },
     "vertical-bla-large": {
       "filename": "Apptainer-Logo_blk_v_L.png",
@@ -386,7 +338,7 @@
       ],
       "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
       "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Apptainer-logos/Apptainer-Logo_blk_v_L.png"
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/apptainer/logos/Apptainer-Logo_blk_v_L.png"
     },
     "icon-whi-large": {
       "filename": "Apptainer-Icon_wht_L.png",
@@ -403,7 +355,55 @@
       ],
       "guidance": "Perfect for tight spaces where you need just the Apptainer symbol",
       "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/Apptainer-logos/Apptainer-Icon_wht_L.png"
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/apptainer/logos/Apptainer-Icon_wht_L.png"
+    }
+  },
+  "warewulf_logos": {
+    "unknown-unk-unknown": {
+      "filename": "WarewulfPro-Logo_wht_v_L.png",
+      "description": "Warewulf logo variant: WarewulfPro-Logo_wht_v_L.png",
+      "layout": "unknown",
+      "color": "unknown",
+      "background": "unknown",
+      "size": "unknown",
+      "use_cases": [
+        "general"
+      ],
+      "guidance": "Warewulf logo variant",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/warewulf/logos/WarewulfPro-Logo_wht_v_L.png"
+    },
+    "icon-whi-vector": {
+      "filename": "Warewulf_icon_wht_L.png",
+      "description": "Warewulf icon (wht_L) for dark backgrounds - SVG",
+      "layout": "icon",
+      "color": "white",
+      "background": "dark",
+      "size": "vector",
+      "use_cases": [
+        "scalable",
+        "favicon",
+        "app_icon"
+      ],
+      "guidance": "Vector format - scales to any size perfectly",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/warewulf/logos/Warewulf_icon_wht_L.png"
+    }
+  },
+  "rlc-hardened_logos": {
+    "unknown-unk-unknown": {
+      "filename": "RLC-H-Icon_wht_L.png",
+      "description": "Rlc-Hardened logo variant: RLC-H-Icon_wht_L.png",
+      "layout": "unknown",
+      "color": "unknown",
+      "background": "unknown",
+      "size": "unknown",
+      "use_cases": [
+        "general"
+      ],
+      "guidance": "Rlc-Hardened logo variant",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc-hardened/logos/RLC-H-Icon_wht_L.png"
     }
   },
   "ciq-support_logos": {
@@ -421,7 +421,7 @@
       ],
       "guidance": "Vector format - scales to any size perfectly",
       "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/CIQ-Support-logos/CIQ-Support_logo_h-wht_L.png"
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/ciq-support/logos/CIQ-Support_logo_h-wht_L.png"
     },
     "icon-whi-vector": {
       "filename": "CIQ-Support_icon_wht_L.png",
@@ -437,7 +437,205 @@
       ],
       "guidance": "Vector format - scales to any size perfectly",
       "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/CIQ-Support-logos/CIQ-Support_icon_wht_L.png"
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/ciq-support/logos/CIQ-Support_icon_wht_L.png"
+    }
+  },
+  "ascender_logos": {
+    "unknown-unk-unknown": {
+      "filename": "AscenderPro-Icon_blk_L.png",
+      "description": "Ascender logo variant: AscenderPro-Icon_blk_L.png",
+      "layout": "unknown",
+      "color": "unknown",
+      "background": "unknown",
+      "size": "unknown",
+      "use_cases": [
+        "general"
+      ],
+      "guidance": "Ascender logo variant",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/ascender/logos/AscenderPro-Icon_blk_L.png"
+    }
+  },
+  "rlc-lts_logos": {
+    "vertical-whi-vector": {
+      "filename": "RLC-LTS_logo_v-blk_L.png",
+      "description": "Rlc-Lts vertical logo (blk_L) for dark backgrounds - SVG",
+      "layout": "vertical",
+      "color": "white",
+      "background": "dark",
+      "size": "vector",
+      "use_cases": [
+        "scalable",
+        "web",
+        "print"
+      ],
+      "guidance": "Vector format - scales to any size perfectly",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc-lts/logos/RLC-LTS_logo_v-blk_L.png"
+    },
+    "horizontal-whi-vector": {
+      "filename": "RLC-LTS_logo_h-blk_L.png",
+      "description": "Rlc-Lts horizontal logo (blk_L) for dark backgrounds - SVG",
+      "layout": "horizontal",
+      "color": "white",
+      "background": "dark",
+      "size": "vector",
+      "use_cases": [
+        "scalable",
+        "web",
+        "print"
+      ],
+      "guidance": "Vector format - scales to any size perfectly",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc-lts/logos/RLC-LTS_logo_h-blk_L.png"
+    }
+  },
+  "bridge_logos": {
+    "unknown-unk-unknown": {
+      "filename": "CIQ-Bridge_logo_v-blk_L.png",
+      "description": "Bridge logo variant: CIQ-Bridge_logo_v-blk_L.png",
+      "layout": "unknown",
+      "color": "unknown",
+      "background": "unknown",
+      "size": "unknown",
+      "use_cases": [
+        "general"
+      ],
+      "guidance": "Bridge logo variant",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/bridge/logos/CIQ-Bridge_logo_v-blk_L.png"
+    },
+    "h-bla-large": {
+      "filename": "CIQ-Bridge-logo_h_blk_L.png",
+      "description": "Bridge logo (blk) for light backgrounds - Large",
+      "layout": "h",
+      "color": "black",
+      "background": "light",
+      "size": "large",
+      "use_cases": [
+        "tall_banners",
+        "social_media_profile",
+        "mobile_layout",
+        "poster"
+      ],
+      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/bridge/logos/CIQ-Bridge-logo_h_blk_L.png"
+    },
+    "h-whi-large": {
+      "filename": "CIQ-Bridge-logo_h_wht_L.png",
+      "description": "Bridge logo (wht) for dark backgrounds - Large",
+      "layout": "h",
+      "color": "white",
+      "background": "dark",
+      "size": "large",
+      "use_cases": [
+        "tall_banners",
+        "social_media_profile",
+        "mobile_layout",
+        "poster"
+      ],
+      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/bridge/logos/CIQ-Bridge-logo_h_wht_L.png"
+    }
+  },
+  "rlc_logos": {
+    "vertical-whi-vector": {
+      "filename": "RLC_logo_v-wht_L.png",
+      "description": "Rlc vertical logo (wht_L) for dark backgrounds - SVG",
+      "layout": "vertical",
+      "color": "white",
+      "background": "dark",
+      "size": "vector",
+      "use_cases": [
+        "scalable",
+        "web",
+        "print"
+      ],
+      "guidance": "Vector format - scales to any size perfectly",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc/logos/RLC_logo_v-wht_L.png"
+    },
+    "unknown-unk-unknown": {
+      "filename": "RLC_Logo_blk_h_L.png",
+      "description": "Rlc logo variant: RLC_Logo_blk_h_L.png",
+      "layout": "unknown",
+      "color": "unknown",
+      "background": "unknown",
+      "size": "unknown",
+      "use_cases": [
+        "general"
+      ],
+      "guidance": "Rlc logo variant",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc/logos/RLC_Logo_blk_h_L.png"
+    },
+    "icon-whi-vector": {
+      "filename": "RLC_icon_wht_L.png",
+      "description": "Rlc icon (wht_L) for dark backgrounds - SVG",
+      "layout": "icon",
+      "color": "white",
+      "background": "dark",
+      "size": "vector",
+      "use_cases": [
+        "scalable",
+        "favicon",
+        "app_icon"
+      ],
+      "guidance": "Vector format - scales to any size perfectly",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc/logos/RLC_icon_wht_L.png"
+    }
+  },
+  "rlc-ai_logos": {
+    "horizontal-whi-vector": {
+      "filename": "RLC-AI_logo_h-blk_L.png",
+      "description": "Rlc-Ai horizontal logo (blk_L) for dark backgrounds - SVG",
+      "layout": "horizontal",
+      "color": "white",
+      "background": "dark",
+      "size": "vector",
+      "use_cases": [
+        "scalable",
+        "web",
+        "print"
+      ],
+      "guidance": "Vector format - scales to any size perfectly",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc-ai/logos/RLC-AI_logo_h-blk_L.png"
+    },
+    "vertical-whi-vector": {
+      "filename": "RLC-AI_logo_v-blk_L.png",
+      "description": "Rlc-Ai vertical logo (blk_L) for dark backgrounds - SVG",
+      "layout": "vertical",
+      "color": "white",
+      "background": "dark",
+      "size": "vector",
+      "use_cases": [
+        "scalable",
+        "web",
+        "print"
+      ],
+      "guidance": "Vector format - scales to any size perfectly",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc-ai/logos/RLC-AI_logo_v-blk_L.png"
+    },
+    "icon-whi-vector": {
+      "filename": "RLC-AI_icon_wht_L.png",
+      "description": "Rlc-Ai icon (wht_L) for dark backgrounds - SVG",
+      "layout": "icon",
+      "color": "white",
+      "background": "dark",
+      "size": "vector",
+      "use_cases": [
+        "scalable",
+        "favicon",
+        "app_icon"
+      ],
+      "guidance": "Vector format - scales to any size perfectly",
+      "format": "png",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc-ai/logos/RLC-AI_icon_wht_L.png"
     }
   }
 }

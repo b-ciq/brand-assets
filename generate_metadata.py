@@ -161,6 +161,39 @@ def parse_generic_filename(filename: str, product: str) -> Dict[str, Any]:
     - {Product}_icon_{color}.{ext} (SVG icon pattern)
     """
     
+    # CIQ-prefixed pattern: CIQ-Bridge-logo_h_wht_L.png 
+    ciq_pattern = rf'CIQ-{re.escape(product.title())}-(\w+)_(\w+)_(\w+)_([LMS])\.(\w+)'
+    match = re.match(ciq_pattern, filename, re.IGNORECASE)
+    
+    if match:
+        asset_type, layout, color, size, ext = match.groups()
+        background = 'light' if color.lower() == 'blk' else 'dark'
+        size_full = {'L': 'large', 'M': 'medium', 'S': 'small'}[size.upper()]
+        final_layout = "icon" if asset_type.lower() == "icon" else layout.lower()
+        
+        # Layout-specific use cases
+        if final_layout == 'icon':
+            use_cases = ["favicon", "app_icon", "small_spaces", "avatars"]
+            guidance = "Perfect for tight spaces where you need just the symbol"
+        elif final_layout == 'horizontal':
+            use_cases = ["headers", "business_cards", "letterhead", "wide_banners"]
+            guidance = "Best for wide spaces - business cards, website headers, email signatures"
+        else:  # vertical
+            use_cases = ["tall_banners", "social_media_profile", "mobile_layout", "poster"]
+            guidance = "Perfect for tall/narrow spaces - social media profiles, mobile layouts"
+        
+        return {
+            "filename": filename,
+            "description": f"{product.title()} {asset_type} ({color}) for {background} backgrounds - {size_full.title()}",
+            "layout": final_layout,
+            "color": "black" if color.lower() == 'blk' else "white",
+            "background": background,
+            "size": size_full.lower(),
+            "use_cases": use_cases,
+            "guidance": guidance,
+            "format": ext.lower()
+        }
+    
     # Icon pattern: Product-Icon_blk_L.png (like Apptainer-Icon_blk_L.png)
     icon_pattern = rf'{re.escape(product.title())}-Icon_(\w+)_([LMS])\.(\w+)'
     match = re.match(icon_pattern, filename, re.IGNORECASE)
@@ -363,11 +396,18 @@ def generate_decision_logic() -> Dict[str, Any]:
     }
 
 def discover_products(base_path: str) -> List[str]:
-    """Auto-discover products by finding *-logos directories"""
+    """Auto-discover products by finding assets subdirectories"""
     products = []
-    path = Path(base_path)
     
-    # Find all *-logos directories
+    # Check /assets/ structure first
+    assets_path = Path(base_path) / "assets"
+    if assets_path.exists():
+        for item in assets_path.iterdir():
+            if item.is_dir() and (item / "logos").exists():
+                products.append(item.name)
+    
+    # Fallback: Find old *-logos directories at root
+    path = Path(base_path)
     for item in path.iterdir():
         if item.is_dir() and item.name.endswith('-logos'):
             # Extract product name
@@ -392,7 +432,7 @@ def discover_products(base_path: str) -> List[str]:
                 # Generic product
                 products.append(product_name)
     
-    return products
+    return list(set(products))  # Remove duplicates
 
 def main():
     parser = argparse.ArgumentParser(description='Generate asset metadata from directory structure')
@@ -416,72 +456,98 @@ def main():
     for product in args.products:
         print(f"📁 Scanning {product} assets...")
         
-        # For current directory structure, check both old and new paths
+        # For current directory structure, prioritize /assets/ structure
         if args.base_path == '.':
-            # Check old structure first: /CIQ-logos, /fuzzball-logos, /Product-logos
-            old_dirs = []
-            if product == 'ciq':
-                old_dirs = ['CIQ-logos']
-            elif product == 'fuzzball':
-                old_dirs = ['fuzzball-logos'] 
-            elif product == 'apptainer':
-                old_dirs = ['Apptainer-logos']
-            elif product == 'bridge':
-                old_dirs = ['Bridge-logos']
-            elif product == 'ascender-pro':
-                old_dirs = ['Ascender-Pro-logos']
-            elif product == 'warewulf-pro':
-                old_dirs = ['Warewulf-Pro-logos']
-            elif product == 'ciq-support':
-                old_dirs = ['CIQ-Support-logos']
-            else:
-                # For other products, try multiple possible directory names
-                old_dirs = [
-                    f"{product.title()}-logos",
-                    f"{product}-logos", 
-                    f"{product.upper()}-logos",
-                    f"{product.title().replace('-', ' ').replace(' ', '-')}-logos"
-                ]
-            
+            # Check NEW assets structure FIRST: /assets/product/logos/
             assets_found = {}
-            for dir_name in old_dirs:
-                old_path = Path(dir_name)
-                if old_path.exists():
-                    print(f"   Found old structure: {old_path}")
-                    for file_path in old_path.glob("*"):
-                        if file_path.is_file() and not file_path.name.startswith('.') and not file_path.name.endswith('.svg'):
-                            filename = file_path.name
-                            
-                            if product == 'ciq':
-                                asset_metadata = parse_ciq_filename(filename)
-                            elif product == 'fuzzball':
-                                asset_metadata = parse_fuzzball_filename(filename)
-                            else:
-                                asset_metadata = parse_generic_filename(filename, product)
-                            
-                            if asset_metadata:
-                                # Use old URL path for now
-                                asset_metadata["url"] = f"{BASE_URL}/{old_path}/{filename}"
-                                
-                                # Generate key
-                                if product == 'ciq':
-                                    key = f"{asset_metadata['variant']}-{asset_metadata['background']}"
-                                elif asset_metadata.get('layout') and asset_metadata.get('background') and asset_metadata.get('size'):
-                                    if asset_metadata['layout'] == 'icon':
-                                        key = f"icon-{asset_metadata['color'][:3]}-{asset_metadata['size']}"
-                                    else:
-                                        key = f"{asset_metadata['layout']}-{asset_metadata['color'][:3]}-{asset_metadata['size']}"
-                                else:
-                                    key = filename.replace('.', '_').replace('-', '_').lower()
-                                
-                                assets_found[key] = asset_metadata
-            
-            # Also check new structure: /assets/{product}/logos
             new_path = Path("assets") / product / "logos"
             if new_path.exists():
-                print(f"   Found new structure: {new_path}")
-                new_assets = scan_directory("assets", product, "logos")
-                assets_found.update(new_assets)
+                print(f"   Found assets structure: {new_path}")
+                for file_path in new_path.glob("*"):
+                    if file_path.is_file() and not file_path.name.startswith('.') and not file_path.name.endswith('.svg'):
+                        filename = file_path.name
+                        
+                        if product == 'ciq':
+                            asset_metadata = parse_ciq_filename(filename)
+                        elif product == 'fuzzball':
+                            asset_metadata = parse_fuzzball_filename(filename)
+                        else:
+                            asset_metadata = parse_generic_filename(filename, product)
+                        
+                        if asset_metadata:
+                            # Use new assets URL path
+                            asset_metadata["url"] = f"{BASE_URL}/assets/{product}/logos/{filename}"
+                            
+                            # Generate key
+                            if product == 'ciq':
+                                key = f"{asset_metadata['variant']}-{asset_metadata['background']}"
+                            elif asset_metadata.get('layout') and asset_metadata.get('background') and asset_metadata.get('size'):
+                                if asset_metadata['layout'] == 'icon':
+                                    key = f"icon-{asset_metadata['color'][:3]}-{asset_metadata['size']}"
+                                else:
+                                    key = f"{asset_metadata['layout']}-{asset_metadata['color'][:3]}-{asset_metadata['size']}"
+                            else:
+                                key = filename.replace('.', '_').replace('-', '_').lower()
+                            
+                            assets_found[key] = asset_metadata
+            
+            # Fallback to old structure if no assets found: /CIQ-logos, /fuzzball-logos, /Product-logos
+            if not assets_found:
+                old_dirs = []
+                if product == 'ciq':
+                    old_dirs = ['CIQ-logos']
+                elif product == 'fuzzball':
+                    old_dirs = ['fuzzball-logos'] 
+                elif product == 'apptainer':
+                    old_dirs = ['Apptainer-logos']
+                elif product == 'bridge':
+                    old_dirs = ['Bridge-logos']
+                elif product == 'ascender-pro':
+                    old_dirs = ['Ascender-Pro-logos']
+                elif product == 'warewulf-pro':
+                    old_dirs = ['Warewulf-Pro-logos']
+                elif product == 'ciq-support':
+                    old_dirs = ['CIQ-Support-logos']
+                else:
+                    # For other products, try multiple possible directory names
+                    old_dirs = [
+                        f"{product.title()}-logos",
+                        f"{product}-logos", 
+                        f"{product.upper()}-logos",
+                        f"{product.title().replace('-', ' ').replace(' ', '-')}-logos"
+                    ]
+                
+                for dir_name in old_dirs:
+                    old_path = Path(dir_name)
+                    if old_path.exists():
+                        print(f"   Found old structure: {old_path}")
+                        for file_path in old_path.glob("*"):
+                            if file_path.is_file() and not file_path.name.startswith('.') and not file_path.name.endswith('.svg'):
+                                filename = file_path.name
+                                
+                                if product == 'ciq':
+                                    asset_metadata = parse_ciq_filename(filename)
+                                elif product == 'fuzzball':
+                                    asset_metadata = parse_fuzzball_filename(filename)
+                                else:
+                                    asset_metadata = parse_generic_filename(filename, product)
+                                
+                                if asset_metadata:
+                                    # Use old URL path for now
+                                    asset_metadata["url"] = f"{BASE_URL}/{old_path}/{filename}"
+                                    
+                                    # Generate key
+                                    if product == 'ciq':
+                                        key = f"{asset_metadata['variant']}-{asset_metadata['background']}"
+                                    elif asset_metadata.get('layout') and asset_metadata.get('background') and asset_metadata.get('size'):
+                                        if asset_metadata['layout'] == 'icon':
+                                            key = f"icon-{asset_metadata['color'][:3]}-{asset_metadata['size']}"
+                                        else:
+                                            key = f"{asset_metadata['layout']}-{asset_metadata['color'][:3]}-{asset_metadata['size']}"
+                                    else:
+                                        key = filename.replace('.', '_').replace('-', '_').lower()
+                                    
+                                    assets_found[key] = asset_metadata
             
             all_product_logos[product] = assets_found
         else:

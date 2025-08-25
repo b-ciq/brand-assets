@@ -3,12 +3,10 @@ name: Auto-Update Asset Metadata
 on:
   push:
     paths:
-      - '*-logos/**'
       - 'assets/**'
     branches: [ main ]
   pull_request:
     paths:
-      - '*-logos/**'
       - 'assets/**'
     branches: [ main ]
 

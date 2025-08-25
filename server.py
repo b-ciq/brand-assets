@@ -40,7 +40,7 @@ class AttributeDetector:
         self.product_patterns = {
             'ciq': ['ciq', 'company', 'brand', 'main'],
             'fuzzball': ['fuzzball', 'fuzz ball', 'workload', 'hpc'],
-            'warewulf': ['warewulf', 'warewulf pro', 'cluster', 'provisioning'],
+            'warewulf': ['warewulf', 'warewulf pro', 'warewulf-pro', 'cluster', 'provisioning'],
             'apptainer': ['apptainer', 'container', 'scientific'],
             'ascender': ['ascender', 'ascender pro', 'automation', 'ansible'],
             'bridge': ['bridge', 'centos', 'migration'],
@@ -168,7 +168,7 @@ class AssetMatcher:
                 'name': 'Warewulf',
                 'description': 'HPC cluster provisioning tool',
                 'structure_type': 'product',
-                'asset_key': 'warewulf_pro_logos'
+                'asset_key': 'warewulf_logos'
             },
             'apptainer': {
                 'name': 'Apptainer',
