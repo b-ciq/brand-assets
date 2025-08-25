@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 CIQ Brand Assets MCP Server - FastMCP Cloud Version
-Integrated System with Attribute Detection, Confidence Scoring, and Clean Response Templates
+Fixed: Enhanced background weighting + No vertical unless requested
 """
 
 from fastmcp import FastMCP
@@ -32,7 +32,7 @@ def load_asset_data():
         return False
 
 class AttributeDetector:
-    """Intelligent attribute detection with confidence scoring"""
+    """Intelligent attribute detection with enhanced background weighting"""
     
     def __init__(self):
         self.product_patterns = {
@@ -56,13 +56,13 @@ class AttributeDetector:
         self.layout_patterns = {
             'icon': ['symbol', 'icon', 'favicon', 'app icon'],
             'horizontal': ['horizontal', 'wide', 'header', 'lockup', 'full logo', 'wordmark'],
-            'vertical': ['vertical', 'tall', 'stacked'],
+            'vertical': ['vertical', 'tall', 'stacked'],  # ONLY when explicitly requested
             '1color': ['1-color', '1 color', 'one color', 'standard'],
             '2color': ['2-color', '2 color', 'two color', 'hero']
         }
 
     def detect_attributes(self, request: str) -> Dict[str, Any]:
-        """Detect attributes with confidence scores"""
+        """Detect attributes with enhanced confidence scores"""
         request_lower = request.lower()
         
         attributes = {
@@ -71,8 +71,16 @@ class AttributeDetector:
             'layout': self._detect_layout(request_lower)
         }
         
-        # Calculate total confidence score
-        total_confidence = sum(attr['confidence'] for attr in attributes.values() if attr)
+        # Enhanced confidence calculation
+        total_confidence = 0
+        if attributes['product']:
+            total_confidence += attributes['product']['confidence']
+        if attributes['background']:
+            # ENHANCED: Background gets major confidence boost (60 instead of 30)
+            total_confidence += 60  # Background detection now worth 60 points
+        if attributes['layout']:
+            total_confidence += attributes['layout']['confidence']
+        
         attributes['total_confidence'] = total_confidence
         
         return attributes
@@ -84,13 +92,9 @@ class AttributeDetector:
             score = 0
             for pattern in patterns:
                 if pattern in request:
-                    # Longer patterns get higher scores + specificity bonus
                     base_score = len(pattern.split()) * 10
-                    
-                    # Specificity bonuses for RLC variants
                     if product.startswith('rlc-') and pattern in request:
                         base_score += 20  # Bonus for specific RLC variants
-                    
                     score += base_score
             if score > 0:
                 scores[product] = min(score, 50)
@@ -104,13 +108,13 @@ class AttributeDetector:
         return None
     
     def _detect_background(self, request: str) -> Optional[Dict]:
-        """Detect background preference (30 points max)"""
+        """Detect background preference (now 60 points for higher confidence)"""
         for bg_type, patterns in self.background_patterns.items():
             for pattern in patterns:
                 if pattern in request:
                     return {
                         'value': bg_type,
-                        'confidence': 30
+                        'confidence': 60  # ENHANCED: Higher weight for background
                     }
         return None
     
@@ -126,72 +130,22 @@ class AttributeDetector:
         return None
 
 class AssetMatcher:
-    """Enhanced asset matching with attribute-based intelligence"""
+    """Enhanced asset matching with NO vertical unless requested rule"""
     
     def __init__(self, asset_data: Dict):
         self.asset_data = asset_data
         self.detector = AttributeDetector()
         self.product_info = {
-            'ciq': {
-                'name': 'CIQ',
-                'description': 'Company brand',
-                'structure_type': 'company',
-                'asset_key': 'logos'
-            },
-            'fuzzball': {
-                'name': 'Fuzzball',
-                'description': 'HPC/AI workload management platform', 
-                'structure_type': 'product',
-                'asset_key': 'fuzzball_logos'
-            },
-            'warewulf': {
-                'name': 'Warewulf',
-                'description': 'HPC cluster provisioning tool',
-                'structure_type': 'product',
-                'asset_key': 'warewulf_pro_logos'
-            },
-            'apptainer': {
-                'name': 'Apptainer',
-                'description': 'Container platform for HPC/scientific workflows',
-                'structure_type': 'product',
-                'asset_key': 'apptainer_logos'
-            },
-            'ascender': {
-                'name': 'Ascender',
-                'description': 'Infrastructure automation platform',
-                'structure_type': 'product',
-                'asset_key': 'ascender_pro_logos'
-            },
-            'bridge': {
-                'name': 'Bridge',
-                'description': 'CentOS 7 migration solution',
-                'structure_type': 'product',
-                'asset_key': 'bridge_logos'
-            },
-            'rlc': {
-                'name': 'RLC',
-                'description': 'Rocky Linux Commercial (base platform)',
-                'structure_type': 'product',
-                'asset_key': 'rlc_logos'
-            },
-            'rlc-ai': {
-                'name': 'RLC-AI',
-                'description': 'Rocky Linux Commercial AI-focused platform',
-                'structure_type': 'product', 
-                'asset_key': 'rlc_ai_logos'
-            },
-            'rlc-hardened': {
-                'name': 'RLC-Hardened',
-                'description': 'Rocky Linux Commercial security-focused platform',
-                'structure_type': 'product',
-                'asset_key': 'rlc_hardened_logos'
-            },
-            'rlc-lts': {
-                'name': 'RLC-LTS',
-                'description': 'Rocky Linux Commercial long-term support',
-                'structure_type': 'product',
-                'asset_key': 'rlc_lts_logos'
-            }
+            'ciq': {'name': 'CIQ', 'description': 'Company brand', 'structure_type': 'company', 'asset_key': 'logos'},
+            'fuzzball': {'name': 'Fuzzball', 'description': 'HPC/AI workload management platform', 'structure_type': 'product', 'asset_key': 'fuzzball_logos'},
+            'warewulf': {'name': 'Warewulf', 'description': 'HPC cluster provisioning tool', 'structure_type': 'product', 'asset_key': 'warewulf_pro_logos'},
+            'apptainer': {'name': 'Apptainer', 'description': 'Container platform for HPC/scientific workflows', 'structure_type': 'product', 'asset_key': 'apptainer_logos'},
+            'ascender': {'name': 'Ascender', 'description': 'Infrastructure automation platform', 'structure_type': 'product', 'asset_key': 'ascender_pro_logos'},
+            'bridge': {'name': 'Bridge', 'description': 'CentOS 7 migration solution', 'structure_type': 'product', 'asset_key': 'bridge_logos'},
+            'rlc': {'name': 'RLC', 'description': 'Rocky Linux Commercial (base platform)', 'structure_type': 'product', 'asset_key': 'rlc_logos'},
+            'rlc-ai': {'name': 'RLC-AI', 'description': 'Rocky Linux Commercial AI-focused platform', 'structure_type': 'product', 'asset_key': 'rlc_ai_logos'},
+            'rlc-hardened': {'name': 'RLC-Hardened', 'description': 'Rocky Linux Commercial security-focused platform', 'structure_type': 'product', 'asset_key': 'rlc_hardened_logos'},
+            'rlc-lts': {'name': 'RLC-LTS', 'description': 'Rocky Linux Commercial long-term support', 'structure_type': 'product', 'asset_key': 'rlc_lts_logos'}
         }
 
     def match_assets(self, request: str) -> Dict[str, Any]:
@@ -204,86 +158,95 @@ class AssetMatcher:
         product_id = attributes['product']['value']
         confidence_level = self._assess_confidence_level(attributes['total_confidence'])
         
-        # Get product assets
         product_info = self.product_info[product_id]
         product_assets = self.asset_data.get(product_info['asset_key'], {})
         
         if not product_assets:
             return {'error': f'No assets found for {product_info["name"]}'}
         
-        # Score and rank assets
-        scored_assets = self._score_assets(product_assets, attributes)
+        # Check if vertical was explicitly requested
+        vertical_requested = attributes['layout'] and attributes['layout']['value'] == 'vertical'
+        
+        # Score and rank assets (with vertical filtering)
+        scored_assets = self._score_assets(product_assets, attributes, vertical_requested)
         
         return {
             'success': True,
             'product': product_info,
             'attributes': attributes,
             'confidence_level': confidence_level,
-            'scored_assets': scored_assets
+            'scored_assets': scored_assets,
+            'vertical_requested': vertical_requested
         }
     
     def _assess_confidence_level(self, total_confidence: int) -> str:
-        """Assess confidence level based on total score"""
-        if total_confidence >= 100:
+        """Assess confidence level with enhanced background weighting"""
+        if total_confidence >= 110:  # Product (50) + Background (60) = 110
             return 'high'
         elif total_confidence >= 50:
             return 'medium'
         else:
             return 'low'
     
-    def _score_assets(self, product_assets: Dict, attributes: Dict) -> List[Tuple[int, Dict, str]]:
-        """Score assets based on detected attributes"""
+    def _score_assets(self, product_assets: Dict, attributes: Dict, vertical_requested: bool) -> List[Tuple[int, Dict, str]]:
+        """Score assets with NO vertical unless requested rule"""
         scored = []
         
         for asset_key, asset in product_assets.items():
+            asset_layout = asset.get('layout', '').lower()
+            
+            # RULE: Skip vertical layouts unless explicitly requested
+            if 'vertical' in asset_layout and not vertical_requested:
+                continue
+            
             score = 0
             reasons = []
             
-            # Layout matching (most important)
+            # Layout matching
             if attributes['layout'] and attributes['layout']['value']:
                 target_layout = attributes['layout']['value']
-                asset_layout = asset.get('layout', '').lower()
-                
                 if target_layout in asset_layout:
                     score += 100
                     reasons.append(f"exact {target_layout} match")
-                elif asset_layout == 'unknown':
-                    score += 30
-                    reasons.append("fallback option")
             else:
-                # Default to horizontal for better brand recognition
-                asset_layout = asset.get('layout', '').lower()
+                # Default scoring: prefer horizontal over icon
                 if 'horizontal' in asset_layout:
                     score += 80
-                    reasons.append("default horizontal layout")
-                elif 'vertical' in asset_layout:
-                    score += 60
-                    reasons.append("vertical layout option")
+                    reasons.append("default horizontal layout (best brand recognition)")
                 elif 'icon' in asset_layout:
-                    score += 40
+                    score += 60
                     reasons.append("icon option")
+                elif '1color' in asset_layout:
+                    score += 90
+                    reasons.append("standard company logo")
+                elif '2color' in asset_layout:
+                    score += 70
+                    reasons.append("hero company logo")
             
-            # Background matching
+            # Enhanced background matching (more weight)
             if attributes['background']:
                 target_bg = attributes['background']['value']
                 asset_bg = asset.get('background', '').lower()
                 
                 if target_bg == asset_bg:
-                    score += 50
-                    reasons.append(f"optimized for {target_bg} backgrounds")
-                elif asset_bg == 'unknown':
-                    score += 15
-                    reasons.append("universal background compatibility")
+                    score += 80  # Enhanced from 50 to 80
+                    reasons.append(f"perfect {target_bg} background match")
             
-            # Format preferences (only PNG files now)
-            if asset.get('format') == 'png':
-                score += 20
-                reasons.append("high-quality PNG format")
+            # Color correctness bonus
+            if attributes['background']:
+                target_bg = attributes['background']['value']
+                asset_color = asset.get('color', '').lower()
+                
+                if target_bg == 'light' and asset_color == 'black':
+                    score += 20
+                    reasons.append("proper dark-on-light contrast")
+                elif target_bg == 'dark' and asset_color == 'white':
+                    score += 20
+                    reasons.append("proper light-on-dark contrast")
             
             if score > 0:
                 scored.append((score, asset, " + ".join(reasons)))
         
-        # Sort by score (highest first)
         return sorted(scored, key=lambda x: x[0], reverse=True)
     
     def _generate_product_help(self) -> Dict[str, Any]:
@@ -310,15 +273,15 @@ class AssetMatcher:
 
 **Examples:**
 • "CIQ logo" → Company brand
-• "Fuzzball logo" → Product brand with options
-• "RLC-AI logo for dark background" → Specific RLC variant
+• "Fuzzball logo for light background" → Direct answer
+• "RLC-AI vertical logo" → Specific layout
 • "Warewulf symbol" → Icon only
 
 Which brand asset do you need?"""
         }
 
 class ResponseFormatter:
-    """Template-based response formatting"""
+    """Template-based response formatting with enhanced confidence logic"""
     
     def format_response(self, match_result: Dict[str, Any]) -> str:
         """Format response based on confidence level"""
@@ -338,7 +301,7 @@ class ResponseFormatter:
             return self._format_low_confidence(match_result)
     
     def _format_high_confidence(self, result: Dict) -> str:
-        """High confidence: Direct answer with single asset"""
+        """High confidence: Direct answer with single best asset"""
         best_asset = result['scored_assets'][0]
         score, asset, reasoning = best_asset
         product_info = result['product']
@@ -349,14 +312,23 @@ class ResponseFormatter:
 
 📎 **Download:** {asset['url']}
 
-💡 **Selection reasoning:** {reasoning}
+💡 **Why this choice:** {reasoning}
 
 📋 **Usage guidance:** {asset.get('guidance', f'Professional {product_info["name"]} branding')}"""
     
     def _format_medium_confidence(self, result: Dict) -> str:
-        """Medium confidence: Top choice + alternatives"""
-        scored_assets = result['scored_assets'][:3]  # Top 3
+        """Medium confidence: Top choice + limited alternatives (no vertical unless requested)"""
+        scored_assets = result['scored_assets']
         product_info = result['product']
+        vertical_requested = result.get('vertical_requested', False)
+        
+        if not vertical_requested:
+            # Filter out vertical from alternatives
+            scored_assets = [(score, asset, reason) for score, asset, reason in scored_assets 
+                           if 'vertical' not in asset.get('layout', '').lower()]
+        
+        # Limit to top 2-3 options
+        scored_assets = scored_assets[:3]
         
         response = f"**{product_info['name']} Logo - Top Recommendation:**\n\n"
         
@@ -370,7 +342,7 @@ class ResponseFormatter:
 
 """
         
-        # Alternatives
+        # Alternatives (limited)
         if len(scored_assets) > 1:
             response += "**Alternative Options:**\n"
             for i, (score, asset, reasoning) in enumerate(scored_assets[1:], 2):
@@ -401,8 +373,9 @@ This helps me recommend the right color version for proper contrast."""
 **Which layout works best for your use case?**
 
 🔸 **horizontal** → Symbol + text side-by-side (headers, business cards, emails)
-🔹 **vertical** → Symbol + text stacked (social media, mobile apps)  
 ⚫ **symbol** → Icon only (tight spaces, favicons)
+
+💡 Need vertical? Just ask for "vertical layout" specifically!
 
 What's your primary use case?"""
         
@@ -413,13 +386,13 @@ What's your primary use case?"""
 @mcp.tool()
 def get_brand_asset(request: str, background: Optional[str] = None) -> str:
     """
-    Get CIQ brand assets with intelligent attribute detection and confidence scoring.
+    Get CIQ brand assets with intelligent attribute detection and enhanced confidence scoring.
     
     Examples:
-    - "CIQ logo for light background" 
-    - "Fuzzball logo"
-    - "RLC-AI logo for dark background"
-    - "Warewulf symbol for email signature"
+    - "CIQ logo for light background" → HIGH confidence, direct answer
+    - "Fuzzball logo" → LOW confidence, asks for background
+    - "RLC-AI vertical logo for dark background" → HIGH confidence, specific match
+    - "Warewulf symbol" → HIGH confidence, direct symbol
     """
     
     # Load data if needed
@@ -494,17 +467,17 @@ def list_all_assets() -> str:
         if product.startswith('RLC'):
             result += f"• **{product}** - {count} variants\n"
     
-    result += """\n**Usage:**
-• "Fuzzball logo" → Smart defaults with options
-• "RLC-AI logo for dark background" → Specific variant
-• "Warewulf symbol" → Icon only
+    result += """\n**Enhanced Behavior:**
+• "Fuzzball logo for light background" → Direct answer (HIGH confidence)
+• "Warewulf logo" → Asks for background (LOW confidence)
+• "RLC-AI symbol" → Direct icon (HIGH confidence)
 
-**New Behavior:**
-• **High confidence** → Direct answer
-• **Medium confidence** → Top choice + alternatives  
-• **Low confidence** → Quick clarifying question
+**New Rules:**
+• **Background specified** → High confidence, direct answer
+• **Vertical only** when explicitly requested
+• **Smart defaults:** Horizontal + symbol (no vertical unless asked)
 
-🧹 **All assets cleaned:** Only largest PNG files, no SVGs or smaller sizes"""
+🧹 **Clean structure:** 46 essential assets, no duplicates"""
     
     return result
 
