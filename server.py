@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-CIQ Brand Assets MCP Server - Integrated System with Intelligent Attribute Detection
+CIQ Brand Assets MCP Server - Integrated System with Separated RLC Products
 Enhanced with confidence scoring, response templates, and clean attribute-based approach
 """
 
@@ -43,7 +43,10 @@ class AttributeDetector:
             'apptainer': ['apptainer', 'container', 'scientific'],
             'ascender': ['ascender', 'ascender pro', 'automation', 'ansible'],
             'bridge': ['bridge', 'centos', 'migration'],
-            'rlc': ['rlc', 'rocky linux', 'commercial', 'rlc-ai', 'rlc ai', 'rlc-hardened', 'rlc hardened']
+            'rlc': ['rlc', 'rocky linux commercial', 'rocky linux'],
+            'rlc-ai': ['rlc-ai', 'rlc ai', 'rocky linux ai', 'rocky linux commercial ai'],
+            'rlc-hardened': ['rlc-hardened', 'rlc hardened', 'rocky linux hardened', 'rocky linux commercial hardened'],
+            'rlc-lts': ['rlc-lts', 'rlc lts', 'rocky linux lts', 'rocky linux commercial lts']
         }
         
         self.background_patterns = {
@@ -89,8 +92,14 @@ class AttributeDetector:
             score = 0
             for pattern in patterns:
                 if pattern in request:
-                    # Longer patterns get higher scores
-                    score += len(pattern.split()) * 10
+                    # Longer patterns get higher scores + specificity bonus
+                    base_score = len(pattern.split()) * 10
+                    
+                    # Specificity bonuses for RLC variants
+                    if product.startswith('rlc-') and pattern in request:
+                        base_score += 20  # Bonus for specific RLC variants
+                    
+                    score += base_score
             if score > 0:
                 scores[product] = min(score, 50)
         
@@ -158,7 +167,7 @@ class AssetMatcher:
                 'name': 'Warewulf',
                 'description': 'HPC cluster provisioning tool',
                 'structure_type': 'product',
-                'asset_key': 'warewulf-pro_logos'
+                'asset_key': 'warewulf_pro_logos'
             },
             'apptainer': {
                 'name': 'Apptainer',
@@ -170,7 +179,7 @@ class AssetMatcher:
                 'name': 'Ascender',
                 'description': 'Infrastructure automation platform',
                 'structure_type': 'product',
-                'asset_key': 'ascender-pro_logos'
+                'asset_key': 'ascender_pro_logos'
             },
             'bridge': {
                 'name': 'Bridge',
@@ -180,9 +189,27 @@ class AssetMatcher:
             },
             'rlc': {
                 'name': 'RLC',
-                'description': 'Rocky Linux Commercial (RLC-AI, RLC-Hardened)',
+                'description': 'Rocky Linux Commercial (base platform)',
                 'structure_type': 'product',
-                'asset_key': 'rlcx_logos'
+                'asset_key': 'rlc_logos'
+            },
+            'rlc-ai': {
+                'name': 'RLC-AI',
+                'description': 'Rocky Linux Commercial AI-focused platform',
+                'structure_type': 'product', 
+                'asset_key': 'rlc_ai_logos'
+            },
+            'rlc-hardened': {
+                'name': 'RLC-Hardened',
+                'description': 'Rocky Linux Commercial security-focused platform',
+                'structure_type': 'product',
+                'asset_key': 'rlc_hardened_logos'
+            },
+            'rlc-lts': {
+                'name': 'RLC-LTS',
+                'description': 'Rocky Linux Commercial long-term support',
+                'structure_type': 'product',
+                'asset_key': 'rlc_lts_logos'
             }
         }
 
@@ -255,10 +282,10 @@ class AssetMatcher:
                     score += 15
                     reasons.append("universal background compatibility")
             
-            # Format preferences
-            if asset.get('format') == 'svg':
+            # Format preferences (only PNG files now)
+            if asset.get('format') == 'png':
                 score += 20
-                reasons.append("scalable vector format")
+                reasons.append("high-quality PNG format")
             
             # Context matching
             if attributes['context']:
@@ -281,7 +308,7 @@ class AssetMatcher:
         context_mappings = {
             'wide_format': ['headers', 'business_cards', 'letterhead', 'wide_banners'],
             'square_format': ['social_media_profile', 'mobile_layout', 'avatars'],
-            'flexible_format': ['scalable', 'web', 'print']
+            'flexible_format': ['scalable', 'web', 'print', 'general_branding']
         }
         
         relevant_cases = context_mappings.get(context, [])
@@ -305,12 +332,18 @@ class AssetMatcher:
 • **Apptainer** - Container platform for HPC/scientific workflows
 • **Ascender** - Infrastructure automation platform
 • **Bridge** - CentOS 7 migration solution
-• **RLC** - Rocky Linux Commercial (AI, Hardened variants)
+
+**RLC Product Family:**
+• **RLC** - Rocky Linux Commercial (base platform)
+• **RLC-AI** - Rocky Linux Commercial AI-focused platform
+• **RLC-Hardened** - Rocky Linux Commercial security-focused platform
+• **RLC-LTS** - Rocky Linux Commercial long-term support
 
 **Examples:**
 • "CIQ logo" → Company brand
 • "Fuzzball logo" → Product brand with options
-• "Warewulf symbol for dark background" → Specific request
+• "RLC-AI logo for dark background" → Specific RLC variant
+• "Warewulf symbol" → Icon only
 
 Which brand asset do you need?"""
         }
@@ -416,6 +449,7 @@ def get_brand_asset(request: str, background: Optional[str] = None) -> str:
     Examples:
     - "CIQ logo for light background" 
     - "Fuzzball logo"
+    - "RLC-AI logo for dark background"
     - "Warewulf symbol for email signature"
     - "Apptainer vertical logo for presentation"
     """
@@ -456,22 +490,53 @@ def list_all_assets() -> str:
         asset_count = len(category_assets)
         total_assets += asset_count
         
-        product_name = category_key.replace('_logos', '').replace('-', ' ').title()
+        # Clean up category names for display
+        product_name = category_key.replace('_logos', '').replace('_', ' ')
+        if product_name == 'warewulf pro':
+            product_name = 'Warewulf Pro'
+        elif product_name == 'ascender pro':
+            product_name = 'Ascender Pro'
+        elif product_name.startswith('rlc'):
+            product_name = product_name.upper().replace('RLC ', 'RLC-')
+        else:
+            product_name = product_name.title()
+            
         product_counts[product_name] = asset_count
     
-    result = f"# 🎨 CIQ Brand Assets Library\n\n**{total_assets} Total Assets**\n\n"
+    result = f"# 🎨 CIQ Brand Assets Library\n\n**{total_assets} Total Clean Assets**\n\n"
     
+    # Group by category
+    result += "## **Company Brand:**\n"
     for product, count in product_counts.items():
-        result += f"• **{product}** - {count} variants\n"
+        if product in ['CIQ', 'CIQ-Support']:
+            result += f"• **{product}** - {count} variants\n"
+    
+    result += "\n## **Development & HPC Tools:**\n"
+    for product, count in product_counts.items():
+        if product in ['Warewulf Pro', 'Ascender Pro', 'Apptainer']:
+            result += f"• **{product}** - {count} variants\n"
+    
+    result += "\n## **Infrastructure & Platform:**\n"
+    for product, count in product_counts.items():
+        if product in ['Bridge', 'Fuzzball']:
+            result += f"• **{product}** - {count} variants\n"
+    
+    result += "\n## **RLC Product Family:**\n"
+    for product, count in product_counts.items():
+        if product.startswith('RLC'):
+            result += f"• **{product}** - {count} variants\n"
     
     result += """\n**Usage:**
 • "Fuzzball logo" → Smart defaults
+• "RLC-AI logo for dark background" → Specific variant
 • "Warewulf symbol" → Icon only
-• "Apptainer logo for dark background" → Specific match
 
-**High confidence** → Direct answer
-**Medium confidence** → Top choice + alternatives  
-**Low confidence** → Quick clarifying question"""
+**Behavior:**
+• **High confidence** → Direct answer
+• **Medium confidence** → Top choice + alternatives  
+• **Low confidence** → Quick clarifying question
+
+🧹 **All assets cleaned:** Only largest PNG files, no SVGs or smaller sizes"""
     
     return result
 
