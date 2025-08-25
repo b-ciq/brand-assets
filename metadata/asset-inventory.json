@@ -1,1065 +1,1164 @@
 {
-  "brand_guidelines": {
-    "clear_space": "Equal to 1/4 the height of the 'Q' in the logo",
-    "minimum_size": "70px height for digital applications",
-    "primary_green": "#229529",
-    "neutral_colors": {
-      "light_background": "dark_grey",
-      "dark_background": "light_grey"
-    }
-  },
-  "decision_logic": {
+  "assets": {
     "ciq": {
-      "main_element": {
-        "description": "Logo is the hero/star of the design",
-        "examples": [
-          "homepage headers",
-          "business cards",
-          "presentation title slides"
-        ],
-        "recommended": "2color (most recognizable branding)"
+      "twocolor_black": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/global/logos/CIQ_logo_twocolor_black_large.png",
+        "filename": "CIQ_logo_twocolor_black_large.png",
+        "background": "light",
+        "color": "black",
+        "layout": "twocolor",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "hero",
+          "primary",
+          "homepage",
+          "presentation",
+          "main_branding"
+        ]
       },
-      "supporting_element": {
-        "description": "Logo is secondary/background element",
-        "examples": [
-          "footers",
-          "watermarks",
-          "corner branding"
-        ],
-        "default": "1color neutral (when in doubt)",
-        "alternative": "green (for neutral designs where logo needs to pop)"
+      "green_white": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/global/logos/CIQ_logo_green_white_large.png",
+        "filename": "CIQ_logo_green_white_large.png",
+        "background": "dark",
+        "color": "white",
+        "layout": "green",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "accent",
+          "highlight",
+          "call_to_action",
+          "brand_pop"
+        ]
+      },
+      "twocolor_white": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/global/logos/CIQ_logo_twocolor_white_large.png",
+        "filename": "CIQ_logo_twocolor_white_large.png",
+        "background": "dark",
+        "color": "white",
+        "layout": "twocolor",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "hero",
+          "primary",
+          "homepage",
+          "presentation",
+          "main_branding"
+        ]
+      },
+      "green_black": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/global/logos/CIQ_logo_green_black_large.png",
+        "filename": "CIQ_logo_green_black_large.png",
+        "background": "light",
+        "color": "black",
+        "layout": "green",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "accent",
+          "highlight",
+          "call_to_action",
+          "brand_pop"
+        ]
+      },
+      "onecolor_white": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/global/logos/CIQ_logo_onecolor_white_large.png",
+        "filename": "CIQ_logo_onecolor_white_large.png",
+        "background": "dark",
+        "color": "white",
+        "layout": "onecolor",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "supporting",
+          "footer",
+          "watermark",
+          "minimal",
+          "professional"
+        ]
+      },
+      "onecolor_black": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/global/logos/CIQ_logo_onecolor_black_large.png",
+        "filename": "CIQ_logo_onecolor_black_large.png",
+        "background": "light",
+        "color": "black",
+        "layout": "onecolor",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "supporting",
+          "footer",
+          "watermark",
+          "minimal",
+          "professional"
+        ]
+      }
+    },
+    "ascender": {
+      "icon_black": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/ascender/logos/Ascender_icon_square_black_large.png",
+        "filename": "Ascender_icon_square_black_large.png",
+        "background": "light",
+        "color": "black",
+        "layout": "icon",
+        "type": "icon",
+        "size": "large",
+        "tags": [
+          "favicon",
+          "app_icon",
+          "compact",
+          "small_space",
+          "avatar"
+        ]
+      },
+      "icon_white": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/ascender/logos/Ascender_icon_square_white_large.png",
+        "filename": "Ascender_icon_square_white_large.png",
+        "background": "dark",
+        "color": "white",
+        "layout": "icon",
+        "type": "icon",
+        "size": "large",
+        "tags": [
+          "favicon",
+          "app_icon",
+          "compact",
+          "small_space",
+          "avatar"
+        ]
+      },
+      "horizontal_white": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/ascender/logos/Ascender_logo_horizontal_white_large.png",
+        "filename": "Ascender_logo_horizontal_white_large.png",
+        "background": "dark",
+        "color": "white",
+        "layout": "horizontal",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "business_card",
+          "header",
+          "email_signature",
+          "letterhead",
+          "wide_format"
+        ]
+      },
+      "vertical_white": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/ascender/logos/Ascender_logo_vertical_white_large.png",
+        "filename": "Ascender_logo_vertical_white_large.png",
+        "background": "dark",
+        "color": "white",
+        "layout": "vertical",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "mobile",
+          "social_profile",
+          "tall_banner",
+          "poster",
+          "stacked"
+        ]
+      },
+      "horizontal_black": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/ascender/logos/Ascender_logo_horizontal_black_large.png",
+        "filename": "Ascender_logo_horizontal_black_large.png",
+        "background": "light",
+        "color": "black",
+        "layout": "horizontal",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "business_card",
+          "header",
+          "email_signature",
+          "letterhead",
+          "wide_format"
+        ]
+      },
+      "vertical_black": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/ascender/logos/Ascender_logo_vertical_black_large.png",
+        "filename": "Ascender_logo_vertical_black_large.png",
+        "background": "light",
+        "color": "black",
+        "layout": "vertical",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "mobile",
+          "social_profile",
+          "tall_banner",
+          "poster",
+          "stacked"
+        ]
+      }
+    },
+    "rlc-hardened": {
+      "horizontal_white": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/rlc-hardened/logos/RLC-Hardened_logo_horizontal_white_large.png",
+        "filename": "RLC-Hardened_logo_horizontal_white_large.png",
+        "background": "dark",
+        "color": "white",
+        "layout": "horizontal",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "business_card",
+          "header",
+          "email_signature",
+          "letterhead",
+          "wide_format"
+        ]
+      },
+      "horizontal_black": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/rlc-hardened/logos/RLC-Hardened_logo_horizontal_black_large.png",
+        "filename": "RLC-Hardened_logo_horizontal_black_large.png",
+        "background": "light",
+        "color": "black",
+        "layout": "horizontal",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "business_card",
+          "header",
+          "email_signature",
+          "letterhead",
+          "wide_format"
+        ]
+      },
+      "vertical_black": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/rlc-hardened/logos/RLC-Hardened_logo_vertical_black_large.png",
+        "filename": "RLC-Hardened_logo_vertical_black_large.png",
+        "background": "light",
+        "color": "black",
+        "layout": "vertical",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "mobile",
+          "social_profile",
+          "tall_banner",
+          "poster",
+          "stacked"
+        ]
+      },
+      "vertical_white": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/rlc-hardened/logos/RLC-Hardened_logo_vertical_white_large.png",
+        "filename": "RLC-Hardened_logo_vertical_white_large.png",
+        "background": "dark",
+        "color": "white",
+        "layout": "vertical",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "mobile",
+          "social_profile",
+          "tall_banner",
+          "poster",
+          "stacked"
+        ]
+      },
+      "icon_black": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/rlc-hardened/logos/RLC-Hardened_icon_square_black_large.png",
+        "filename": "RLC-Hardened_icon_square_black_large.png",
+        "background": "light",
+        "color": "black",
+        "layout": "icon",
+        "type": "icon",
+        "size": "large",
+        "tags": [
+          "favicon",
+          "app_icon",
+          "compact",
+          "small_space",
+          "avatar"
+        ]
+      },
+      "icon_white": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/rlc-hardened/logos/RLC-Hardened_icon_square_white_large.png",
+        "filename": "RLC-Hardened_icon_square_white_large.png",
+        "background": "dark",
+        "color": "white",
+        "layout": "icon",
+        "type": "icon",
+        "size": "large",
+        "tags": [
+          "favicon",
+          "app_icon",
+          "compact",
+          "small_space",
+          "avatar"
+        ]
+      }
+    },
+    "bridge": {
+      "horizontal_white": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/bridge/logos/Bridge_logo_horizontal_white_large.png",
+        "filename": "Bridge_logo_horizontal_white_large.png",
+        "background": "dark",
+        "color": "white",
+        "layout": "horizontal",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "business_card",
+          "header",
+          "email_signature",
+          "letterhead",
+          "wide_format"
+        ]
+      },
+      "icon_white": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/bridge/logos/Bridge_icon_square_white_large.png",
+        "filename": "Bridge_icon_square_white_large.png",
+        "background": "dark",
+        "color": "white",
+        "layout": "icon",
+        "type": "icon",
+        "size": "large",
+        "tags": [
+          "favicon",
+          "app_icon",
+          "compact",
+          "small_space",
+          "avatar"
+        ]
+      },
+      "horizontal_black": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/bridge/logos/Bridge_logo_horizontal_black_large.png",
+        "filename": "Bridge_logo_horizontal_black_large.png",
+        "background": "light",
+        "color": "black",
+        "layout": "horizontal",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "business_card",
+          "header",
+          "email_signature",
+          "letterhead",
+          "wide_format"
+        ]
+      },
+      "icon_black": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/bridge/logos/Bridge_icon_square_black_large.png",
+        "filename": "Bridge_icon_square_black_large.png",
+        "background": "light",
+        "color": "black",
+        "layout": "icon",
+        "type": "icon",
+        "size": "large",
+        "tags": [
+          "favicon",
+          "app_icon",
+          "compact",
+          "small_space",
+          "avatar"
+        ]
+      },
+      "vertical_white": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/bridge/logos/Bridge_logo_vertical_white_large.png",
+        "filename": "Bridge_logo_vertical_white_large.png",
+        "background": "dark",
+        "color": "white",
+        "layout": "vertical",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "mobile",
+          "social_profile",
+          "tall_banner",
+          "poster",
+          "stacked"
+        ]
+      },
+      "vertical_black": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/bridge/logos/Bridge_logo_vertical_black_large.png",
+        "filename": "Bridge_logo_vertical_black_large.png",
+        "background": "light",
+        "color": "black",
+        "layout": "vertical",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "mobile",
+          "social_profile",
+          "tall_banner",
+          "poster",
+          "stacked"
+        ]
+      }
+    },
+    "apptainer": {
+      "vertical_black": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/apptainer/logos/Apptainer_logo_vertical_black_large.png",
+        "filename": "Apptainer_logo_vertical_black_large.png",
+        "background": "light",
+        "color": "black",
+        "layout": "vertical",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "mobile",
+          "social_profile",
+          "tall_banner",
+          "poster",
+          "stacked"
+        ]
+      },
+      "horizontal_white": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/apptainer/logos/Apptainer_logo_horizontal_white_large.png",
+        "filename": "Apptainer_logo_horizontal_white_large.png",
+        "background": "dark",
+        "color": "white",
+        "layout": "horizontal",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "business_card",
+          "header",
+          "email_signature",
+          "letterhead",
+          "wide_format"
+        ]
+      },
+      "vertical_white": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/apptainer/logos/Apptainer_logo_vertical_white_large.png",
+        "filename": "Apptainer_logo_vertical_white_large.png",
+        "background": "dark",
+        "color": "white",
+        "layout": "vertical",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "mobile",
+          "social_profile",
+          "tall_banner",
+          "poster",
+          "stacked"
+        ]
+      },
+      "horizontal_black": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/apptainer/logos/Apptainer_logo_horizontal_black_large.png",
+        "filename": "Apptainer_logo_horizontal_black_large.png",
+        "background": "light",
+        "color": "black",
+        "layout": "horizontal",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "business_card",
+          "header",
+          "email_signature",
+          "letterhead",
+          "wide_format"
+        ]
+      },
+      "icon_black": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/apptainer/logos/Apptainer_icon_square_black_large.png",
+        "filename": "Apptainer_icon_square_black_large.png",
+        "background": "light",
+        "color": "black",
+        "layout": "icon",
+        "type": "icon",
+        "size": "large",
+        "tags": [
+          "favicon",
+          "app_icon",
+          "compact",
+          "small_space",
+          "avatar"
+        ]
+      },
+      "icon_white": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/apptainer/logos/Apptainer_icon_square_white_large.png",
+        "filename": "Apptainer_icon_square_white_large.png",
+        "background": "dark",
+        "color": "white",
+        "layout": "icon",
+        "type": "icon",
+        "size": "large",
+        "tags": [
+          "favicon",
+          "app_icon",
+          "compact",
+          "small_space",
+          "avatar"
+        ]
+      }
+    },
+    "warewulf": {
+      "vertical_white": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/warewulf/logos/Warewulf_logo_vertical_white_large.png",
+        "filename": "Warewulf_logo_vertical_white_large.png",
+        "background": "dark",
+        "color": "white",
+        "layout": "vertical",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "mobile",
+          "social_profile",
+          "tall_banner",
+          "poster",
+          "stacked"
+        ]
+      },
+      "vertical_black": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/warewulf/logos/Warewulf_logo_vertical_black_large.png",
+        "filename": "Warewulf_logo_vertical_black_large.png",
+        "background": "light",
+        "color": "black",
+        "layout": "vertical",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "mobile",
+          "social_profile",
+          "tall_banner",
+          "poster",
+          "stacked"
+        ]
+      },
+      "icon_white": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/warewulf/logos/Warewulf_icon_square_white_large.png",
+        "filename": "Warewulf_icon_square_white_large.png",
+        "background": "dark",
+        "color": "white",
+        "layout": "icon",
+        "type": "icon",
+        "size": "large",
+        "tags": [
+          "favicon",
+          "app_icon",
+          "compact",
+          "small_space",
+          "avatar"
+        ]
+      },
+      "horizontal_black": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/warewulf/logos/Warewulf_logo_horizontal_black_large.png",
+        "filename": "Warewulf_logo_horizontal_black_large.png",
+        "background": "light",
+        "color": "black",
+        "layout": "horizontal",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "business_card",
+          "header",
+          "email_signature",
+          "letterhead",
+          "wide_format"
+        ]
+      },
+      "icon_black": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/warewulf/logos/Warewulf_icon_square_black_large.png",
+        "filename": "Warewulf_icon_square_black_large.png",
+        "background": "light",
+        "color": "black",
+        "layout": "icon",
+        "type": "icon",
+        "size": "large",
+        "tags": [
+          "favicon",
+          "app_icon",
+          "compact",
+          "small_space",
+          "avatar"
+        ]
+      },
+      "horizontal_white": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/warewulf/logos/Warewulf_logo_horizontal_white_large.png",
+        "filename": "Warewulf_logo_horizontal_white_large.png",
+        "background": "dark",
+        "color": "white",
+        "layout": "horizontal",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "business_card",
+          "header",
+          "email_signature",
+          "letterhead",
+          "wide_format"
+        ]
+      }
+    },
+    "rlc-lts": {
+      "vertical_black": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/rlc-lts/logos/RLC-LTS_logo_vertical_black_large.png",
+        "filename": "RLC-LTS_logo_vertical_black_large.png",
+        "background": "light",
+        "color": "black",
+        "layout": "vertical",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "mobile",
+          "social_profile",
+          "tall_banner",
+          "poster",
+          "stacked"
+        ]
+      },
+      "horizontal_black": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/rlc-lts/logos/RLC-LTS_logo_horizontal_black_large.png",
+        "filename": "RLC-LTS_logo_horizontal_black_large.png",
+        "background": "light",
+        "color": "black",
+        "layout": "horizontal",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "business_card",
+          "header",
+          "email_signature",
+          "letterhead",
+          "wide_format"
+        ]
+      },
+      "vertical_white": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/rlc-lts/logos/RLC-LTS_logo_vertical_white_large.png",
+        "filename": "RLC-LTS_logo_vertical_white_large.png",
+        "background": "dark",
+        "color": "white",
+        "layout": "vertical",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "mobile",
+          "social_profile",
+          "tall_banner",
+          "poster",
+          "stacked"
+        ]
+      },
+      "horizontal_white": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/rlc-lts/logos/RLC-LTS_logo_horizontal_white_large.png",
+        "filename": "RLC-LTS_logo_horizontal_white_large.png",
+        "background": "dark",
+        "color": "white",
+        "layout": "horizontal",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "business_card",
+          "header",
+          "email_signature",
+          "letterhead",
+          "wide_format"
+        ]
+      }
+    },
+    "rlc": {
+      "icon_white": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/rlc/logos/RLC_icon_square_white_large.png",
+        "filename": "RLC_icon_square_white_large.png",
+        "background": "dark",
+        "color": "white",
+        "layout": "icon",
+        "type": "icon",
+        "size": "large",
+        "tags": [
+          "favicon",
+          "app_icon",
+          "compact",
+          "small_space",
+          "avatar"
+        ]
+      },
+      "vertical_white": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/rlc/logos/RLC_logo_vertical_white_large.png",
+        "filename": "RLC_logo_vertical_white_large.png",
+        "background": "dark",
+        "color": "white",
+        "layout": "vertical",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "mobile",
+          "social_profile",
+          "tall_banner",
+          "poster",
+          "stacked"
+        ]
+      },
+      "icon_black": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/rlc/logos/RLC_icon_square_black_large.png",
+        "filename": "RLC_icon_square_black_large.png",
+        "background": "light",
+        "color": "black",
+        "layout": "icon",
+        "type": "icon",
+        "size": "large",
+        "tags": [
+          "favicon",
+          "app_icon",
+          "compact",
+          "small_space",
+          "avatar"
+        ]
+      },
+      "vertical_black": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/rlc/logos/RLC_logo_vertical_black_large.png",
+        "filename": "RLC_logo_vertical_black_large.png",
+        "background": "light",
+        "color": "black",
+        "layout": "vertical",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "mobile",
+          "social_profile",
+          "tall_banner",
+          "poster",
+          "stacked"
+        ]
+      },
+      "horizontal_black": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/rlc/logos/RLC_logo_horizontal_black_large.png",
+        "filename": "RLC_logo_horizontal_black_large.png",
+        "background": "light",
+        "color": "black",
+        "layout": "horizontal",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "business_card",
+          "header",
+          "email_signature",
+          "letterhead",
+          "wide_format"
+        ]
+      },
+      "horizontal_white": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/rlc/logos/RLC_logo_horizontal_white_large.png",
+        "filename": "RLC_logo_horizontal_white_large.png",
+        "background": "dark",
+        "color": "white",
+        "layout": "horizontal",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "business_card",
+          "header",
+          "email_signature",
+          "letterhead",
+          "wide_format"
+        ]
+      }
+    },
+    "support": {
+      "horizontal_black": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/support/logos/Support_logo_horizontal_black_large.png",
+        "filename": "Support_logo_horizontal_black_large.png",
+        "background": "light",
+        "color": "black",
+        "layout": "horizontal",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "business_card",
+          "header",
+          "email_signature",
+          "letterhead",
+          "wide_format"
+        ]
+      },
+      "horizontal_white": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/support/logos/Support_logo_horizontal_white_large.png",
+        "filename": "Support_logo_horizontal_white_large.png",
+        "background": "dark",
+        "color": "white",
+        "layout": "horizontal",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "business_card",
+          "header",
+          "email_signature",
+          "letterhead",
+          "wide_format"
+        ]
+      },
+      "icon_black": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/support/logos/Support_icon_square_black_large.png",
+        "filename": "Support_icon_square_black_large.png",
+        "background": "light",
+        "color": "black",
+        "layout": "icon",
+        "type": "icon",
+        "size": "large",
+        "tags": [
+          "favicon",
+          "app_icon",
+          "compact",
+          "small_space",
+          "avatar"
+        ]
+      },
+      "icon_white": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/support/logos/Support_icon_square_white_large.png",
+        "filename": "Support_icon_square_white_large.png",
+        "background": "dark",
+        "color": "white",
+        "layout": "icon",
+        "type": "icon",
+        "size": "large",
+        "tags": [
+          "favicon",
+          "app_icon",
+          "compact",
+          "small_space",
+          "avatar"
+        ]
+      }
+    },
+    "rlc-ai": {
+      "vertical_white": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/rlc-ai/logos/RLC-AI_logo_vertical_white_large.png",
+        "filename": "RLC-AI_logo_vertical_white_large.png",
+        "background": "dark",
+        "color": "white",
+        "layout": "vertical",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "mobile",
+          "social_profile",
+          "tall_banner",
+          "poster",
+          "stacked"
+        ]
+      },
+      "icon_white": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/rlc-ai/logos/RLC-AI_icon_square_white_large.png",
+        "filename": "RLC-AI_icon_square_white_large.png",
+        "background": "dark",
+        "color": "white",
+        "layout": "icon",
+        "type": "icon",
+        "size": "large",
+        "tags": [
+          "favicon",
+          "app_icon",
+          "compact",
+          "small_space",
+          "avatar"
+        ]
+      },
+      "vertical_black": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/rlc-ai/logos/RLC-AI_logo_vertical_black_large.png",
+        "filename": "RLC-AI_logo_vertical_black_large.png",
+        "background": "light",
+        "color": "black",
+        "layout": "vertical",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "mobile",
+          "social_profile",
+          "tall_banner",
+          "poster",
+          "stacked"
+        ]
+      },
+      "icon_black": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/rlc-ai/logos/RLC-AI_icon_square_black_large.png",
+        "filename": "RLC-AI_icon_square_black_large.png",
+        "background": "light",
+        "color": "black",
+        "layout": "icon",
+        "type": "icon",
+        "size": "large",
+        "tags": [
+          "favicon",
+          "app_icon",
+          "compact",
+          "small_space",
+          "avatar"
+        ]
+      },
+      "horizontal_white": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/rlc-ai/logos/RLC-AI_logo_horizontal_white_large.png",
+        "filename": "RLC-AI_logo_horizontal_white_large.png",
+        "background": "dark",
+        "color": "white",
+        "layout": "horizontal",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "business_card",
+          "header",
+          "email_signature",
+          "letterhead",
+          "wide_format"
+        ]
+      },
+      "horizontal_black": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/rlc-ai/logos/RLC-AI_logo_horizontal_black_large.png",
+        "filename": "RLC-AI_logo_horizontal_black_large.png",
+        "background": "light",
+        "color": "black",
+        "layout": "horizontal",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "business_card",
+          "header",
+          "email_signature",
+          "letterhead",
+          "wide_format"
+        ]
       }
     },
     "fuzzball": {
-      "layout_selection": {
-        "icon": {
-          "description": "Just the symbol - most compact",
-          "examples": [
-            "favicons",
-            "app icons",
-            "avatars",
-            "tight spaces"
-          ],
-          "when_to_use": "Space is very limited or you need just the recognizable symbol"
-        },
-        "horizontal": {
-          "description": "Symbol + text side-by-side",
-          "examples": [
-            "business cards",
-            "headers",
-            "email signatures",
-            "letterhead"
-          ],
-          "when_to_use": "Wide spaces, professional documents, primary branding"
-        },
-        "vertical": {
-          "description": "Symbol + text stacked",
-          "examples": [
-            "social media profiles",
-            "mobile layouts",
-            "tall banners",
-            "posters"
-          ],
-          "when_to_use": "Tall/narrow spaces, mobile-first designs"
-        }
+      "icon_white": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/fuzzball/logos/Fuzzball_icon_square_white_large.png",
+        "filename": "Fuzzball_icon_square_white_large.png",
+        "background": "dark",
+        "color": "white",
+        "layout": "icon",
+        "type": "icon",
+        "size": "large",
+        "tags": [
+          "favicon",
+          "app_icon",
+          "compact",
+          "small_space",
+          "avatar"
+        ]
       },
-      "size_selection": {
-        "small": "Compact usage, small spaces",
-        "medium": "Standard usage, most common",
-        "large": "Hero placement, high-impact usage"
+      "icon_black": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/fuzzball/logos/Fuzzball_icon_square_black_large.png",
+        "filename": "Fuzzball_icon_square_black_large.png",
+        "background": "light",
+        "color": "black",
+        "layout": "icon",
+        "type": "icon",
+        "size": "large",
+        "tags": [
+          "favicon",
+          "app_icon",
+          "compact",
+          "small_space",
+          "avatar"
+        ]
+      },
+      "vertical_white": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/fuzzball/logos/Fuzzball_logo_vertical_white_large.png",
+        "filename": "Fuzzball_logo_vertical_white_large.png",
+        "background": "dark",
+        "color": "white",
+        "layout": "vertical",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "mobile",
+          "social_profile",
+          "tall_banner",
+          "poster",
+          "stacked"
+        ]
+      },
+      "horizontal_white": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/fuzzball/logos/Fuzzball_logo_horizontal_white_large.png",
+        "filename": "Fuzzball_logo_horizontal_white_large.png",
+        "background": "dark",
+        "color": "white",
+        "layout": "horizontal",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "business_card",
+          "header",
+          "email_signature",
+          "letterhead",
+          "wide_format"
+        ]
+      },
+      "vertical_black": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/fuzzball/logos/Fuzzball_logo_vertical_black_large.png",
+        "filename": "Fuzzball_logo_vertical_black_large.png",
+        "background": "light",
+        "color": "black",
+        "layout": "vertical",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "mobile",
+          "social_profile",
+          "tall_banner",
+          "poster",
+          "stacked"
+        ]
+      },
+      "horizontal_black": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/fuzzball/logos/Fuzzball_logo_horizontal_black_large.png",
+        "filename": "Fuzzball_logo_horizontal_black_large.png",
+        "background": "light",
+        "color": "black",
+        "layout": "horizontal",
+        "type": "logo",
+        "size": "large",
+        "tags": [
+          "business_card",
+          "header",
+          "email_signature",
+          "letterhead",
+          "wide_format"
+        ]
       }
     }
   },
-  "logos": {
-    "1color-light": {
-      "filename": "CIQ-Logo-1color-light.png",
-      "description": "Single color (neutral) logo for light backgrounds",
-      "use_cases": [
-        "supporting_element",
-        "footer",
-        "watermark",
-        "professional_documents"
-      ],
-      "colors": [
-        "neutral"
-      ],
-      "background": "light",
-      "guidance": "Professional and clean - won't compete with colorful design elements",
-      "variant": "1color",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/ciq/logos/CIQ-Logo-1color-light.png"
+  "rules": {
+    "use_case_matching": {
+      "favicon": {
+        "prefer_layout": "icon",
+        "prefer_size": "large",
+        "description": "Small square icon for browser tabs"
+      },
+      "app_icon": {
+        "prefer_layout": "icon",
+        "prefer_size": "large",
+        "description": "Application icon for software"
+      },
+      "business_card": {
+        "prefer_layout": "horizontal",
+        "prefer_size": "large",
+        "description": "Logo for business cards and professional materials"
+      },
+      "email_signature": {
+        "prefer_layout": "horizontal",
+        "prefer_size": "large",
+        "description": "Logo for email signatures"
+      },
+      "letterhead": {
+        "prefer_layout": "horizontal",
+        "prefer_size": "large",
+        "description": "Logo for official letterhead"
+      },
+      "website_header": {
+        "prefer_layout": "horizontal",
+        "prefer_size": "large",
+        "description": "Logo for website headers"
+      },
+      "mobile_app": {
+        "prefer_layout": "vertical",
+        "prefer_size": "large",
+        "description": "Logo optimized for mobile layouts"
+      },
+      "social_media": {
+        "prefer_layout": "vertical",
+        "prefer_size": "large",
+        "description": "Logo for social media profiles"
+      },
+      "presentation": {
+        "prefer_layout": "horizontal",
+        "prefer_size": "large",
+        "description": "Logo for presentations and slides"
+      }
     },
-    "2color-dark": {
-      "filename": "CIQ-Logo-2color-dark.png",
-      "description": "Two color (neutral + green) logo for dark backgrounds",
-      "use_cases": [
-        "hero",
-        "main_element",
-        "homepage",
-        "business_cards",
-        "presentations"
-      ],
-      "colors": [
-        "neutral",
-        "PMS_347_green"
-      ],
-      "background": "dark",
-      "guidance": "Most recognizable CIQ branding - use when logo is the star of the design",
-      "variant": "2color",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/ciq/logos/CIQ-Logo-2color-dark.png"
+    "background_matching": {
+      "light": {
+        "prefer_color": "black",
+        "description": "Dark logos on light backgrounds"
+      },
+      "dark": {
+        "prefer_color": "white",
+        "description": "Light logos on dark backgrounds"
+      },
+      "any": {
+        "prefer_color": "color",
+        "fallback_color": "black",
+        "description": "Color logos that work on various backgrounds"
+      }
     },
-    "green-light": {
-      "filename": "CIQ-Logo-green-light.png",
-      "description": "Single color (green) logo for light backgrounds",
-      "use_cases": [
-        "supporting_element",
-        "minimal_designs",
-        "advertising",
-        "brand_accent"
-      ],
-      "colors": [
-        "PMS_347_green"
-      ],
-      "background": "light",
-      "guidance": "Use in neutral/minimal designs when you need the logo to jump out",
-      "variant": "green",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/ciq/logos/CIQ-Logo-green-light.png"
+    "ciq_variant_rules": {
+      "main_branding": {
+        "prefer_variant": "twocolor",
+        "description": "Most recognizable CIQ branding - use when logo is the star"
+      },
+      "supporting": {
+        "prefer_variant": "onecolor",
+        "description": "Clean, professional - won't compete with other elements"
+      },
+      "accent": {
+        "prefer_variant": "green",
+        "description": "Use when you need the logo to pop in neutral designs"
+      }
     },
-    "1color-dark": {
-      "filename": "CIQ-Logo-1color-dark.png",
-      "description": "Single color (neutral) logo for dark backgrounds",
-      "use_cases": [
-        "supporting_element",
-        "footer",
-        "watermark",
-        "professional_documents"
-      ],
-      "colors": [
-        "neutral"
-      ],
-      "background": "dark",
-      "guidance": "Professional and clean - won't compete with colorful design elements",
-      "variant": "1color",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/ciq/logos/CIQ-Logo-1color-dark.png"
-    },
-    "2color-light": {
-      "filename": "CIQ-Logo-2color-light.png",
-      "description": "Two color (neutral + green) logo for light backgrounds",
-      "use_cases": [
-        "hero",
-        "main_element",
-        "homepage",
-        "business_cards",
-        "presentations"
-      ],
-      "colors": [
-        "neutral",
-        "PMS_347_green"
-      ],
-      "background": "light",
-      "guidance": "Most recognizable CIQ branding - use when logo is the star of the design",
-      "variant": "2color",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/ciq/logos/CIQ-Logo-2color-light.png"
-    },
-    "green-dark": {
-      "filename": "CIQ-Logo-green-dark.png",
-      "description": "Single color (green) logo for dark backgrounds",
-      "use_cases": [
-        "supporting_element",
-        "minimal_designs",
-        "advertising",
-        "brand_accent"
-      ],
-      "colors": [
-        "PMS_347_green"
-      ],
-      "background": "dark",
-      "guidance": "Use in neutral/minimal designs when you need the logo to jump out",
-      "variant": "green",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/ciq/logos/CIQ-Logo-green-dark.png"
+    "confidence_scoring": {
+      "exact_match": 1.0,
+      "layout_match": 0.8,
+      "background_match": 0.7,
+      "tag_match": 0.6,
+      "fallback": 0.3
     }
   },
-  "fuzzball_logos": {
-    "icon-whi-large": {
-      "filename": "Fuzzball-Icon_wht_L.png",
-      "description": "Fuzzball icon (wht) for dark backgrounds - Large",
-      "layout": "icon",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the Fuzzball symbol",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/fuzzball/logos/Fuzzball-Icon_wht_L.png"
-    },
-    "horizontal-bla-large": {
-      "filename": "Fuzzball_logo_logo_h-blk_L.png",
-      "description": "Fuzzball horizontal logo (blk) for light backgrounds - Large",
-      "layout": "horizontal",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "headers",
-        "business_cards",
-        "letterhead",
-        "wide_banners"
-      ],
-      "guidance": "Best for wide spaces - business cards, website headers, email signatures",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/fuzzball/logos/Fuzzball_logo_logo_h-blk_L.png"
-    },
-    "vertical-bla-large": {
-      "filename": "Fuzzball_logo_logo_v-blk_L.png",
-      "description": "Fuzzball vertical logo (blk) for light backgrounds - Large",
-      "layout": "vertical",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "tall_banners",
-        "social_media_profile",
-        "mobile_layout",
-        "poster"
-      ],
-      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/fuzzball/logos/Fuzzball_logo_logo_v-blk_L.png"
-    },
-    "horizontal-whi-large": {
-      "filename": "Fuzzball_logo_logo_h-wht_L.png",
-      "description": "Fuzzball horizontal logo (wht) for dark backgrounds - Large",
-      "layout": "horizontal",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "headers",
-        "business_cards",
-        "letterhead",
-        "wide_banners"
-      ],
-      "guidance": "Best for wide spaces - business cards, website headers, email signatures",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/fuzzball/logos/Fuzzball_logo_logo_h-wht_L.png"
-    },
-    "icon-bla-large": {
-      "filename": "Fuzzball-Icon_blk_L.png",
-      "description": "Fuzzball icon (blk) for light backgrounds - Large",
-      "layout": "icon",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the Fuzzball symbol",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/fuzzball/logos/Fuzzball-Icon_blk_L.png"
-    },
-    "vertical-whi-large": {
-      "filename": "Fuzzball_logo_logo_v-wht_L.png",
-      "description": "Fuzzball vertical logo (wht) for dark backgrounds - Large",
-      "layout": "vertical",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "tall_banners",
-        "social_media_profile",
-        "mobile_layout",
-        "poster"
-      ],
-      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/fuzzball/logos/Fuzzball_logo_logo_v-wht_L.png"
-    }
-  },
-  "rlc-hardened_logos": {
-    "unknown-unk-unknown": {
-      "filename": "RLC-H-logo_h_blk_L.png",
-      "description": "Rlc-Hardened logo variant: RLC-H-logo_h_blk_L.png",
-      "layout": "unknown",
-      "color": "unknown",
-      "background": "unknown",
-      "size": "unknown",
-      "use_cases": [
-        "general"
-      ],
-      "guidance": "Rlc-Hardened logo variant",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc-hardened/logos/RLC-H-logo_h_blk_L.png"
-    },
-    "icon-bla-large": {
-      "filename": "RLC-H-Icon_blk_L.png",
-      "description": "Rlc-Hardened icon (blk) for light backgrounds - Large",
-      "layout": "icon",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the Rlc-Hardened symbol",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc-hardened/logos/RLC-H-Icon_blk_L.png"
-    },
-    "icon-whi-large": {
-      "filename": "RLC-H-Icon_wht_L.png",
-      "description": "Rlc-Hardened icon (wht) for dark backgrounds - Large",
-      "layout": "icon",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the Rlc-Hardened symbol",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc-hardened/logos/RLC-H-Icon_wht_L.png"
-    }
-  },
-  "ciq-support_logos": {
-    "horizontal-bla-large": {
-      "filename": "CIQ-Support_logo_h-blk_L.png",
-      "description": "Ciq-Support horizontal logo (blk) for light backgrounds - Large",
-      "layout": "horizontal",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "headers",
-        "business_cards",
-        "letterhead",
-        "wide_banners"
-      ],
-      "guidance": "Best for wide spaces - business cards, website headers, email signatures",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/ciq-support/logos/CIQ-Support_logo_h-blk_L.png"
-    },
-    "icon-bla-large": {
-      "filename": "CIQ-Support_icon_blk_L.png",
-      "description": "Ciq-Support icon (blk) for light backgrounds - Large",
-      "layout": "icon",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the Ciq-Support symbol",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/ciq-support/logos/CIQ-Support_icon_blk_L.png"
-    },
-    "horizontal-whi-large": {
-      "filename": "CIQ-Support_logo_h-wht_L.png",
-      "description": "Ciq-Support horizontal logo (wht) for dark backgrounds - Large",
-      "layout": "horizontal",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "headers",
-        "business_cards",
-        "letterhead",
-        "wide_banners"
-      ],
-      "guidance": "Best for wide spaces - business cards, website headers, email signatures",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/ciq-support/logos/CIQ-Support_logo_h-wht_L.png"
-    },
-    "icon-whi-large": {
-      "filename": "CIQ-Support_icon_wht_L.png",
-      "description": "Ciq-Support icon (wht) for dark backgrounds - Large",
-      "layout": "icon",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the Ciq-Support symbol",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/ciq-support/logos/CIQ-Support_icon_wht_L.png"
-    }
-  },
-  "rlc_logos": {
-    "vertical-bla-large": {
-      "filename": "RLC_logo_v-blk_L.png",
-      "description": "Rlc vertical logo (blk) for light backgrounds - Large",
-      "layout": "vertical",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "tall_banners",
-        "social_media_profile",
-        "mobile_layout",
-        "poster"
-      ],
-      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc/logos/RLC_logo_v-blk_L.png"
-    },
-    "unknown-unk-unknown": {
-      "filename": "RLC_Logo_blk_h_L.png",
-      "description": "Rlc logo variant: RLC_Logo_blk_h_L.png",
-      "layout": "unknown",
-      "color": "unknown",
-      "background": "unknown",
-      "size": "unknown",
-      "use_cases": [
-        "general"
-      ],
-      "guidance": "Rlc logo variant",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc/logos/RLC_Logo_blk_h_L.png"
-    },
-    "vertical-whi-large": {
-      "filename": "RLC_logo_v-wht_L.png",
-      "description": "Rlc vertical logo (wht) for dark backgrounds - Large",
-      "layout": "vertical",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "tall_banners",
-        "social_media_profile",
-        "mobile_layout",
-        "poster"
-      ],
-      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc/logos/RLC_logo_v-wht_L.png"
-    },
-    "icon-bla-large": {
-      "filename": "RLC_icon_blk_L.png",
-      "description": "Rlc icon (blk) for light backgrounds - Large",
-      "layout": "icon",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the Rlc symbol",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc/logos/RLC_icon_blk_L.png"
-    },
-    "icon-whi-large": {
-      "filename": "RLC_icon_wht_L.png",
-      "description": "Rlc icon (wht) for dark backgrounds - Large",
-      "layout": "icon",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the Rlc symbol",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc/logos/RLC_icon_wht_L.png"
-    }
-  },
-  "rlc-lts_logos": {
-    "vertical-whi-large": {
-      "filename": "RLC-LTS_logo_v-wht_L.png",
-      "description": "Rlc-Lts vertical logo (wht) for dark backgrounds - Large",
-      "layout": "vertical",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "tall_banners",
-        "social_media_profile",
-        "mobile_layout",
-        "poster"
-      ],
-      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc-lts/logos/RLC-LTS_logo_v-wht_L.png"
-    },
-    "horizontal-whi-large": {
-      "filename": "RLC-LTS_logo_h-wht_L.png",
-      "description": "Rlc-Lts horizontal logo (wht) for dark backgrounds - Large",
-      "layout": "horizontal",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "headers",
-        "business_cards",
-        "letterhead",
-        "wide_banners"
-      ],
-      "guidance": "Best for wide spaces - business cards, website headers, email signatures",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc-lts/logos/RLC-LTS_logo_h-wht_L.png"
-    },
-    "vertical-bla-large": {
-      "filename": "RLC-LTS_logo_v-blk_L.png",
-      "description": "Rlc-Lts vertical logo (blk) for light backgrounds - Large",
-      "layout": "vertical",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "tall_banners",
-        "social_media_profile",
-        "mobile_layout",
-        "poster"
-      ],
-      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc-lts/logos/RLC-LTS_logo_v-blk_L.png"
-    },
-    "horizontal-bla-large": {
-      "filename": "RLC-LTS_logo_h-blk_L.png",
-      "description": "Rlc-Lts horizontal logo (blk) for light backgrounds - Large",
-      "layout": "horizontal",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "headers",
-        "business_cards",
-        "letterhead",
-        "wide_banners"
-      ],
-      "guidance": "Best for wide spaces - business cards, website headers, email signatures",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc-lts/logos/RLC-LTS_logo_h-blk_L.png"
-    }
-  },
-  "rlc-ai_logos": {
-    "horizontal-whi-large": {
-      "filename": "RLC-AI_logo_h-wht_L.png",
-      "description": "Rlc-Ai horizontal logo (wht) for dark backgrounds - Large",
-      "layout": "horizontal",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "headers",
-        "business_cards",
-        "letterhead",
-        "wide_banners"
-      ],
-      "guidance": "Best for wide spaces - business cards, website headers, email signatures",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc-ai/logos/RLC-AI_logo_h-wht_L.png"
-    },
-    "vertical-whi-large": {
-      "filename": "RLC-AI_logo_v-wht_L.png",
-      "description": "Rlc-Ai vertical logo (wht) for dark backgrounds - Large",
-      "layout": "vertical",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "tall_banners",
-        "social_media_profile",
-        "mobile_layout",
-        "poster"
-      ],
-      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc-ai/logos/RLC-AI_logo_v-wht_L.png"
-    },
-    "horizontal-bla-large": {
-      "filename": "RLC-AI_logo_h-blk_L.png",
-      "description": "Rlc-Ai horizontal logo (blk) for light backgrounds - Large",
-      "layout": "horizontal",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "headers",
-        "business_cards",
-        "letterhead",
-        "wide_banners"
-      ],
-      "guidance": "Best for wide spaces - business cards, website headers, email signatures",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc-ai/logos/RLC-AI_logo_h-blk_L.png"
-    },
-    "vertical-bla-large": {
-      "filename": "RLC-AI_logo_v-blk_L.png",
-      "description": "Rlc-Ai vertical logo (blk) for light backgrounds - Large",
-      "layout": "vertical",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "tall_banners",
-        "social_media_profile",
-        "mobile_layout",
-        "poster"
-      ],
-      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc-ai/logos/RLC-AI_logo_v-blk_L.png"
-    },
-    "icon-bla-large": {
-      "filename": "RLC-AI_icon_blk_L.png",
-      "description": "Rlc-Ai icon (blk) for light backgrounds - Large",
-      "layout": "icon",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the Rlc-Ai symbol",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc-ai/logos/RLC-AI_icon_blk_L.png"
-    },
-    "icon-whi-large": {
-      "filename": "RLC-AI_icon_wht_L.png",
-      "description": "Rlc-Ai icon (wht) for dark backgrounds - Large",
-      "layout": "icon",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the Rlc-Ai symbol",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/rlc-ai/logos/RLC-AI_icon_wht_L.png"
-    }
-  },
-  "warewulf_logos": {
-    "horizontal-bla-large": {
-      "filename": "WarewulfPro-Logo_blk_h_L.png",
-      "description": "Warewulf horizontal logo (blk) for light backgrounds - Large",
-      "layout": "horizontal",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "headers",
-        "business_cards",
-        "letterhead",
-        "wide_banners"
-      ],
-      "guidance": "Best for wide spaces - business cards, website headers, email signatures",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/warewulf/logos/WarewulfPro-Logo_blk_h_L.png"
-    },
-    "icon-bla-large": {
-      "filename": "Warewulf_icon_blk_L.png",
-      "description": "Warewulf icon (blk) for light backgrounds - Large",
-      "layout": "icon",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the Warewulf symbol",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/warewulf/logos/Warewulf_icon_blk_L.png"
-    },
-    "vertical-bla-large": {
-      "filename": "WarewulfPro-Logo_blk_v_L.png",
-      "description": "Warewulf vertical logo (blk) for light backgrounds - Large",
-      "layout": "vertical",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "tall_banners",
-        "social_media_profile",
-        "mobile_layout",
-        "poster"
-      ],
-      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/warewulf/logos/WarewulfPro-Logo_blk_v_L.png"
-    },
-    "icon-whi-large": {
-      "filename": "Warewulf_icon_wht_L.png",
-      "description": "Warewulf icon (wht) for dark backgrounds - Large",
-      "layout": "icon",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the Warewulf symbol",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/warewulf/logos/Warewulf_icon_wht_L.png"
-    },
-    "horizontal-whi-large": {
-      "filename": "WarewulfPro-Logo_wht_h_L.png",
-      "description": "Warewulf horizontal logo (wht) for dark backgrounds - Large",
-      "layout": "horizontal",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "headers",
-        "business_cards",
-        "letterhead",
-        "wide_banners"
-      ],
-      "guidance": "Best for wide spaces - business cards, website headers, email signatures",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/warewulf/logos/WarewulfPro-Logo_wht_h_L.png"
-    },
-    "vertical-whi-large": {
-      "filename": "WarewulfPro-Logo_wht_v_L.png",
-      "description": "Warewulf vertical logo (wht) for dark backgrounds - Large",
-      "layout": "vertical",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "tall_banners",
-        "social_media_profile",
-        "mobile_layout",
-        "poster"
-      ],
-      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/warewulf/logos/WarewulfPro-Logo_wht_v_L.png"
-    }
-  },
-  "apptainer_logos": {
-    "vertical-whi-large": {
-      "filename": "Apptainer-Logo_wht_v_L.png",
-      "description": "Apptainer vertical logo (wht) for dark backgrounds - Large",
-      "layout": "vertical",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "tall_banners",
-        "social_media_profile",
-        "mobile_layout",
-        "poster"
-      ],
-      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/apptainer/logos/Apptainer-Logo_wht_v_L.png"
-    },
-    "horizontal-whi-large": {
-      "filename": "Apptainer-Logo_wht_h_L.png",
-      "description": "Apptainer horizontal logo (wht) for dark backgrounds - Large",
-      "layout": "horizontal",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "headers",
-        "business_cards",
-        "letterhead",
-        "wide_banners"
-      ],
-      "guidance": "Best for wide spaces - business cards, website headers, email signatures",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/apptainer/logos/Apptainer-Logo_wht_h_L.png"
-    },
-    "icon-bla-large": {
-      "filename": "Apptainer-Icon_blk_L.png",
-      "description": "Apptainer icon (blk) for light backgrounds - Large",
-      "layout": "icon",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the Apptainer symbol",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/apptainer/logos/Apptainer-Icon_blk_L.png"
-    },
-    "vertical-bla-large": {
-      "filename": "Apptainer-Logo_blk_v_L.png",
-      "description": "Apptainer vertical logo (blk) for light backgrounds - Large",
-      "layout": "vertical",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "tall_banners",
-        "social_media_profile",
-        "mobile_layout",
-        "poster"
-      ],
-      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/apptainer/logos/Apptainer-Logo_blk_v_L.png"
-    },
-    "icon-whi-large": {
-      "filename": "Apptainer-Icon_wht_L.png",
-      "description": "Apptainer icon (wht) for dark backgrounds - Large",
-      "layout": "icon",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the Apptainer symbol",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/apptainer/logos/Apptainer-Icon_wht_L.png"
-    },
-    "horizontal-bla-large": {
-      "filename": "Apptainer-Logo_blk_h_L.png",
-      "description": "Apptainer horizontal logo (blk) for light backgrounds - Large",
-      "layout": "horizontal",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "headers",
-        "business_cards",
-        "letterhead",
-        "wide_banners"
-      ],
-      "guidance": "Best for wide spaces - business cards, website headers, email signatures",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/apptainer/logos/Apptainer-Logo_blk_h_L.png"
-    }
-  },
-  "bridge_logos": {
-    "icon-whi-large": {
-      "filename": "CIQ-Bridge_icon_wht_L.png",
-      "description": "Bridge icon (wht) for dark backgrounds - Large",
-      "layout": "icon",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the Bridge symbol",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/bridge/logos/CIQ-Bridge_icon_wht_L.png"
-    },
-    "icon-bla-large": {
-      "filename": "CIQ-Bridge_icon_blk_L.png",
-      "description": "Bridge icon (blk) for light backgrounds - Large",
-      "layout": "icon",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the Bridge symbol",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/bridge/logos/CIQ-Bridge_icon_blk_L.png"
-    },
-    "vertical-whi-large": {
-      "filename": "CIQ-Bridge_logo_v-wht_L.png",
-      "description": "Bridge vertical logo (wht) for dark backgrounds - Large",
-      "layout": "vertical",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "tall_banners",
-        "social_media_profile",
-        "mobile_layout",
-        "poster"
-      ],
-      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/bridge/logos/CIQ-Bridge_logo_v-wht_L.png"
-    },
-    "unknown-unk-unknown": {
-      "filename": "CIQ-Bridge-logo_h_wht_L.png",
-      "description": "Bridge logo variant: CIQ-Bridge-logo_h_wht_L.png",
-      "layout": "unknown",
-      "color": "unknown",
-      "background": "unknown",
-      "size": "unknown",
-      "use_cases": [
-        "general"
-      ],
-      "guidance": "Bridge logo variant",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/bridge/logos/CIQ-Bridge-logo_h_wht_L.png"
-    },
-    "vertical-bla-large": {
-      "filename": "CIQ-Bridge_logo_v-blk_L.png",
-      "description": "Bridge vertical logo (blk) for light backgrounds - Large",
-      "layout": "vertical",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "tall_banners",
-        "social_media_profile",
-        "mobile_layout",
-        "poster"
-      ],
-      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/bridge/logos/CIQ-Bridge_logo_v-blk_L.png"
-    }
-  },
-  "ascender_logos": {
-    "horizontal-whi-large": {
-      "filename": "AscenderPro_logo_h-wht_L.png",
-      "description": "Ascender horizontal logo (wht) for dark backgrounds - Large",
-      "layout": "horizontal",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "headers",
-        "business_cards",
-        "letterhead",
-        "wide_banners"
-      ],
-      "guidance": "Best for wide spaces - business cards, website headers, email signatures",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/ascender/logos/AscenderPro_logo_h-wht_L.png"
-    },
-    "vertical-whi-large": {
-      "filename": "AscenderPro_logo_v-wht_L.png",
-      "description": "Ascender vertical logo (wht) for dark backgrounds - Large",
-      "layout": "vertical",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "tall_banners",
-        "social_media_profile",
-        "mobile_layout",
-        "poster"
-      ],
-      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/ascender/logos/AscenderPro_logo_v-wht_L.png"
-    },
-    "horizontal-bla-large": {
-      "filename": "AscenderPro_logo_h-blk_L.png",
-      "description": "Ascender horizontal logo (blk) for light backgrounds - Large",
-      "layout": "horizontal",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "headers",
-        "business_cards",
-        "letterhead",
-        "wide_banners"
-      ],
-      "guidance": "Best for wide spaces - business cards, website headers, email signatures",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/ascender/logos/AscenderPro_logo_h-blk_L.png"
-    },
-    "vertical-bla-large": {
-      "filename": "AscenderPro_logo_v-blk_L.png",
-      "description": "Ascender vertical logo (blk) for light backgrounds - Large",
-      "layout": "vertical",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "tall_banners",
-        "social_media_profile",
-        "mobile_layout",
-        "poster"
-      ],
-      "guidance": "Perfect for tall/narrow spaces - social media profiles, mobile layouts",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/ascender/logos/AscenderPro_logo_v-blk_L.png"
-    },
-    "icon-whi-large": {
-      "filename": "AscenderPro-Icon_wht_L.png",
-      "description": "Ascender icon (wht) for dark backgrounds - Large",
-      "layout": "icon",
-      "color": "white",
-      "background": "dark",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the Ascender symbol",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/ascender/logos/AscenderPro-Icon_wht_L.png"
-    },
-    "icon-bla-large": {
-      "filename": "AscenderPro-Icon_blk_L.png",
-      "description": "Ascender icon (blk) for light backgrounds - Large",
-      "layout": "icon",
-      "color": "black",
-      "background": "light",
-      "size": "large",
-      "use_cases": [
-        "favicon",
-        "app_icon",
-        "small_spaces",
-        "avatars"
-      ],
-      "guidance": "Perfect for tight spaces where you need just the Ascender symbol",
-      "format": "png",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/ascender/logos/AscenderPro-Icon_blk_L.png"
-    }
+  "index": {
+    "products": [
+      "apptainer",
+      "ascender",
+      "bridge",
+      "ciq",
+      "fuzzball",
+      "rlc",
+      "rlc-ai",
+      "rlc-hardened",
+      "rlc-lts",
+      "support",
+      "warewulf"
+    ],
+    "layouts": [
+      "green",
+      "horizontal",
+      "icon",
+      "onecolor",
+      "twocolor",
+      "vertical"
+    ],
+    "colors": [
+      "black",
+      "white"
+    ],
+    "backgrounds": [
+      "dark",
+      "light"
+    ],
+    "tags": [
+      "accent",
+      "app_icon",
+      "avatar",
+      "brand_pop",
+      "business_card",
+      "call_to_action",
+      "compact",
+      "email_signature",
+      "favicon",
+      "footer",
+      "header",
+      "hero",
+      "highlight",
+      "homepage",
+      "letterhead",
+      "main_branding",
+      "minimal",
+      "mobile",
+      "poster",
+      "presentation",
+      "primary",
+      "professional",
+      "small_space",
+      "social_profile",
+      "stacked",
+      "supporting",
+      "tall_banner",
+      "watermark",
+      "wide_format"
+    ],
+    "total_assets": 62
   }
 }

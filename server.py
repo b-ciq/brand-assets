@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-# Deployment trigger: 1756157892
 """
-CIQ Brand Assets MCP Server - Integrated System with Separated RLC Products
-Enhanced with confidence scoring, response templates, and clean attribute-based approach
+CIQ Brand Assets MCP Server - Declarative Rules Engine
+Clean, scalable server using declarative metadata with rule-based matching
 """
 
 from fastmcp import FastMCP
@@ -27,31 +26,37 @@ def load_asset_data():
         response = requests.get(METADATA_URL, timeout=10)
         response.raise_for_status()
         asset_data = response.json()
-        print(f"✅ Loaded {len(asset_data)} asset categories")
-        if 'warewulf_logos' in asset_data:
-            print(f"✅ Warewulf assets found: {len(asset_data['warewulf_logos'])} logos")
-        else:
-            print("❌ Warewulf assets NOT found in metadata")
+        
+        # Validate structure
+        if 'assets' not in asset_data or 'rules' not in asset_data or 'index' not in asset_data:
+            raise ValueError("Invalid metadata structure")
+        
+        total_assets = asset_data['index']['total_assets']
+        products_count = len(asset_data['index']['products'])
+        
+        print(f"✅ Loaded {total_assets} assets across {products_count} products")
+        print(f"✅ Declarative rules engine ready")
         return True
     except Exception as e:
         print(f"❌ Failed to load asset data: {e}")
         return False
 
-class AttributeDetector:
-    """Intelligent attribute detection with confidence scoring"""
+class DeclarativeAssetMatcher:
+    """Rule-based asset matching using declarative metadata"""
     
     def __init__(self):
         self.product_patterns = {
             'ciq': ['ciq', 'company', 'brand', 'main'],
             'fuzzball': ['fuzzball', 'fuzz ball', 'workload', 'hpc'],
-            'warewulf': ['warewulf', 'warewulf pro', 'warewulf-pro', 'cluster', 'provisioning'],
+            'warewulf': ['warewulf', 'cluster', 'provisioning'],
             'apptainer': ['apptainer', 'container', 'scientific'],
-            'ascender': ['ascender', 'ascender pro', 'automation', 'ansible'],
+            'ascender': ['ascender', 'automation', 'ansible'],
             'bridge': ['bridge', 'centos', 'migration'],
+            'support': ['support', 'ciq support'],
             'rlc': ['rlc', 'rocky linux commercial', 'rocky linux'],
-            'rlc-ai': ['rlc-ai', 'rlc ai', 'rocky linux ai', 'rocky linux commercial ai'],
-            'rlc-hardened': ['rlc-hardened', 'rlc hardened', 'rocky linux hardened', 'rocky linux commercial hardened'],
-            'rlc-lts': ['rlc-lts', 'rlc lts', 'rocky linux lts', 'rocky linux commercial lts']
+            'rlc-ai': ['rlc-ai', 'rlc ai', 'rocky linux ai'],
+            'rlc-hardened': ['rlc-hardened', 'rlc hardened', 'rocky linux hardened'],
+            'rlc-lts': ['rlc-lts', 'rlc lts', 'rocky linux lts']
         }
         
         self.background_patterns = {
@@ -63,491 +68,352 @@ class AttributeDetector:
             'icon': ['symbol', 'icon', 'favicon', 'app icon'],
             'horizontal': ['horizontal', 'wide', 'header', 'lockup'],
             'vertical': ['vertical', 'tall', 'stacked'],
-            '1color': ['1-color', '1 color', 'one color', 'standard'],
-            '2color': ['2-color', '2 color', 'two color', 'hero']
-        }
-        
-        self.context_patterns = {
-            'wide_format': ['email signature', 'header', 'business card', 'letterhead', 'banner', 'website header'],
-            'square_format': ['social media', 'profile picture', 'avatar', 'mobile app', 'app icon'],
-            'flexible_format': ['presentation', 'slide', 'document', 'report', 'proposal']
+            'onecolor': ['1-color', '1 color', 'one color', 'onecolor'],
+            'twocolor': ['2-color', '2 color', 'two color', 'twocolor'],
+            'green': ['green', 'accent']
         }
 
-    def detect_attributes(self, request: str) -> Dict[str, Any]:
-        """Detect attributes with confidence scores"""
+    def find_assets(self, request: str) -> Dict[str, Any]:
+        """Main asset finding function using declarative rules"""
+        if not asset_data:
+            return {'error': 'Asset data not loaded'}
+        
+        # Parse user request
+        parsed = self._parse_request(request)
+        
+        # Find matching assets
+        if parsed['product']:
+            matches = self._match_assets(parsed['product'], parsed)
+            return self._format_response(matches, parsed)
+        else:
+            return self._generate_product_help()
+
+    def _parse_request(self, request: str) -> Dict[str, Any]:
+        """Parse user request into structured attributes"""
         request_lower = request.lower()
         
-        attributes = {
-            'product': self._detect_product(request_lower),
-            'background': self._detect_background(request_lower), 
-            'layout': self._detect_layout(request_lower),
-            'context': self._detect_context(request_lower)
-        }
+        # Detect product
+        product = None
+        product_confidence = 0.0
         
-        # Calculate total confidence score
-        total_confidence = sum(attr['confidence'] for attr in attributes.values() if attr)
-        attributes['total_confidence'] = total_confidence
-        
-        return attributes
-    
-    def _detect_product(self, request: str) -> Optional[Dict]:
-        """Detect product with confidence scoring (50 points max)"""
-        scores = {}
-        for product, patterns in self.product_patterns.items():
-            score = 0
+        for prod, patterns in self.product_patterns.items():
             for pattern in patterns:
-                if pattern in request:
-                    # Longer patterns get higher scores + specificity bonus
-                    base_score = len(pattern.split()) * 10
-                    
-                    # Specificity bonuses for RLC variants
-                    if product.startswith('rlc-') and pattern in request:
-                        base_score += 20  # Bonus for specific RLC variants
-                    
-                    score += base_score
-            if score > 0:
-                scores[product] = min(score, 50)
+                if pattern in request_lower:
+                    # Longer, more specific patterns get higher confidence
+                    confidence = min(len(pattern) / 10.0, 0.6)  # Max 0.6 for product
+                    if confidence > product_confidence:
+                        product = prod
+                        product_confidence = confidence
         
-        if scores:
-            best_product = max(scores, key=scores.get)
-            return {
-                'value': best_product,
-                'confidence': scores[best_product]
-            }
-        return None
-    
-    def _detect_background(self, request: str) -> Optional[Dict]:
-        """Detect background preference (30 points max)"""
-        for bg_type, patterns in self.background_patterns.items():
+        # Detect background
+        background = None
+        background_confidence = 0.0
+        
+        for bg, patterns in self.background_patterns.items():
             for pattern in patterns:
-                if pattern in request:
-                    return {
-                        'value': bg_type,
-                        'confidence': 30
-                    }
-        return None
-    
-    def _detect_layout(self, request: str) -> Optional[Dict]:
-        """Detect layout preference (30 points max)"""
-        for layout_type, patterns in self.layout_patterns.items():
+                if pattern in request_lower:
+                    background = bg
+                    background_confidence = 0.3  # Fixed confidence for background
+                    break
+        
+        # Detect layout/variant
+        layout = None
+        layout_confidence = 0.0
+        
+        for lyt, patterns in self.layout_patterns.items():
             for pattern in patterns:
-                if pattern in request:
-                    return {
-                        'value': layout_type,
-                        'confidence': 30
-                    }
-        return None
-    
-    def _detect_context(self, request: str) -> Optional[Dict]:
-        """Detect context clues (20 points max)"""
-        for context_type, patterns in self.context_patterns.items():
-            for pattern in patterns:
-                if pattern in request:
-                    return {
-                        'value': context_type,
-                        'confidence': 20
-                    }
-        return None
-
-class AssetMatcher:
-    """Enhanced asset matching with attribute-based intelligence"""
-    
-    def __init__(self, asset_data: Dict):
-        self.asset_data = asset_data
-        self.detector = AttributeDetector()
-        self.product_info = {
-            'ciq': {
-                'name': 'CIQ',
-                'description': 'Company brand',
-                'structure_type': 'company',
-                'asset_key': 'logos'
-            },
-            'fuzzball': {
-                'name': 'Fuzzball',
-                'description': 'HPC/AI workload management platform', 
-                'structure_type': 'product',
-                'asset_key': 'fuzzball_logos'
-            },
-            'warewulf': {
-                'name': 'Warewulf',
-                'description': 'HPC cluster provisioning tool',
-                'structure_type': 'product',
-                'asset_key': 'warewulf_logos'
-            },
-            'apptainer': {
-                'name': 'Apptainer',
-                'description': 'Container platform for HPC/scientific workflows',
-                'structure_type': 'product',
-                'asset_key': 'apptainer_logos'
-            },
-            'ascender': {
-                'name': 'Ascender',
-                'description': 'Infrastructure automation platform',
-                'structure_type': 'product',
-                'asset_key': 'ascender_logos'
-            },
-            'bridge': {
-                'name': 'Bridge',
-                'description': 'CentOS 7 migration solution',
-                'structure_type': 'product',
-                'asset_key': 'bridge_logos'
-            },
-            'rlc': {
-                'name': 'RLC',
-                'description': 'Rocky Linux Commercial (base platform)',
-                'structure_type': 'product',
-                'asset_key': 'rlc_logos'
-            },
-            'rlc-ai': {
-                'name': 'RLC-AI',
-                'description': 'Rocky Linux Commercial AI-focused platform',
-                'structure_type': 'product', 
-                'asset_key': 'rlc_ai_logos'
-            },
-            'rlc-hardened': {
-                'name': 'RLC-Hardened',
-                'description': 'Rocky Linux Commercial security-focused platform',
-                'structure_type': 'product',
-                'asset_key': 'rlc_hardened_logos'
-            },
-            'rlc-lts': {
-                'name': 'RLC-LTS',
-                'description': 'Rocky Linux Commercial long-term support',
-                'structure_type': 'product',
-                'asset_key': 'rlc_lts_logos'
-            }
-        }
-
-    def match_assets(self, request: str) -> Dict[str, Any]:
-        """Match assets using attribute detection"""
-        attributes = self.detector.detect_attributes(request)
+                if pattern in request_lower:
+                    layout = lyt
+                    layout_confidence = 0.3  # Fixed confidence for layout
+                    break
         
-        if not attributes['product']:
-            return self._generate_product_help()
+        # Calculate total confidence - boost if multiple attributes detected
+        total_confidence = product_confidence
+        if background:
+            total_confidence += background_confidence
+        if layout:
+            total_confidence += layout_confidence
         
-        product_id = attributes['product']['value']
-        confidence_level = self._assess_confidence_level(attributes['total_confidence'])
-        
-        # Get product assets
-        product_info = self.product_info[product_id]
-        product_assets = self.asset_data.get(product_info['asset_key'], {})
-        
-        if not product_assets:
-            return {'error': f'No assets found for {product_info["name"]}'}
-        
-        # Score and rank assets
-        scored_assets = self._score_assets(product_assets, attributes)
+        # Boost total confidence if we have multiple specific attributes
+        if product and background and layout:
+            total_confidence = min(total_confidence * 1.2, 1.0)  # 20% boost for complete match
         
         return {
-            'success': True,
-            'product': product_info,
-            'attributes': attributes,
-            'confidence_level': confidence_level,
-            'scored_assets': scored_assets
+            'product': product,
+            'background': background,
+            'layout': layout,
+            'confidence': min(total_confidence, 1.0),
+            'raw_request': request
         }
-    
-    def _assess_confidence_level(self, total_confidence: int) -> str:
-        """Assess confidence level based on total score"""
-        if total_confidence >= 100:
+
+    def _match_assets(self, product: str, parsed: Dict) -> List[Tuple[float, Dict, str]]:
+        """Match assets using declarative rules"""
+        if product not in asset_data['assets']:
+            return []
+        
+        product_assets = asset_data['assets'][product]
+        rules = asset_data['rules']
+        matches = []
+        
+        for asset_key, asset in product_assets.items():
+            score, reason = self._score_asset(asset, parsed, rules)
+            if score > 0:
+                matches.append((score, asset, reason))
+        
+        # Sort by score (highest first)
+        return sorted(matches, key=lambda x: x[0], reverse=True)
+
+    def _score_asset(self, asset: Dict, parsed: Dict, rules: Dict) -> Tuple[float, str]:
+        """Score individual asset using confidence rules"""
+        score = 0.0
+        reasons = []
+        
+        # Base score for having the product
+        score += rules['confidence_scoring']['fallback']
+        reasons.append("product match")
+        
+        # Background matching
+        if parsed['background'] and asset['background'] == parsed['background']:
+            score += rules['confidence_scoring']['background_match']
+            reasons.append(f"optimized for {parsed['background']} backgrounds")
+        
+        # Layout matching
+        if parsed['layout'] and asset['layout'] == parsed['layout']:
+            score += rules['confidence_scoring']['layout_match']
+            reasons.append(f"exact {parsed['layout']} match")
+        
+        # Both background and layout match = exact match
+        if (parsed['background'] and parsed['layout'] and 
+            asset['background'] == parsed['background'] and 
+            asset['layout'] == parsed['layout']):
+            score = rules['confidence_scoring']['exact_match']
+            reasons = [f"exact match: {parsed['layout']} for {parsed['background']} backgrounds"]
+        
+        # Use case tag matching
+        if parsed.get('use_case'):
+            asset_tags = asset.get('tags', [])
+            if parsed['use_case'] in asset_tags:
+                score += rules['confidence_scoring']['tag_match'] 
+                reasons.append(f"perfect for {parsed['use_case']}")
+        
+        return score, " + ".join(reasons)
+
+    def _format_response(self, matches: List[Tuple[float, Dict, str]], parsed: Dict) -> Dict[str, Any]:
+        """Format response based on confidence and matches"""
+        if not matches:
+            return {
+                'message': f"No {parsed['product']} assets found matching your criteria.",
+                'confidence': 'none'
+            }
+        
+        confidence_level = self._get_confidence_level(parsed['confidence'])
+        
+        # Find perfect matches (score > 1.0 - multiple criteria matched)
+        perfect_matches = [m for m in matches if m[0] > 1.0]
+        # Find exact matches (score >= 1.0)
+        exact_matches = [m for m in matches if m[0] >= 1.0]
+        
+        if confidence_level == 'high' and len(perfect_matches) == 1:
+            # High confidence, single perfect match - return it directly
+            asset = perfect_matches[0][1]
+            return {
+                'message': f"Here's the perfect {parsed['product']} asset for your needs:",
+                'asset': {
+                    'url': asset['url'],
+                    'filename': asset['filename'],
+                    'description': f"{parsed['product'].title()} {asset['layout']} logo ({asset['color']}) for {asset['background']} backgrounds",
+                    'background': asset['background'],
+                    'layout': asset['layout']
+                },
+                'confidence': 'high',
+                'reason': perfect_matches[0][2]
+            }
+        elif confidence_level == 'high' and len(perfect_matches) > 1:
+            # High confidence, multiple perfect matches - show them
+            assets = []
+            for score, asset, reason in perfect_matches:
+                assets.append({
+                    'url': asset['url'],
+                    'filename': asset['filename'],
+                    'layout': asset['layout'],
+                    'background': asset['background'],
+                    'score': round(score, 2),
+                    'reason': reason
+                })
+            
+            return {
+                'message': f"Here are the perfect {parsed['product']} matches for your request:",
+                'assets': assets,
+                'confidence': 'high',
+                'suggestion': self._generate_suggestion(parsed)
+            }
+        elif confidence_level == 'high' and len(exact_matches) == 1:
+            # High confidence, single exact match - return it
+            asset = exact_matches[0][1]
+            return {
+                'message': f"Here's the exact {parsed['product']} asset you requested:",
+                'asset': {
+                    'url': asset['url'],
+                    'filename': asset['filename'],
+                    'description': f"{parsed['product'].title()} {asset['layout']} logo ({asset['color']}) for {asset['background']} backgrounds",
+                    'background': asset['background'],
+                    'layout': asset['layout']
+                },
+                'confidence': 'high',
+                'reason': exact_matches[0][2]
+            }
+        elif confidence_level in ['high', 'medium'] and len(matches) <= 4:
+            # Medium confidence or manageable matches - show options
+            assets = []
+            for score, asset, reason in matches[:3]:
+                assets.append({
+                    'url': asset['url'],
+                    'filename': asset['filename'],
+                    'layout': asset['layout'],
+                    'background': asset['background'],
+                    'score': round(score, 2),
+                    'reason': reason
+                })
+            
+            return {
+                'message': f"Here are the best {parsed['product']} options based on your request:",
+                'assets': assets,
+                'confidence': confidence_level,
+                'suggestion': self._generate_suggestion(parsed)
+            }
+        else:
+            # Low confidence or many matches - show categories
+            return self._generate_guided_response(parsed['product'], matches)
+
+    def _get_confidence_level(self, score: float) -> str:
+        """Convert numeric confidence to level"""
+        if score >= 0.8:
             return 'high'
-        elif total_confidence >= 50:
+        elif score >= 0.4:
             return 'medium'
         else:
             return 'low'
-    
-    def _score_assets(self, product_assets: Dict, attributes: Dict) -> List[Tuple[int, Dict, str]]:
-        """Score assets based on detected attributes"""
-        scored = []
+
+    def _generate_suggestion(self, parsed: Dict) -> str:
+        """Generate helpful suggestion for user"""
+        suggestions = []
         
+        if not parsed['background']:
+            suggestions.append("specify the background (light or dark)")
+        
+        if not parsed['layout']:
+            if parsed['product'] == 'ciq':
+                suggestions.append("specify variant (onecolor, twocolor, or green)")
+            else:
+                suggestions.append("specify layout (icon, horizontal, or vertical)")
+        
+        if suggestions:
+            return f"For more precise results, try also mentioning: {', '.join(suggestions)}"
+        
+        return "Great match! This should work perfectly for your needs."
+
+    def _generate_guided_response(self, product: str, matches: List) -> Dict[str, Any]:
+        """Generate guided response for low-confidence requests"""
+        if product not in asset_data['assets']:
+            return self._generate_product_help()
+        
+        product_assets = asset_data['assets'][product]
+        
+        # Group by layout
+        layout_groups = {}
         for asset_key, asset in product_assets.items():
-            score = 0
-            reasons = []
-            
-            # Layout matching (most important)
-            if attributes['layout'] and attributes['layout']['value']:
-                target_layout = attributes['layout']['value']
-                asset_layout = asset.get('layout', '').lower()
-                
-                if target_layout in asset_layout:
-                    score += 100
-                    reasons.append(f"exact {target_layout} match")
-                elif asset_layout == 'unknown':
-                    score += 30
-                    reasons.append("fallback option")
-            
-            # Background matching
-            if attributes['background']:
-                target_bg = attributes['background']['value']
-                asset_bg = asset.get('background', '').lower()
-                
-                if target_bg == asset_bg:
-                    score += 50
-                    reasons.append(f"optimized for {target_bg} backgrounds")
-                elif asset_bg == 'unknown':
-                    score += 15
-                    reasons.append("universal background compatibility")
-            
-            # Format preferences (only PNG files now)
-            if asset.get('format') == 'png':
-                score += 20
-                reasons.append("high-quality PNG format")
-            
-            # Context matching
-            if attributes['context']:
-                context = attributes['context']['value']
-                asset_use_cases = asset.get('use_cases', [])
-                
-                context_bonus = self._calculate_context_bonus(context, asset_use_cases)
-                if context_bonus > 0:
-                    score += context_bonus
-                    reasons.append(f"suitable for {context.replace('_', ' ')}")
-            
-            if score > 0:
-                scored.append((score, asset, " + ".join(reasons)))
+            layout = asset['layout']
+            if layout not in layout_groups:
+                layout_groups[layout] = []
+            layout_groups[layout].append(asset)
         
-        # Sort by score (highest first)
-        return sorted(scored, key=lambda x: x[0], reverse=True)
-    
-    def _calculate_context_bonus(self, context: str, use_cases: List[str]) -> int:
-        """Calculate context bonus points"""
-        context_mappings = {
-            'wide_format': ['headers', 'business_cards', 'letterhead', 'wide_banners'],
-            'square_format': ['social_media_profile', 'mobile_layout', 'avatars'],
-            'flexible_format': ['scalable', 'web', 'print', 'general_branding']
+        options = []
+        for layout, assets in layout_groups.items():
+            # Show one example of each layout
+            example = assets[0]
+            options.append({
+                'layout': layout,
+                'example_url': example['url'],
+                'count': len(assets),
+                'description': self._get_layout_description(layout)
+            })
+        
+        return {
+            'message': f"I found {len(matches)} {product} assets. Here are your options:",
+            'product': product,
+            'options': options,
+            'confidence': 'low',
+            'help': f"Try being more specific: '{product} horizontal logo for light backgrounds' or '{product} icon for dark theme'"
         }
-        
-        relevant_cases = context_mappings.get(context, [])
-        for case in relevant_cases:
-            if case in use_cases:
-                return 30
-        return 0
-    
+
+    def _get_layout_description(self, layout: str) -> str:
+        """Get description for layout type"""
+        descriptions = {
+            'icon': 'Square symbol, perfect for favicons and app icons',
+            'horizontal': 'Wide format, great for headers and business cards',
+            'vertical': 'Tall format, ideal for mobile and social media',
+            'onecolor': 'Clean single-color CIQ logo',
+            'twocolor': 'Full-color CIQ logo with green accent',
+            'green': 'Green CIQ logo for brand accent'
+        }
+        return descriptions.get(layout, f'{layout.title()} layout')
+
     def _generate_product_help(self) -> Dict[str, Any]:
-        """Generate help when product is not detected"""
+        """Generate help when no product is detected"""
+        products = asset_data['index']['products']
+        
         return {
             'help': True,
-            'message': """**CIQ Brand Assets Available:**
-
-**Company Brand:**
-• **CIQ** - Main company logo
-
-**Product Brands:**
-• **Fuzzball** - HPC/AI workload management platform
-• **Warewulf** - HPC cluster provisioning tool  
-• **Apptainer** - Container platform for HPC/scientific workflows
-• **Ascender** - Infrastructure automation platform
-• **Bridge** - CentOS 7 migration solution
-
-**RLC Product Family:**
-• **RLC** - Rocky Linux Commercial (base platform)
-• **RLC-AI** - Rocky Linux Commercial AI-focused platform
-• **RLC-Hardened** - Rocky Linux Commercial security-focused platform
-• **RLC-LTS** - Rocky Linux Commercial long-term support
-
-**Examples:**
-• "CIQ logo" → Company brand
-• "Fuzzball logo" → Product brand with options
-• "RLC-AI logo for dark background" → Specific RLC variant
-• "Warewulf symbol" → Icon only
-
-Which brand asset do you need?"""
+            'message': "**CIQ Brand Assets Available:**\n\n" +
+                      "**Company Brand:**\n• **CIQ** - Main company logo\n\n" +
+                      "**Product Brands:**\n" +
+                      "\n".join([f"• **{prod.title()}**" for prod in products if prod != 'ciq']),
+            'examples': [
+                "CIQ twocolor logo for light backgrounds",
+                "Warewulf horizontal logo for dark theme",
+                "Apptainer icon for favicon"
+            ],
+            'confidence': 'none'
         }
 
-class ResponseFormatter:
-    """Template-based response formatting"""
-    
-    def format_response(self, match_result: Dict[str, Any]) -> str:
-        """Format response based on confidence level"""
-        if match_result.get('help'):
-            return match_result['message']
-        
-        if match_result.get('error'):
-            return f"❌ {match_result['error']}"
-        
-        confidence_level = match_result['confidence_level']
-        
-        if confidence_level == 'high':
-            return self._format_high_confidence(match_result)
-        elif confidence_level == 'medium':
-            return self._format_medium_confidence(match_result) 
-        else:
-            return self._format_low_confidence(match_result)
-    
-    def _format_high_confidence(self, result: Dict) -> str:
-        """High confidence: Direct answer with single asset"""
-        best_asset = result['scored_assets'][0]
-        score, asset, reasoning = best_asset
-        product_info = result['product']
-        
-        layout_desc = asset.get('layout', 'logo').replace('icon', 'symbol')
-        
-        return f"""✅ **{product_info['name']} {layout_desc}:**
-
-📎 **Download:** {asset['url']}
-
-💡 **Selection reasoning:** {reasoning}
-
-📋 **Usage guidance:** {asset.get('guidance', f'Professional {product_info["name"]} branding')}"""
-    
-    def _format_medium_confidence(self, result: Dict) -> str:
-        """Medium confidence: Top choice + alternatives"""
-        scored_assets = result['scored_assets'][:3]  # Top 3
-        product_info = result['product']
-        
-        response = f"**{product_info['name']} Logo - Top Recommendation:**\n\n"
-        
-        # Primary choice
-        best_score, best_asset, best_reasoning = scored_assets[0]
-        layout_desc = best_asset.get('layout', 'logo').replace('icon', 'symbol')
-        
-        response += f"""✅ **Primary Choice: {layout_desc.title()}**
-• **Download:** {best_asset['url']}
-• **Why:** {best_reasoning}
-
-"""
-        
-        # Alternatives
-        if len(scored_assets) > 1:
-            response += "**Alternative Options:**\n"
-            for i, (score, asset, reasoning) in enumerate(scored_assets[1:], 2):
-                alt_layout = asset.get('layout', 'logo').replace('icon', 'symbol')
-                response += f"• **Option {i}:** {alt_layout} - {asset['url']}\n"
-        
-        return response
-    
-    def _format_low_confidence(self, result: Dict) -> str:
-        """Low confidence: Quick clarifying question"""
-        product_info = result['product']
-        attributes = result['attributes']
-        
-        # Determine what we need to clarify
-        if not attributes['background']:
-            return f"""🎨 **I found {product_info['name']} assets for you!**
-
-**What background will this logo be placed on?**
-
-• 🌞 **light** → white, light gray, light colors, most websites
-• 🌙 **dark** → black, dark gray, dark colors, dark photos
-
-This helps me recommend the right color version for proper contrast."""
-        
-        elif not attributes['layout'] and product_info['structure_type'] == 'product':
-            return f"""✨ **Perfect! For {product_info['name']} logos...**
-
-**Which layout works best for your use case?**
-
-🔸 **horizontal** → Symbol + text side-by-side (headers, business cards, emails)
-🔹 **vertical** → Symbol + text stacked (social media, mobile apps)  
-⚫ **symbol** → Icon only (tight spaces, favicons)
-
-What's your primary use case?"""
-        
-        else:
-            # Show top options with guidance
-            return self._format_medium_confidence(result)
+# Initialize the matcher
+matcher = DeclarativeAssetMatcher()
 
 @mcp.tool()
-def get_brand_asset(request: str, background: Optional[str] = None) -> str:
+def get_brand_assets(request: str = "CIQ logo") -> Dict[str, Any]:
     """
-    Get CIQ brand assets with intelligent attribute detection and confidence scoring.
+    Find and recommend CIQ brand assets based on your needs.
+    
+    Specify what you need and I'll find the perfect asset:
+    - Product: CIQ, Fuzzball, Warewulf, Apptainer, etc.
+    - Background: light, dark
+    - Layout: icon, horizontal, vertical (or for CIQ: onecolor, twocolor, green)
+    - Use case: favicon, business card, presentation, etc.
     
     Examples:
-    - "CIQ logo for light background" 
-    - "Fuzzball logo"
-    - "RLC-AI logo for dark background"
-    - "Warewulf symbol for email signature"
-    - "Apptainer vertical logo for presentation"
+    - "Warewulf logo for dark backgrounds"
+    - "CIQ twocolor logo for presentations" 
+    - "Apptainer icon for favicon"
     """
-    
-    # Load data if needed
-    if asset_data is None:
+    if not asset_data:
         if not load_asset_data():
-            return "❌ Sorry, couldn't load brand assets data."
+            return {"error": "Unable to load asset data. Please try again."}
     
-    # Override background if provided
-    if background:
-        request = f"{request} for {background} background"
-    
-    # Initialize components
-    matcher = AssetMatcher(asset_data)
-    formatter = ResponseFormatter()
-    
-    # Match assets and format response
-    match_result = matcher.match_assets(request)
-    return formatter.format_response(match_result)
+    try:
+        result = matcher.find_assets(request)
+        return result
+    except Exception as e:
+        return {
+            "error": f"Error processing request: {e}",
+            "suggestion": "Try a simpler request like 'CIQ logo' or 'Fuzzball assets'"
+        }
 
-@mcp.tool()
-def list_all_assets() -> str:
-    """List all available brand assets with counts"""
-    
-    if asset_data is None:
-        if not load_asset_data():
-            return "❌ Sorry, couldn't load brand assets data."
-    
-    # Count assets by product
-    product_counts = {}
-    total_assets = 0
-    
-    for category_key, category_assets in asset_data.items():
-        if category_key == 'brand_guidelines':
-            continue
-            
-        asset_count = len(category_assets)
-        total_assets += asset_count
-        
-        # Clean up category names for display
-        product_name = category_key.replace('_logos', '').replace('_', ' ')
-        if product_name == 'warewulf pro':
-            product_name = 'Warewulf Pro'
-        elif product_name == 'ascender pro':
-            product_name = 'Ascender Pro'
-        elif product_name.startswith('rlc'):
-            product_name = product_name.upper().replace('RLC ', 'RLC-')
-        else:
-            product_name = product_name.title()
-            
-        product_counts[product_name] = asset_count
-    
-    result = f"# 🎨 CIQ Brand Assets Library\n\n**{total_assets} Total Clean Assets**\n\n"
-    
-    # Group by category
-    result += "## **Company Brand:**\n"
-    for product, count in product_counts.items():
-        if product in ['CIQ', 'CIQ-Support']:
-            result += f"• **{product}** - {count} variants\n"
-    
-    result += "\n## **Development & HPC Tools:**\n"
-    for product, count in product_counts.items():
-        if product in ['Warewulf Pro', 'Ascender Pro', 'Apptainer']:
-            result += f"• **{product}** - {count} variants\n"
-    
-    result += "\n## **Infrastructure & Platform:**\n"
-    for product, count in product_counts.items():
-        if product in ['Bridge', 'Fuzzball']:
-            result += f"• **{product}** - {count} variants\n"
-    
-    result += "\n## **RLC Product Family:**\n"
-    for product, count in product_counts.items():
-        if product.startswith('RLC'):
-            result += f"• **{product}** - {count} variants\n"
-    
-    result += """\n**Usage:**
-• "Fuzzball logo" → Smart defaults
-• "RLC-AI logo for dark background" → Specific variant
-• "Warewulf symbol" → Icon only
+# Load asset data on startup
+print("🚀 Starting CIQ Brand Assets MCP Server...")
+if load_asset_data():
+    print("✅ Server ready!")
+else:
+    print("⚠️  Server started with limited functionality")
 
-**Behavior:**
-• **High confidence** → Direct answer
-• **Medium confidence** → Top choice + alternatives  
-• **Low confidence** → Quick clarifying question
-
-🧹 **All assets cleaned:** Only largest PNG files, no SVGs or smaller sizes"""
-    
-    return result
-
-# Load data on startup  
-load_asset_data()
-
-# FastMCP Cloud will handle the server startup
 if __name__ == "__main__":
     mcp.run()

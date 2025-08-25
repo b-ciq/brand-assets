@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 """
-Asset Metadata Generator
-Automatically scans asset directories and generates metadata JSON files
+Declarative Asset Metadata Generator
+Creates clean, rule-based metadata for scalable asset management
 """
 
 import os
 import json
-import re
 from pathlib import Path
 from typing import Dict, List, Any
 import argparse
@@ -14,661 +13,281 @@ import argparse
 # Base GitHub raw URL for assets
 BASE_URL = "https://raw.githubusercontent.com/b-ciq/brand-assets/main"
 
-def parse_ciq_filename(filename: str) -> Dict[str, Any]:
+def parse_filename(filename: str) -> Dict[str, str]:
     """
-    Parse CIQ logo filename: CIQ-Logo-{variant}-{background}.{ext}
-    Examples: CIQ-Logo-2color-light.png, CIQ-Logo-1color-dark.png
+    Parse consistent filename: {Product}_{type}_{layout}_{color}_{size}.{ext}
+    Returns: {product, type, layout, color, size, ext}
     """
-    pattern = r'CIQ-Logo-(\w+)-(\w+)\.(\w+)'
-    match = re.match(pattern, filename)
+    name_without_ext = filename.rsplit('.', 1)[0]
+    ext = filename.rsplit('.', 1)[1] if '.' in filename else 'png'
     
-    if not match:
+    parts = name_without_ext.split('_')
+    if len(parts) < 5:
         return None
     
-    variant, background, ext = match.groups()
-    
-    # Generate description
-    if variant == '1color':
-        desc = f"Single color (neutral) logo for {background} backgrounds"
-        use_cases = ["supporting_element", "footer", "watermark", "professional_documents"]
-        colors = ["neutral"]
-        guidance = "Professional and clean - won't compete with colorful design elements"
-    elif variant == '2color':
-        desc = f"Two color (neutral + green) logo for {background} backgrounds"
-        use_cases = ["hero", "main_element", "homepage", "business_cards", "presentations"]
-        colors = ["neutral", "PMS_347_green"]
-        guidance = "Most recognizable CIQ branding - use when logo is the star of the design"
-    elif variant == 'green':
-        desc = f"Single color (green) logo for {background} backgrounds"
-        use_cases = ["supporting_element", "minimal_designs", "advertising", "brand_accent"]
-        colors = ["PMS_347_green"]
-        guidance = "Use in neutral/minimal designs when you need the logo to jump out"
+    return {
+        'product': parts[0].lower(),
+        'type': parts[1], 
+        'layout': parts[2],
+        'color': parts[3],
+        'size': parts[4],
+        'ext': ext
+    }
+
+def generate_asset_key(parsed: Dict[str, str]) -> str:
+    """Generate consistent asset key"""
+    if parsed['layout'] in ['onecolor', 'twocolor', 'green']:
+        # CIQ special variants
+        return f"{parsed['layout']}_{parsed['color']}"
+    elif parsed['layout'] == 'square':
+        # Icons
+        return f"icon_{parsed['color']}"
     else:
-        desc = f"CIQ logo variant: {variant} for {background} backgrounds"
-        use_cases = ["general"]
-        colors = ["unknown"]
-        guidance = "CIQ logo variant"
-    
-    return {
-        "filename": filename,
-        "description": desc,
-        "use_cases": use_cases,
-        "colors": colors,
-        "background": background,
-        "guidance": guidance,
-        "variant": variant,
-        "format": ext
-    }
+        # Regular logos
+        return f"{parsed['layout']}_{parsed['color']}"
 
-def parse_fuzzball_filename(filename: str) -> Dict[str, Any]:
-    """
-    Parse Fuzzball logo filename patterns:
-    - Fuzzball-Icon_{color}_{size}.{ext}  
-    - Fuzzball_logo_logo_{layout}-{color}_{size}.{ext}
-    - Fuzzball_logo_{layout}-{color}.{ext}
-    """
-    
-    # Icon pattern: Fuzzball-Icon_blk_L.png
-    icon_pattern = r'Fuzzball-Icon_(\w+)_([LMS])\.(\w+)'
-    icon_match = re.match(icon_pattern, filename)
-    
-    if icon_match:
-        color, size, ext = icon_match.groups()
-        background = 'light' if color == 'blk' else 'dark'
-        size_full = {'L': 'large', 'M': 'medium', 'S': 'small'}[size]
-        
-        return {
-            "filename": filename,
-            "description": f"Fuzzball icon ({color}) for {background} backgrounds - {size_full.title()}",
-            "layout": "icon",
-            "color": "black" if color == 'blk' else "white",
-            "background": background,
-            "size": size_full,
-            "use_cases": ["favicon", "app_icon", "small_spaces", "avatars"],
-            "guidance": "Perfect for tight spaces where you need just the Fuzzball symbol",
-            "format": ext
-        }
-    
-    # Horizontal/Vertical pattern: Fuzzball_logo_logo_h-blk_L.png or Fuzzball_logo_logo_v-wht_M.png
-    layout_pattern = r'Fuzzball_logo_logo_([hv])-(\w+)_([LMS])\.(\w+)'
-    layout_match = re.match(layout_pattern, filename)
-    
-    if layout_match:
-        layout_code, color, size, ext = layout_match.groups()
-        layout = 'horizontal' if layout_code == 'h' else 'vertical'
-        background = 'light' if color == 'blk' else 'dark'
-        size_full = {'L': 'large', 'M': 'medium', 'S': 'small'}[size]
-        
-        if layout == 'horizontal':
-            use_cases = ["headers", "business_cards", "letterhead", "wide_banners"]
-            guidance = "Best for wide spaces - business cards, website headers, email signatures"
-        else:  # vertical
-            use_cases = ["tall_banners", "social_media_profile", "mobile_layout", "poster"]
-            guidance = "Perfect for tall/narrow spaces - social media profiles, mobile layouts"
-        
-        return {
-            "filename": filename,
-            "description": f"Fuzzball {layout} logo ({color}) for {background} backgrounds - {size_full.title()}",
-            "layout": layout,
-            "color": "black" if color == 'blk' else "white",
-            "background": background,
-            "size": size_full,
-            "use_cases": use_cases,
-            "guidance": guidance,
-            "format": ext
-        }
-    
-    # SVG pattern: Fuzzball_logo_h-blk.svg or Fuzzball_logo_logo_v-wht.svg
-    svg_pattern = r'Fuzzball_logo_(?:logo_)?([hv])-(\w+)\.(\w+)'
-    svg_match = re.match(svg_pattern, filename)
-    
-    if svg_match:
-        layout_code, color, ext = svg_match.groups()
-        layout = 'horizontal' if layout_code == 'h' else 'vertical'
-        background = 'light' if color == 'blk' else 'dark'
-        
-        return {
-            "filename": filename,
-            "description": f"Fuzzball {layout} logo ({color}) for {background} backgrounds - SVG",
-            "layout": layout,
-            "color": "black" if color == 'blk' else "white",
-            "background": background,
-            "size": "vector",
-            "use_cases": ["scalable", "web", "print"],
-            "guidance": f"Vector format - scales to any size perfectly",
-            "format": ext
-        }
-    
-    # If no pattern matches, return basic info
-    return {
-        "filename": filename,
-        "description": f"Fuzzball logo variant: {filename}",
-        "layout": "unknown",
-        "color": "unknown",
-        "background": "unknown",
-        "size": "unknown",
-        "use_cases": ["general"],
-        "guidance": "Fuzzball logo variant",
-        "format": filename.split('.')[-1] if '.' in filename else "unknown"
-    }
-
-def get_filename_prefix(product: str) -> List[str]:
-    """Get possible filename prefixes for a product directory name"""
-    prefix_map = {
-        'ascender': ['AscenderPro'],
-        'bridge': ['CIQ-Bridge'], 
-        'ciq-support': ['CIQ-Support'],
-        'rlc-ai': ['RLC-AI'],
-        'rlc-hardened': ['RLC-H'],
-        'rlc-lts': ['RLC-LTS'],
-        'rlc': ['RLC'],
-        'warewulf': ['Warewulf', 'WarewulfPro'],
-        'apptainer': ['Apptainer'],
-        'fuzzball': ['Fuzzball'],
-        'ciq': ['CIQ']
-    }
-    
-    if product in prefix_map:
-        return prefix_map[product]
+def determine_background(color: str) -> str:
+    """Determine optimal background for color"""
+    if color.lower() == 'black':
+        return 'light'  # black logo on light background
+    elif color.lower() == 'white': 
+        return 'dark'   # white logo on dark background
     else:
-        # Default fallbacks
-        return [product.title(), product.upper(), product]
+        return 'any'    # color logos work on various backgrounds
 
-def parse_generic_filename(filename: str, product: str) -> Dict[str, Any]:
-    """
-    Parse generic product logo filename patterns for new products:
-    - {Product}-Icon_{color}_{size}.{ext} (icon pattern)
-    - {Product}-Logo_{color}_{layout}_{size}.{ext} (new logo pattern)  
-    - {Product}_logo_{layout}-{color}.{ext} (SVG logo pattern)
-    - {Product}_icon_{color}.{ext} (SVG icon pattern)
-    """
+def get_asset_tags(layout: str, type_: str) -> List[str]:
+    """Get semantic tags for asset matching"""
+    tags = []
     
-    # Get all possible filename prefixes for this product
-    possible_prefixes = get_filename_prefix(product)
+    if layout == 'square' or type_ == 'icon':
+        tags.extend(['favicon', 'app_icon', 'compact', 'small_space', 'avatar'])
+    elif layout == 'horizontal':
+        tags.extend(['business_card', 'header', 'email_signature', 'letterhead', 'wide_format'])
+    elif layout == 'vertical':
+        tags.extend(['mobile', 'social_profile', 'tall_banner', 'poster', 'stacked'])
+    elif layout in ['onecolor', 'twocolor', 'green']:
+        if layout == 'onecolor':
+            tags.extend(['supporting', 'footer', 'watermark', 'minimal', 'professional'])
+        elif layout == 'twocolor':
+            tags.extend(['hero', 'primary', 'homepage', 'presentation', 'main_branding'])
+        elif layout == 'green':
+            tags.extend(['accent', 'highlight', 'call_to_action', 'brand_pop'])
     
-    # Try each possible prefix with different patterns
-    for prefix in possible_prefixes:
-        # Icon pattern: Prefix-Icon_blk_L.png (like Apptainer-Icon_blk_L.png, AscenderPro-Icon_blk_L.png)
-        icon_pattern = rf'{re.escape(prefix)}-Icon_(\w+)_([LMS])\.(\w+)'
-        match = re.match(icon_pattern, filename, re.IGNORECASE)
-        
-        if match:
-            color, size, ext = match.groups()
-            background = 'light' if color.lower() == 'blk' else 'dark'
-            size_full = {'L': 'large', 'M': 'medium', 'S': 'small'}[size.upper()]
-            
-            return {
-                "filename": filename,
-                "description": f"{product.title()} icon ({color}) for {background} backgrounds - {size_full.title()}",
-                "layout": "icon",
-                "color": "black" if color.lower() == 'blk' else "white",
-                "background": background,
-                "size": size_full,
-                "use_cases": ["favicon", "app_icon", "small_spaces", "avatars"],
-                "guidance": f"Perfect for tight spaces where you need just the {product.title()} symbol",
-                "format": ext
-            }
-        
-        # Logo pattern: Prefix-Logo_blk_h_L.png (like WarewulfPro-Logo_blk_h_L.png)
-        logo_dash_pattern = rf'{re.escape(prefix)}-Logo_(\w+)_([hv])_([LMS])\.(\w+)'
-        match = re.match(logo_dash_pattern, filename, re.IGNORECASE)
-        
-        if match:
-            color, layout_code, size, ext = match.groups()
-            layout = 'horizontal' if layout_code.lower() == 'h' else 'vertical'
-            background = 'light' if color.lower() == 'blk' else 'dark'
-            size_full = {'L': 'large', 'M': 'medium', 'S': 'small'}[size.upper()]
-            
-            if layout == 'horizontal':
-                use_cases = ["headers", "business_cards", "letterhead", "wide_banners"]
-                guidance = f"Best for wide spaces - business cards, website headers, email signatures"
-            else:  # vertical
-                use_cases = ["tall_banners", "social_media_profile", "mobile_layout", "poster"]
-                guidance = f"Perfect for tall/narrow spaces - social media profiles, mobile layouts"
-            
-            return {
-                "filename": filename,
-                "description": f"{product.title()} {layout} logo ({color}) for {background} backgrounds - {size_full.title()}",
-                "layout": layout,
-                "color": "black" if color.lower() == 'blk' else "white",
-                "background": background,
-                "size": size_full,
-                "use_cases": use_cases,
-                "guidance": guidance,
-                "format": ext
-            }
-        
-        # PNG logo pattern: Prefix_logo_h-blk_L.png (like AscenderPro_logo_h-blk_L.png)
-        png_logo_pattern = rf'{re.escape(prefix)}_logo_([hv])-(\w+)_([LMS])\.(\w+)'
-        match = re.match(png_logo_pattern, filename, re.IGNORECASE)
-        
-        if match:
-            layout_code, color, size, ext = match.groups()
-            layout = 'horizontal' if layout_code.lower() == 'h' else 'vertical'
-            background = 'light' if color.lower() == 'blk' else 'dark'
-            size_full = {'L': 'large', 'M': 'medium', 'S': 'small'}[size.upper()]
-            
-            if layout == 'horizontal':
-                use_cases = ["headers", "business_cards", "letterhead", "wide_banners"]
-                guidance = f"Best for wide spaces - business cards, website headers, email signatures"
-            else:  # vertical
-                use_cases = ["tall_banners", "social_media_profile", "mobile_layout", "poster"]
-                guidance = f"Perfect for tall/narrow spaces - social media profiles, mobile layouts"
-            
-            return {
-                "filename": filename,
-                "description": f"{product.title()} {layout} logo ({color}) for {background} backgrounds - {size_full.title()}",
-                "layout": layout,
-                "color": "black" if color.lower() == 'blk' else "white",
-                "background": background,
-                "size": size_full,
-                "use_cases": use_cases,
-                "guidance": guidance,
-                "format": ext
-            }
+    return tags
 
-        # Icon pattern with underscore: Prefix_icon_blk_L.png (like CIQ-Bridge_icon_blk_L.png)
-        underscore_icon_pattern = rf'{re.escape(prefix)}_icon_(\w+)_([LMS])\.(\w+)'
-        match = re.match(underscore_icon_pattern, filename, re.IGNORECASE)
-        
-        if match:
-            color, size, ext = match.groups()
-            background = 'light' if color.lower() == 'blk' else 'dark'
-            size_full = {'L': 'large', 'M': 'medium', 'S': 'small'}[size.upper()]
-            
-            return {
-                "filename": filename,
-                "description": f"{product.title()} icon ({color}) for {background} backgrounds - {size_full.title()}",
-                "layout": "icon",
-                "color": "black" if color.lower() == 'blk' else "white",
-                "background": background,
-                "size": size_full,
-                "use_cases": ["favicon", "app_icon", "small_spaces", "avatars"],
-                "guidance": f"Perfect for tight spaces where you need just the {product.title()} symbol",
-                "format": ext
-            }
-        
-        # Logo pattern with underscore: Prefix_logo_h-blk_L.png (like RLC-LTS_logo_h-blk_L.png)
-        underscore_logo_pattern = rf'{re.escape(prefix)}_logo_([hv])-(\w+)_([LMS])\.(\w+)'
-        match = re.match(underscore_logo_pattern, filename, re.IGNORECASE)
-        
-        if match:
-            layout_code, color, size, ext = match.groups()
-            layout = 'horizontal' if layout_code.lower() == 'h' else 'vertical'
-            background = 'light' if color.lower() == 'blk' else 'dark'
-            size_full = {'L': 'large', 'M': 'medium', 'S': 'small'}[size.upper()]
-            
-            if layout == 'horizontal':
-                use_cases = ["headers", "business_cards", "letterhead", "wide_banners"]
-                guidance = f"Best for wide spaces - business cards, website headers, email signatures"
-            else:  # vertical
-                use_cases = ["tall_banners", "social_media_profile", "mobile_layout", "poster"]
-                guidance = f"Perfect for tall/narrow spaces - social media profiles, mobile layouts"
-            
-            return {
-                "filename": filename,
-                "description": f"{product.title()} {layout} logo ({color}) for {background} backgrounds - {size_full.title()}",
-                "layout": layout,
-                "color": "black" if color.lower() == 'blk' else "white",
-                "background": background,
-                "size": size_full,
-                "use_cases": use_cases,
-                "guidance": guidance,
-                "format": ext
-            }
-
-        # SVG logo pattern: Prefix_logo_h-blk.svg (like Apptainer_logo_h-blk.svg)
-        svg_logo_pattern = rf'{re.escape(prefix)}_logo_([hv])-(\w+)\.(\w+)'
-        match = re.match(svg_logo_pattern, filename, re.IGNORECASE)
-        
-        if match:
-            layout_code, color, ext = match.groups()
-            layout = 'horizontal' if layout_code.lower() == 'h' else 'vertical'
-            background = 'light' if color.lower() == 'blk' else 'dark'
-            
-            return {
-                "filename": filename,
-                "description": f"{product.title()} {layout} logo ({color}) for {background} backgrounds - SVG",
-                "layout": layout,
-                "color": "black" if color.lower() == 'blk' else "white",
-                "background": background,
-                "size": "vector",
-                "use_cases": ["scalable", "web", "print"],
-                "guidance": f"Vector format - scales to any size perfectly",
-                "format": ext
-            }
-        
-        # SVG icon pattern: Prefix_icon_blk.svg (like Apptainer_icon_blk.svg)
-        svg_icon_pattern = rf'{re.escape(prefix)}_icon_(\w+)\.(\w+)'
-        match = re.match(svg_icon_pattern, filename, re.IGNORECASE)
-        
-        if match:
-            color, ext = match.groups()
-            background = 'light' if color.lower() == 'blk' else 'dark'
-            
-            return {
-                "filename": filename,
-                "description": f"{product.title()} icon ({color}) for {background} backgrounds - SVG",
-                "layout": "icon",
-                "color": "black" if color.lower() == 'blk' else "white",
-                "background": background,
-                "size": "vector",
-                "use_cases": ["scalable", "favicon", "app_icon"],
-                "guidance": f"Vector format - scales to any size perfectly",
-                "format": ext
-            }
-    
-    # Fallback - basic file info
-    return {
-        "filename": filename,
-        "description": f"{product.title()} logo variant: {filename}",
-        "layout": "unknown",
-        "color": "unknown", 
-        "background": "unknown",
-        "size": "unknown",
-        "use_cases": ["general"],
-        "guidance": f"{product.title()} logo variant",
-        "format": filename.split('.')[-1] if '.' in filename else "unknown"
-    }
-
-def scan_directory(base_path: str, product: str, asset_type: str) -> Dict[str, Any]:
-    """Scan a directory and parse all asset files"""
-    directory_path = Path(base_path) / product / asset_type
+def scan_assets_directory(assets_path: Path) -> Dict[str, Any]:
+    """Scan and catalog all assets"""
     assets = {}
     
-    if not directory_path.exists():
-        print(f"Directory not found: {directory_path}")
-        return assets
+    # Scan global assets (CIQ)
+    global_logos = assets_path / "global" / "logos"
+    if global_logos.exists():
+        ciq_assets = {}
+        for file_path in global_logos.glob("*.png"):
+            parsed = parse_filename(file_path.name)
+            if parsed:
+                key = generate_asset_key(parsed)
+                ciq_assets[key] = {
+                    "url": f"{BASE_URL}/assets/global/logos/{file_path.name}",
+                    "filename": file_path.name,
+                    "background": determine_background(parsed['color']),
+                    "color": parsed['color'],
+                    "layout": parsed['layout'],
+                    "type": parsed['type'],
+                    "size": parsed['size'],
+                    "tags": get_asset_tags(parsed['layout'], parsed['type'])
+                }
+        if ciq_assets:
+            assets['ciq'] = ciq_assets
     
-    for file_path in directory_path.glob("*"):
-        if file_path.is_file() and not file_path.name.startswith('.'):
-            filename = file_path.name
-            
-            # Parse based on product
-            if product == 'ciq':
-                metadata = parse_ciq_filename(filename)
-            elif product == 'fuzzball':
-                metadata = parse_fuzzball_filename(filename)
-            else:
-                # Use generic parser for new products
-                metadata = parse_generic_filename(filename, product)
-            
-            if metadata:
-                # Add URL
-                url_path = f"{product}-{asset_type}" if base_path == "." else f"assets/{product}/{asset_type}"
-                metadata["url"] = f"{BASE_URL}/{url_path}/{filename}"
+    # Scan product assets
+    products_path = assets_path / "products"
+    if products_path.exists():
+        for product_dir in products_path.iterdir():
+            if product_dir.is_dir():
+                product_name = product_dir.name
+                logos_path = product_dir / "logos"
                 
-                # Generate asset key for current structure
-                if product == 'ciq':
-                    asset_key = f"{metadata['variant']}-{metadata['background']}"
-                elif metadata.get('layout') and metadata.get('background') and metadata.get('size'):
-                    if metadata['layout'] == 'icon':
-                        asset_key = f"icon-{metadata['color'][:3]}-{metadata['size']}"
-                    else:
-                        asset_key = f"{metadata['layout']}-{metadata['color'][:3]}-{metadata['size']}"
-                else:
-                    # Fallback key
-                    asset_key = filename.replace('.', '_').replace('-', '_').lower()
-                
-                assets[asset_key] = metadata
+                if logos_path.exists():
+                    product_assets = {}
+                    for file_path in logos_path.glob("*.png"):
+                        parsed = parse_filename(file_path.name)
+                        if parsed:
+                            key = generate_asset_key(parsed)
+                            product_assets[key] = {
+                                "url": f"{BASE_URL}/assets/products/{product_name}/logos/{file_path.name}",
+                                "filename": file_path.name,
+                                "background": determine_background(parsed['color']),
+                                "color": parsed['color'],
+                                "layout": "icon" if parsed['layout'] == 'square' else parsed['layout'],
+                                "type": parsed['type'],
+                                "size": parsed['size'],
+                                "tags": get_asset_tags(parsed['layout'], parsed['type'])
+                            }
+                    
+                    if product_assets:
+                        assets[product_name] = product_assets
     
     return assets
 
-def generate_brand_guidelines() -> Dict[str, Any]:
-    """Generate brand guidelines structure"""
+def generate_rules() -> Dict[str, Any]:
+    """Generate declarative matching rules"""
     return {
-        "clear_space": "Equal to 1/4 the height of the 'Q' in the logo",
-        "minimum_size": "70px height for digital applications", 
-        "primary_green": "#229529",
-        "neutral_colors": {
-            "light_background": "dark_grey",
-            "dark_background": "light_grey"
-        }
-    }
-
-def generate_decision_logic() -> Dict[str, Any]:
-    """Generate decision logic for both CIQ and Fuzzball"""
-    return {
-        "ciq": {
-            "main_element": {
-                "description": "Logo is the hero/star of the design",
-                "examples": ["homepage headers", "business cards", "presentation title slides"],
-                "recommended": "2color (most recognizable branding)"
+        "use_case_matching": {
+            "favicon": {
+                "prefer_layout": "icon",
+                "prefer_size": "large",
+                "description": "Small square icon for browser tabs"
             },
-            "supporting_element": {
-                "description": "Logo is secondary/background element",
-                "examples": ["footers", "watermarks", "corner branding"], 
-                "default": "1color neutral (when in doubt)",
-                "alternative": "green (for neutral designs where logo needs to pop)"
+            "app_icon": {
+                "prefer_layout": "icon", 
+                "prefer_size": "large",
+                "description": "Application icon for software"
+            },
+            "business_card": {
+                "prefer_layout": "horizontal",
+                "prefer_size": "large",
+                "description": "Logo for business cards and professional materials"
+            },
+            "email_signature": {
+                "prefer_layout": "horizontal",
+                "prefer_size": "large", 
+                "description": "Logo for email signatures"
+            },
+            "letterhead": {
+                "prefer_layout": "horizontal",
+                "prefer_size": "large",
+                "description": "Logo for official letterhead"
+            },
+            "website_header": {
+                "prefer_layout": "horizontal",
+                "prefer_size": "large",
+                "description": "Logo for website headers"
+            },
+            "mobile_app": {
+                "prefer_layout": "vertical",
+                "prefer_size": "large",
+                "description": "Logo optimized for mobile layouts"
+            },
+            "social_media": {
+                "prefer_layout": "vertical", 
+                "prefer_size": "large",
+                "description": "Logo for social media profiles"
+            },
+            "presentation": {
+                "prefer_layout": "horizontal",
+                "prefer_size": "large",
+                "description": "Logo for presentations and slides"
             }
         },
-        "fuzzball": {
-            "layout_selection": {
-                "icon": {
-                    "description": "Just the symbol - most compact",
-                    "examples": ["favicons", "app icons", "avatars", "tight spaces"],
-                    "when_to_use": "Space is very limited or you need just the recognizable symbol"
-                },
-                "horizontal": {
-                    "description": "Symbol + text side-by-side",
-                    "examples": ["business cards", "headers", "email signatures", "letterhead"],
-                    "when_to_use": "Wide spaces, professional documents, primary branding"
-                },
-                "vertical": {
-                    "description": "Symbol + text stacked", 
-                    "examples": ["social media profiles", "mobile layouts", "tall banners", "posters"],
-                    "when_to_use": "Tall/narrow spaces, mobile-first designs"
-                }
+        "background_matching": {
+            "light": {
+                "prefer_color": "black",
+                "description": "Dark logos on light backgrounds"
             },
-            "size_selection": {
-                "small": "Compact usage, small spaces",
-                "medium": "Standard usage, most common",
-                "large": "Hero placement, high-impact usage"
+            "dark": {
+                "prefer_color": "white", 
+                "description": "Light logos on dark backgrounds"
+            },
+            "any": {
+                "prefer_color": "color",
+                "fallback_color": "black",
+                "description": "Color logos that work on various backgrounds"
             }
+        },
+        "ciq_variant_rules": {
+            "main_branding": {
+                "prefer_variant": "twocolor",
+                "description": "Most recognizable CIQ branding - use when logo is the star"
+            },
+            "supporting": {
+                "prefer_variant": "onecolor",
+                "description": "Clean, professional - won't compete with other elements"
+            },
+            "accent": {
+                "prefer_variant": "green", 
+                "description": "Use when you need the logo to pop in neutral designs"
+            }
+        },
+        "confidence_scoring": {
+            "exact_match": 1.0,
+            "layout_match": 0.8,
+            "background_match": 0.7,
+            "tag_match": 0.6,
+            "fallback": 0.3
         }
     }
 
-def discover_products(base_path: str) -> List[str]:
-    """Auto-discover products by finding assets subdirectories"""
-    products = []
+def generate_index(assets: Dict[str, Any]) -> Dict[str, Any]:
+    """Generate index for fast lookups"""
+    products = list(assets.keys())
     
-    # Check /assets/ structure first
-    assets_path = Path(base_path) / "assets"
-    if assets_path.exists():
-        for item in assets_path.iterdir():
-            if item.is_dir() and (item / "logos").exists():
-                products.append(item.name)
+    all_layouts = set()
+    all_colors = set()
+    all_backgrounds = set() 
+    all_tags = set()
     
-    # Fallback: Find old *-logos directories at root
-    path = Path(base_path)
-    for item in path.iterdir():
-        if item.is_dir() and item.name.endswith('-logos'):
-            # Extract product name
-            product_name = item.name.replace('-logos', '').lower()
-            
-            # Map directory names to product names
-            if product_name == 'ciq':
-                products.append('ciq')
-            elif product_name == 'fuzzball':
-                products.append('fuzzball')
-            elif product_name == 'apptainer':
-                products.append('apptainer')
-            elif product_name == 'bridge':
-                products.append('bridge')
-            elif product_name == 'ascender-pro':
-                products.append('ascender-pro')
-            elif product_name == 'warewulf-pro':
-                products.append('warewulf-pro')
-            elif product_name == 'ciq-support':
-                products.append('ciq-support')
-            else:
-                # Generic product
-                products.append(product_name)
+    for product_assets in assets.values():
+        for asset in product_assets.values():
+            all_layouts.add(asset['layout'])
+            all_colors.add(asset['color'])
+            all_backgrounds.add(asset['background'])
+            all_tags.update(asset['tags'])
     
-    return list(set(products))  # Remove duplicates
+    return {
+        "products": sorted(products),
+        "layouts": sorted(all_layouts),
+        "colors": sorted(all_colors),
+        "backgrounds": sorted(all_backgrounds),
+        "tags": sorted(all_tags),
+        "total_assets": sum(len(assets_dict) for assets_dict in assets.values())
+    }
 
 def main():
-    parser = argparse.ArgumentParser(description='Generate asset metadata from directory structure')
+    parser = argparse.ArgumentParser(description='Generate declarative asset metadata')
     parser.add_argument('--base-path', default='.', help='Base path to scan (default: current directory)')
     parser.add_argument('--output', default='metadata/asset-inventory.json', help='Output JSON file')
-    parser.add_argument('--products', nargs='*', help='Products to scan (default: auto-discover)')
     
     args = parser.parse_args()
+    assets_path = Path(args.base_path) / "assets"
     
-    # Auto-discover products if not specified
-    if not args.products:
-        args.products = discover_products(args.base_path)
-        print(f"🔍 Auto-discovered products: {', '.join(args.products)}")
+    print(f"🔍 Scanning assets for declarative metadata generation...")
     
-    print(f"🔍 Scanning asset directories in: {args.base_path}")
+    # Scan all assets
+    assets = scan_assets_directory(assets_path)
     
-    # Build complete metadata structure
-    all_product_logos = {}
-    
-    # Scan each product
-    for product in args.products:
-        print(f"📁 Scanning {product} assets...")
-        
-        # For current directory structure, prioritize /assets/ structure
-        if args.base_path == '.':
-            # Check NEW assets structure FIRST: /assets/product/logos/
-            assets_found = {}
-            new_path = Path("assets") / product / "logos"
-            if new_path.exists():
-                print(f"   Found assets structure: {new_path}")
-                for file_path in new_path.glob("*"):
-                    if file_path.is_file() and not file_path.name.startswith('.') and not file_path.name.endswith('.svg'):
-                        filename = file_path.name
-                        
-                        if product == 'ciq':
-                            asset_metadata = parse_ciq_filename(filename)
-                        elif product == 'fuzzball':
-                            asset_metadata = parse_fuzzball_filename(filename)
-                        else:
-                            asset_metadata = parse_generic_filename(filename, product)
-                        
-                        if asset_metadata:
-                            # Use new assets URL path
-                            asset_metadata["url"] = f"{BASE_URL}/assets/{product}/logos/{filename}"
-                            
-                            # Generate key
-                            if product == 'ciq':
-                                key = f"{asset_metadata['variant']}-{asset_metadata['background']}"
-                            elif asset_metadata.get('layout') and asset_metadata.get('background') and asset_metadata.get('size'):
-                                if asset_metadata['layout'] == 'icon':
-                                    key = f"icon-{asset_metadata['color'][:3]}-{asset_metadata['size']}"
-                                else:
-                                    key = f"{asset_metadata['layout']}-{asset_metadata['color'][:3]}-{asset_metadata['size']}"
-                            else:
-                                key = filename.replace('.', '_').replace('-', '_').lower()
-                            
-                            assets_found[key] = asset_metadata
-            
-            # Fallback to old structure if no assets found: /CIQ-logos, /fuzzball-logos, /Product-logos
-            if not assets_found:
-                old_dirs = []
-                if product == 'ciq':
-                    old_dirs = ['CIQ-logos']
-                elif product == 'fuzzball':
-                    old_dirs = ['fuzzball-logos'] 
-                elif product == 'apptainer':
-                    old_dirs = ['Apptainer-logos']
-                elif product == 'bridge':
-                    old_dirs = ['Bridge-logos']
-                elif product == 'ascender-pro':
-                    old_dirs = ['Ascender-Pro-logos']
-                elif product == 'warewulf-pro':
-                    old_dirs = ['Warewulf-Pro-logos']
-                elif product == 'ciq-support':
-                    old_dirs = ['CIQ-Support-logos']
-                else:
-                    # For other products, try multiple possible directory names
-                    old_dirs = [
-                        f"{product.title()}-logos",
-                        f"{product}-logos", 
-                        f"{product.upper()}-logos",
-                        f"{product.title().replace('-', ' ').replace(' ', '-')}-logos"
-                    ]
-                
-                for dir_name in old_dirs:
-                    old_path = Path(dir_name)
-                    if old_path.exists():
-                        print(f"   Found old structure: {old_path}")
-                        for file_path in old_path.glob("*"):
-                            if file_path.is_file() and not file_path.name.startswith('.') and not file_path.name.endswith('.svg'):
-                                filename = file_path.name
-                                
-                                if product == 'ciq':
-                                    asset_metadata = parse_ciq_filename(filename)
-                                elif product == 'fuzzball':
-                                    asset_metadata = parse_fuzzball_filename(filename)
-                                else:
-                                    asset_metadata = parse_generic_filename(filename, product)
-                                
-                                if asset_metadata:
-                                    # Use old URL path for now
-                                    asset_metadata["url"] = f"{BASE_URL}/{old_path}/{filename}"
-                                    
-                                    # Generate key
-                                    if product == 'ciq':
-                                        key = f"{asset_metadata['variant']}-{asset_metadata['background']}"
-                                    elif asset_metadata.get('layout') and asset_metadata.get('background') and asset_metadata.get('size'):
-                                        if asset_metadata['layout'] == 'icon':
-                                            key = f"icon-{asset_metadata['color'][:3]}-{asset_metadata['size']}"
-                                        else:
-                                            key = f"{asset_metadata['layout']}-{asset_metadata['color'][:3]}-{asset_metadata['size']}"
-                                    else:
-                                        key = filename.replace('.', '_').replace('-', '_').lower()
-                                    
-                                    assets_found[key] = asset_metadata
-            
-            all_product_logos[product] = assets_found
-        else:
-            # Scan new structure
-            assets = scan_directory(args.base_path, product, "logos")
-            all_product_logos[product] = assets
-    
-    # Build final metadata structure
+    # Build metadata structure
     metadata = {
-        "brand_guidelines": generate_brand_guidelines(),
-        "decision_logic": generate_decision_logic()
+        "assets": assets,
+        "rules": generate_rules(),
+        "index": generate_index(assets)
     }
     
-    # Add product-specific logos
-    if 'ciq' in all_product_logos:
-        metadata["logos"] = all_product_logos['ciq']
-    if 'fuzzball' in all_product_logos:
-        metadata["fuzzball_logos"] = all_product_logos['fuzzball']
-    
-    # Add other products as separate categories
-    for product, assets in all_product_logos.items():
-        if product not in ['ciq', 'fuzzball'] and assets:
-            metadata[f"{product}_logos"] = assets
-    
-    # Create output directory if it doesn't exist
+    # Create output directory
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     
-    # Write metadata JSON
+    # Write metadata
     with open(output_path, 'w') as f:
         json.dump(metadata, f, indent=2)
     
     # Print summary
-    print(f"\n✅ Generated metadata: {args.output}")
-    total_assets = 0
-    for product, assets in all_product_logos.items():
-        if assets:
-            print(f"   {product.title()} logos: {len(assets)}")
-            total_assets += len(assets)
-    print(f"   Total assets: {total_assets}")
+    total_assets = metadata["index"]["total_assets"]
+    products = len(metadata["index"]["products"])
     
-    print(f"\n🚀 Next steps:")
-    print(f"   1. Review generated metadata: {args.output}")
-    print(f"   2. Restart your MCP server to use new metadata")
-    print(f"   3. Test with: 'I need a CIQ logo' or 'Fuzzball logo'")
+    print(f"\n✅ Generated declarative metadata: {args.output}")
+    print(f"   📊 {total_assets} assets across {products} products")
+    print(f"   🏷️  {len(metadata['index']['tags'])} semantic tags")
+    print(f"   📐 {len(metadata['index']['layouts'])} layouts")
+    print(f"   🎨 {len(metadata['index']['backgrounds'])} background types")
     
-    if total_assets > 30:
-        print(f"\n🎉 Great! Found {total_assets} total assets - much better!")
+    print(f"\n🎯 Benefits:")
+    print(f"   • Declarative rules for consistent matching")
+    print(f"   • Semantic tags for intelligent recommendations")
+    print(f"   • Confidence scoring for quality results")
+    print(f"   • Easy debugging and troubleshooting")
+    
+    print(f"\n🚀 Ready for FastMCP integration!")
 
 if __name__ == "__main__":
     main()
