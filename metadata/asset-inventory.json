@@ -9,12 +9,33 @@
     }
   },
   "logos": {
-    "ciq_1color_bla_large": {
-      "filename": "CIQ-Logo-1color-dark.png",
-      "description": "CIQ 1color company logo",
-      "layout": "1color",
+    "ciq_1color_neutral_light": {
+      "filename": "CIQ-Logo-1color-light.png",
+      "description": "CIQ 1-color neutral logo for light backgrounds",
+      "color_type": "1color_neutral",
+      "color_mode": "light",
       "color": "black",
       "background": "light",
+      "size": "large",
+      "use_cases": [
+        "headers",
+        "business_cards",
+        "letterhead",
+        "general_branding"
+      ],
+      "guidance": "Standard CIQ company logo for most applications",
+      "format": "png",
+      "product": "ciq",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/CIQ-logos/CIQ-Logo-1color-light.png",
+      "path": "CIQ-logos/CIQ-Logo-1color-light.png"
+    },
+    "ciq_1color_neutral_dark": {
+      "filename": "CIQ-Logo-1color-dark.png",
+      "description": "CIQ 1-color neutral logo for dark backgrounds",
+      "color_type": "1color_neutral",
+      "color_mode": "dark",
+      "color": "white",
+      "background": "dark",
       "size": "large",
       "use_cases": [
         "headers",
@@ -28,11 +49,54 @@
       "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/CIQ-logos/CIQ-Logo-1color-dark.png",
       "path": "CIQ-logos/CIQ-Logo-1color-dark.png"
     },
-    "ciq_2color_bla_large": {
+    "ciq_1color_green_light": {
+      "filename": "CIQ-Logo-green-light.png",
+      "description": "CIQ 1-color green logo for light backgrounds",
+      "color_type": "1color_green",
+      "color_mode": "light",
+      "color": "green",
+      "background": "light",
+      "size": "large",
+      "use_cases": [
+        "headers",
+        "business_cards",
+        "letterhead",
+        "advertising",
+        "social_media"
+      ],
+      "guidance": "Standard+ version to be used when the logo is not the hero of the page but the surrounding elements are not visually exciting or when the branding needs an extra punch, like in some advertising and social media",
+      "format": "png",
+      "product": "ciq",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/CIQ-logos/CIQ-Logo-green-light.png",
+      "path": "CIQ-logos/CIQ-Logo-green-light.png"
+    },
+    "ciq_1color_green_dark": {
+      "filename": "CIQ-Logo-green-dark.png",
+      "description": "CIQ 1-color green logo for dark backgrounds",
+      "color_type": "1color_green",
+      "color_mode": "dark",
+      "color": "green",
+      "background": "dark",
+      "size": "large",
+      "use_cases": [
+        "headers",
+        "business_cards",
+        "letterhead",
+        "advertising",
+        "social_media"
+      ],
+      "guidance": "Standard+ version to be used when the logo is not the hero of the page but the surrounding elements are not visually exciting or when the branding needs an extra punch, like in some advertising and social media",
+      "format": "png",
+      "product": "ciq",
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/CIQ-logos/CIQ-Logo-green-dark.png",
+      "path": "CIQ-logos/CIQ-Logo-green-dark.png"
+    },
+    "ciq_2color_light": {
       "filename": "CIQ-Logo-2color-light.png",
-      "description": "CIQ 2color company logo",
-      "layout": "2color",
-      "color": "black",
+      "description": "CIQ 2-color logo for light backgrounds",
+      "color_type": "2color",
+      "color_mode": "light",
+      "color": "black_green",
       "background": "light",
       "size": "large",
       "use_cases": [
@@ -47,24 +111,25 @@
       "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/CIQ-logos/CIQ-Logo-2color-light.png",
       "path": "CIQ-logos/CIQ-Logo-2color-light.png"
     },
-    "ciq_horizontal_gre_large": {
-      "filename": "CIQ-Logo-green-dark.png",
-      "description": "CIQ horizontal logo (green) for light backgrounds - Large",
-      "layout": "horizontal",
-      "color": "green",
-      "background": "light",
+    "ciq_2color_dark": {
+      "filename": "CIQ-Logo-2color-dark.png",
+      "description": "CIQ 2-color logo for dark backgrounds",
+      "color_type": "2color",
+      "color_mode": "dark",
+      "color": "white_green",
+      "background": "dark",
       "size": "large",
       "use_cases": [
-        "headers",
-        "business_cards",
-        "letterhead",
-        "wide_banners"
+        "hero_sections",
+        "presentations",
+        "marketing_materials",
+        "large_displays"
       ],
-      "guidance": "Best for wide spaces - business cards, website headers, email signatures",
+      "guidance": "Hero CIQ company logo when logo is primary visual element",
       "format": "png",
       "product": "ciq",
-      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/CIQ-logos/CIQ-Logo-green-dark.png",
-      "path": "CIQ-logos/CIQ-Logo-green-dark.png"
+      "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/CIQ-logos/CIQ-Logo-2color-dark.png",
+      "path": "CIQ-logos/CIQ-Logo-2color-dark.png"
     }
   },
   "fuzzball_logos": {
