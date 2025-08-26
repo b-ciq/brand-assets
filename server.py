@@ -27,8 +27,16 @@ def load_image_as_data_uri(image_url: str) -> Optional[str]:
         response = requests.get(image_url, timeout=10)
         response.raise_for_status()
         
-        # Get content type from response headers
-        content_type = response.headers.get('content-type', 'image/png')
+        # Check if content type is actually an image
+        content_type = response.headers.get('content-type', '')
+        if not content_type.startswith('image/'):
+            print(f"❌ URL does not return an image: {image_url} (got {content_type})")
+            return None
+        
+        # Check if we got actual image data (more than just a few bytes)
+        if len(response.content) < 100:  # Very small files are probably not real images
+            print(f"❌ Image data too small: {image_url}")
+            return None
         
         # Convert to base64
         image_data = base64.b64encode(response.content).decode('utf-8')
