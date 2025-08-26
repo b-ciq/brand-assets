@@ -92,6 +92,10 @@ class DeclarativeAssetMatcher:
         """Parse user request into structured attributes"""
         request_lower = request.lower()
         
+        # Check for CIQ product disambiguation case
+        ciq_product_patterns = ['ciq product', 'ciq products', 'product logos', 'products logos']
+        is_ciq_product_query = any(pattern in request_lower for pattern in ciq_product_patterns)
+        
         # Detect product
         product = None
         product_confidence = 0.0
@@ -143,7 +147,8 @@ class DeclarativeAssetMatcher:
             'background': background,
             'layout': layout,
             'confidence': min(total_confidence, 1.0),
-            'raw_request': request
+            'raw_request': request,
+            'needs_ciq_disambiguation': is_ciq_product_query and product == 'ciq'
         }
 
     def _match_assets(self, product: str, parsed: Dict) -> List[Tuple[float, Dict, str]]:
@@ -209,6 +214,10 @@ class DeclarativeAssetMatcher:
                 'message': f"No {parsed['product']} assets found matching your criteria.",
                 'confidence': 'none'
             }
+        
+        # Handle CIQ product disambiguation
+        if parsed.get('needs_ciq_disambiguation'):
+            return self._generate_ciq_disambiguation()
         
         confidence_level = self._get_confidence_level(parsed['confidence'])
         
@@ -439,6 +448,32 @@ class DeclarativeAssetMatcher:
             'green': 'Green CIQ logo for brand accent'
         }
         return descriptions.get(layout, f'{layout.title()} layout')
+
+    def _generate_ciq_disambiguation(self) -> Dict[str, Any]:
+        """Generate disambiguation response for CIQ product queries"""
+        if not asset_data:
+            return {'error': 'Asset data not loaded'}
+        
+        products = [prod.title() for prod in asset_data['index']['products'] if prod != 'ciq']
+        
+        return {
+            'message': "I found CIQ assets. Are you looking for:",
+            'question': "Which type of logo do you need?",
+            'options': [
+                {
+                    "value": "company", 
+                    "label": "CIQ Company Logo", 
+                    "description": "The main CIQ brand logo (onecolor, twocolor, green variants)"
+                },
+                {
+                    "value": "products", 
+                    "label": "CIQ Product Logos", 
+                    "description": f"Logos for CIQ products: {', '.join(products)}"
+                }
+            ],
+            'confidence': 'clarifying',
+            'help': "Please specify 'CIQ company logo' or name a specific product like 'Warewulf logo' for more precise results."
+        }
 
     def _generate_product_help(self) -> Dict[str, Any]:
         """Generate help when no product is detected"""
