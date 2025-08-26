@@ -9,8 +9,6 @@ import json
 import requests
 from typing import Optional, Dict, Any, List, Tuple
 import re
-import base64
-from io import BytesIO
 
 # Asset metadata URL
 METADATA_URL = 'https://raw.githubusercontent.com/b-ciq/brand-assets/main/metadata/asset-inventory.json'
@@ -20,38 +18,6 @@ mcp = FastMCP("CIQ Brand Assets")
 
 # Global asset data cache
 asset_data = None
-
-def load_image_as_data_uri(image_url: str) -> Optional[str]:
-    """Load image from URL and convert to data URI"""
-    try:
-        response = requests.get(image_url, timeout=10)
-        response.raise_for_status()
-        
-        # Get content type from response headers
-        content_type = response.headers.get('content-type', 'image/png')
-        
-        # Convert to base64
-        image_data = base64.b64encode(response.content).decode('utf-8')
-        
-        # Return as data URI
-        return f"data:{content_type};base64,{image_data}"
-    except Exception as e:
-        print(f"❌ Failed to load image {image_url}: {e}")
-        return None
-
-def enhance_asset_with_image(asset: Dict[str, Any]) -> Dict[str, Any]:
-    """Enhance asset dictionary with image data"""
-    enhanced_asset = asset.copy()
-    
-    # Load the actual image
-    image_data_uri = load_image_as_data_uri(asset['url'])
-    if image_data_uri:
-        enhanced_asset['image'] = image_data_uri
-    else:
-        # Still include the key but with None value so the response structure is consistent
-        enhanced_asset['image'] = None
-    
-    return enhanced_asset
 
 def load_asset_data():
     """Load asset metadata from GitHub"""
@@ -268,7 +234,6 @@ class DeclarativeAssetMatcher:
         if confidence_level == 'high' and len(perfect_matches) == 1:
             # High confidence, single perfect match - return it directly
             asset = perfect_matches[0][1]
-            enhanced_asset = enhance_asset_with_image(asset)
             return {
                 'message': f"Here's the perfect {parsed['product']} asset for your needs:",
                 'asset': {
@@ -276,8 +241,7 @@ class DeclarativeAssetMatcher:
                     'filename': asset['filename'],
                     'description': f"{parsed['product'].title()} {asset['layout']} logo ({asset['color']}) for {parsed['background'] or asset['background']} backgrounds",
                     'background': asset['background'],
-                    'layout': asset['layout'],
-                    'image': enhanced_asset.get('image')
+                    'layout': asset['layout']
                 },
                 'confidence': 'high',
                 'reason': perfect_matches[0][2]
@@ -286,15 +250,13 @@ class DeclarativeAssetMatcher:
             # High confidence, multiple perfect matches - show them
             assets = []
             for score, asset, reason in perfect_matches:
-                enhanced_asset = enhance_asset_with_image(asset)
                 assets.append({
                     'url': asset['url'],
                     'filename': asset['filename'],
                     'layout': asset['layout'],
                     'background': asset['background'],
                     'score': round(score, 2),
-                    'reason': reason,
-                    'image': enhanced_asset.get('image')
+                    'reason': reason
                 })
             
             return {
@@ -306,7 +268,6 @@ class DeclarativeAssetMatcher:
         elif confidence_level == 'high' and len(exact_matches) == 1:
             # High confidence, single exact match - return it
             asset = exact_matches[0][1]
-            enhanced_asset = enhance_asset_with_image(asset)
             return {
                 'message': f"Here's the exact {parsed['product']} asset you requested:",
                 'asset': {
@@ -314,8 +275,7 @@ class DeclarativeAssetMatcher:
                     'filename': asset['filename'],
                     'description': f"{parsed['product'].title()} {asset['layout']} logo ({asset['color']}) for {parsed['background'] or asset['background']} backgrounds",
                     'background': asset['background'],
-                    'layout': asset['layout'],
-                    'image': enhanced_asset.get('image')
+                    'layout': asset['layout']
                 },
                 'confidence': 'high',
                 'reason': exact_matches[0][2]
@@ -332,7 +292,6 @@ class DeclarativeAssetMatcher:
             if len(perfect_candidates) == 1:
                 # Found single perfect match - return it
                 asset = perfect_candidates[0][1]
-                enhanced_asset = enhance_asset_with_image(asset)
                 return {
                     'message': f"Here's the perfect {parsed['product']} asset for your needs:",
                     'asset': {
@@ -340,8 +299,7 @@ class DeclarativeAssetMatcher:
                         'filename': asset['filename'],
                         'description': f"{parsed['product'].title()} {asset['layout']} logo ({asset['color']}) for {parsed['background']} backgrounds",
                         'background': asset['background'],
-                        'layout': asset['layout'],
-                        'image': enhanced_asset.get('image')
+                        'layout': asset['layout']
                     },
                     'confidence': 'high',
                     'reason': perfect_candidates[0][2]
@@ -350,15 +308,13 @@ class DeclarativeAssetMatcher:
                 # Multiple matches - show top matches
                 assets = []
                 for score, asset, reason in exact_matches[:3]:
-                    enhanced_asset = enhance_asset_with_image(asset)
                     assets.append({
                         'url': asset['url'],
                         'filename': asset['filename'],
                         'layout': asset['layout'],
                         'background': asset['background'],
                         'score': round(score, 2),
-                        'reason': reason,
-                        'image': enhanced_asset.get('image')
+                        'reason': reason
                     })
                 
                 return {
@@ -374,15 +330,13 @@ class DeclarativeAssetMatcher:
             assets = []
             matches_to_show = exact_matches if parsed['background'] and len(exact_matches) > 0 else matches
             for score, asset, reason in matches_to_show[:3]:
-                enhanced_asset = enhance_asset_with_image(asset)
                 assets.append({
                     'url': asset['url'],
                     'filename': asset['filename'],
                     'layout': asset['layout'],
                     'background': asset['background'],
                     'score': round(score, 2),
-                    'reason': reason,
-                    'image': enhanced_asset.get('image')
+                    'reason': reason
                 })
             
             return {
@@ -453,14 +407,12 @@ class DeclarativeAssetMatcher:
             if not example:
                 example = assets[0]
                 
-            enhanced_example = enhance_asset_with_image(example)
             options.append({
                 'layout': layout,
                 'example_url': example['url'],
                 'count': len(assets),
                 'description': self._get_layout_description(layout),
-                'background_note': f"Showing {example['color']} version (for {example['background']} backgrounds)",
-                'image': enhanced_example.get('image')
+                'background_note': f"Showing {example['color']} version (for {example['background']} backgrounds)"
             })
         
         return {
