@@ -547,7 +547,7 @@ def get_brand_assets(request: str = "CIQ logo") -> Dict[str, Any]:
         }
 
 # Load asset data on startup
-print("🚀 Starting CIQ Brand Assets MCP Server v1.1 (Logic Improvements Branch)...")
+print("🚀 Starting CIQ Brand Assets MCP Server...")
 if load_asset_data():
     print("✅ Server ready!")
 else:
