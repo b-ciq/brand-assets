@@ -92,9 +92,24 @@ class DeclarativeAssetMatcher:
         """Parse user request into structured attributes"""
         request_lower = request.lower()
         
-        # Check for CIQ product disambiguation case
-        ciq_product_patterns = ['ciq product', 'ciq products', 'product logos', 'products logos']
-        is_ciq_product_query = any(pattern in request_lower for pattern in ciq_product_patterns)
+        # Check for CIQ disambiguation cases
+        # Any mention of products in context of CIQ should trigger disambiguation
+        product_context_patterns = [
+            'product', 'products', 'portfolio', 'offerings', 'solutions',
+            'brands', 'brand logos', 'all logos', 'available logos'
+        ]
+        
+        contains_ciq = any(pattern in request_lower for pattern in ['ciq', 'company'])
+        contains_product_context = any(pattern in request_lower for pattern in product_context_patterns)
+        
+        # Exceptions: clearly asking for company logo only
+        company_only_patterns = [
+            'ciq company logo', 'main ciq logo', 'ciq brand logo',
+            'corporate logo', 'company brand'
+        ]
+        is_clearly_company_only = any(pattern in request_lower for pattern in company_only_patterns)
+        
+        is_ciq_product_query = (contains_ciq and contains_product_context and not is_clearly_company_only)
         
         # Detect product
         product = None
