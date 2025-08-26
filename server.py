@@ -172,10 +172,14 @@ class DeclarativeAssetMatcher:
         score += rules['confidence_scoring']['fallback']
         reasons.append("product match")
         
-        # Background matching
+        # Background matching - critical when specified
         if parsed['background'] and asset['background'] == parsed['background']:
             score += rules['confidence_scoring']['background_match']
             reasons.append(f"optimized for {parsed['background']} backgrounds")
+        elif parsed['background'] and asset['background'] != parsed['background']:
+            # Penalize wrong background when user specifies one
+            score *= 0.5  # Reduce score by half for wrong background
+            reasons.append(f"wrong background ({asset['background']} instead of {parsed['background']})")
         
         # Layout matching
         if parsed['layout'] and asset['layout'] == parsed['layout']:
@@ -207,6 +211,21 @@ class DeclarativeAssetMatcher:
             }
         
         confidence_level = self._get_confidence_level(parsed['confidence'])
+        
+        # Handle simple product-only queries (e.g., "CIQ logo") - ask for background first
+        if (confidence_level == 'low' and parsed['product'] and 
+            not parsed['background'] and not parsed['layout'] and
+            len(parsed['raw_request'].split()) <= 2):
+            return {
+                'message': f"I have several {parsed['product'].upper()} logos available.",
+                'question': "What background will you be using this on?",
+                'options': [
+                    {"value": "light", "label": "Light backgrounds (white, bright colors)"},
+                    {"value": "dark", "label": "Dark backgrounds (black, dark colors)"}
+                ],
+                'confidence': 'clarifying',
+                'help': f"Once I know the background, I can recommend the perfect {parsed['product'].upper()} logo for you."
+            }
         
         # Find perfect matches (score > 1.0 - multiple criteria matched)
         perfect_matches = [m for m in matches if m[0] > 1.0]
@@ -262,10 +281,56 @@ class DeclarativeAssetMatcher:
                 'confidence': 'high',
                 'reason': exact_matches[0][2]
             }
-        elif confidence_level in ['high', 'medium'] and len(matches) <= 4:
+        elif confidence_level == 'high' and len(exact_matches) > 1:
+            # High confidence, multiple exact matches - try to find perfect match first
+            perfect_candidates = []
+            if parsed['background'] and parsed['layout']:
+                # Filter for assets matching both criteria
+                for score, asset, reason in exact_matches:
+                    if asset['background'] == parsed['background'] and asset['layout'] == parsed['layout']:
+                        perfect_candidates.append((score, asset, reason))
+            
+            if len(perfect_candidates) == 1:
+                # Found single perfect match - return it
+                asset = perfect_candidates[0][1]
+                return {
+                    'message': f"Here's the perfect {parsed['product']} asset for your needs:",
+                    'asset': {
+                        'url': asset['url'],
+                        'filename': asset['filename'],
+                        'description': f"{parsed['product'].title()} {asset['layout']} logo ({asset['color']}) for {parsed['background']} backgrounds",
+                        'background': asset['background'],
+                        'layout': asset['layout']
+                    },
+                    'confidence': 'high',
+                    'reason': perfect_candidates[0][2]
+                }
+            else:
+                # Multiple matches - show top matches
+                assets = []
+                for score, asset, reason in exact_matches[:3]:
+                    assets.append({
+                        'url': asset['url'],
+                        'filename': asset['filename'],
+                        'layout': asset['layout'],
+                        'background': asset['background'],
+                        'score': round(score, 2),
+                        'reason': reason
+                    })
+                
+                return {
+                    'message': f"Here are the best {parsed['product']} matches for your request:",
+                    'assets': assets,
+                    'confidence': 'high',
+                    'suggestion': self._generate_suggestion(parsed)
+                }
+        elif (confidence_level in ['high', 'medium'] and len(matches) <= 4) or \
+             (confidence_level == 'medium' and parsed['background'] and len(exact_matches) > 0):
             # Medium confidence or manageable matches - show options
+            # Also handle background-specific queries with exact matches
             assets = []
-            for score, asset, reason in matches[:3]:
+            matches_to_show = exact_matches if parsed['background'] and len(exact_matches) > 0 else matches
+            for score, asset, reason in matches_to_show[:3]:
                 assets.append({
                     'url': asset['url'],
                     'filename': asset['filename'],
