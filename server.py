@@ -212,10 +212,9 @@ class DeclarativeAssetMatcher:
         
         confidence_level = self._get_confidence_level(parsed['confidence'])
         
-        # Handle simple product-only queries (e.g., "CIQ logo") - ask for background first
-        if (confidence_level == 'low' and parsed['product'] and 
-            not parsed['background'] and not parsed['layout'] and
-            len(parsed['raw_request'].split()) <= 2):
+        # Handle simple product-only queries (e.g., "CIQ logo", "can you find me a warewulf logo?") - ask for background first
+        if (confidence_level in ['low', 'medium'] and parsed['product'] and 
+            not parsed['background'] and not parsed['layout']):
             return {
                 'message': f"I have several {parsed['product'].upper()} logos available.",
                 'question': "What background will you be using this on?",
