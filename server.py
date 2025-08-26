@@ -221,7 +221,7 @@ class DeclarativeAssetMatcher:
                 'asset': {
                     'url': asset['url'],
                     'filename': asset['filename'],
-                    'description': f"{parsed['product'].title()} {asset['layout']} logo ({asset['color']}) for {asset['background']} backgrounds",
+                    'description': f"{parsed['product'].title()} {asset['layout']} logo ({asset['color']}) for {parsed['background'] or asset['background']} backgrounds",
                     'background': asset['background'],
                     'layout': asset['layout']
                 },
@@ -255,7 +255,7 @@ class DeclarativeAssetMatcher:
                 'asset': {
                     'url': asset['url'],
                     'filename': asset['filename'],
-                    'description': f"{parsed['product'].title()} {asset['layout']} logo ({asset['color']}) for {asset['background']} backgrounds",
+                    'description': f"{parsed['product'].title()} {asset['layout']} logo ({asset['color']}) for {parsed['background'] or asset['background']} backgrounds",
                     'background': asset['background'],
                     'layout': asset['layout']
                 },
