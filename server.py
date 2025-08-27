@@ -41,8 +41,8 @@ def load_asset_data():
         print(f"❌ Failed to load asset data: {e}")
         return False
 
-class DeclarativeAssetMatcher:
-    """Rule-based asset matching using declarative metadata"""
+class SemanticAssetMatcher:
+    """Semantic intent-based asset matching system"""
     
     def __init__(self):
         self.product_patterns = {
@@ -56,7 +56,7 @@ class DeclarativeAssetMatcher:
             'rlc': ['rlc', 'rocky linux commercial', 'rocky linux'],
             'rlc-ai': ['rlc-ai', 'rlc ai', 'rocky linux ai'],
             'rlc-hardened': ['rlc-hardened', 'rlc hardened', 'rocky linux hardened'],
-            'rlc-lts': ['rlc-lts', 'rlc lts', 'rocky linux lts']
+            'rlc-lts': ['rlc-lts', 'rlc lts', 'rocky linux lts', 'long term support', 'long-term support']
         }
         
         self.background_patterns = {
@@ -73,12 +73,14 @@ class DeclarativeAssetMatcher:
             'green': ['green', 'accent']
         }
         
-        self.document_patterns = {
-            'solution brief': ['solution brief', 'brief', 'overview', 'sales sheet'],
-            'datasheet': ['datasheet', 'data sheet', 'specs', 'specifications'],
-            'white paper': ['white paper', 'whitepaper', 'research', 'analysis'],
-            'case study': ['case study', 'success story', 'customer story'],
-            'user guide': ['user guide', 'manual', 'documentation', 'how to']
+        # Semantic intent categories
+        self.intent_categories = {
+            'all_assets': ['everything', 'all assets', 'all materials', 'complete set', 'full package', 'everything available'],
+            'documents': ['docs', 'documentation', 'papers', 'materials', 'content', 'files', 'pdfs'],
+            'sales_materials': ['sales', 'brief', 'sheet', '1-pager', '1 pager', 'one pager', 'overview', 'summary', 'sales sheet'],
+            'technical_docs': ['specs', 'technical', 'datasheet', 'data sheet', 'whitepaper', 'white paper', 'guide', 'manual'],
+            'visual_assets': ['logos', 'images', 'graphics', 'branding', 'visual', 'brand assets'],
+            'case_studies': ['case study', 'success story', 'customer story', 'case studies']
         }
 
     def find_assets(self, request: str) -> Dict[str, Any]:
@@ -97,11 +99,10 @@ class DeclarativeAssetMatcher:
             return self._generate_product_help()
 
     def _parse_request(self, request: str) -> Dict[str, Any]:
-        """Parse user request into structured attributes"""
+        """Parse user request using semantic intent recognition"""
         request_lower = request.lower()
         
         # Check for CIQ disambiguation cases
-        # Any mention of products in context of CIQ should trigger disambiguation
         product_context_patterns = [
             'product', 'products', 'portfolio', 'offerings', 'solutions',
             'brands', 'brand logos', 'all logos', 'available logos'
@@ -110,7 +111,6 @@ class DeclarativeAssetMatcher:
         contains_ciq = any(pattern in request_lower for pattern in ['ciq', 'company'])
         contains_product_context = any(pattern in request_lower for pattern in product_context_patterns)
         
-        # Exceptions: clearly asking for company logo only
         company_only_patterns = [
             'ciq company logo', 'main ciq logo', 'ciq brand logo',
             'corporate logo', 'company brand'
@@ -126,84 +126,181 @@ class DeclarativeAssetMatcher:
         for prod, patterns in self.product_patterns.items():
             for pattern in patterns:
                 if pattern in request_lower:
-                    # Longer, more specific patterns get higher confidence
-                    confidence = min(len(pattern) / 10.0, 0.6)  # Max 0.6 for product
+                    confidence = min(len(pattern) / 10.0, 0.6)
                     if confidence > product_confidence:
                         product = prod
                         product_confidence = confidence
         
-        # Detect background
-        background = None
-        background_confidence = 0.0
+        # Detect semantic intent
+        intent_scores = {}
+        for intent_type, patterns in self.intent_categories.items():
+            score = 0.0
+            matched_patterns = []
+            for pattern in patterns:
+                if pattern in request_lower:
+                    score += len(pattern) / 15.0  # Weight by pattern length
+                    matched_patterns.append(pattern)
+            intent_scores[intent_type] = {
+                'score': min(score, 1.0),
+                'patterns': matched_patterns
+            }
         
+        # Determine primary intent
+        primary_intent = max(intent_scores.items(), key=lambda x: x[1]['score'])
+        
+        # Legacy parsing for backward compatibility
+        background = None
         for bg, patterns in self.background_patterns.items():
             for pattern in patterns:
                 if pattern in request_lower:
                     background = bg
-                    background_confidence = 0.3  # Fixed confidence for background
                     break
         
-        # Detect layout/variant
         layout = None
-        layout_confidence = 0.0
-        
         for lyt, patterns in self.layout_patterns.items():
             for pattern in patterns:
                 if pattern in request_lower:
                     layout = lyt
-                    layout_confidence = 0.3  # Fixed confidence for layout
                     break
         
-        # Detect document type
-        doc_type = None
-        doc_confidence = 0.0
-        
-        for doc, patterns in self.document_patterns.items():
-            for pattern in patterns:
-                if pattern in request_lower:
-                    doc_type = doc
-                    doc_confidence = 0.4  # Higher confidence for document detection
-                    break
-        
-        # Calculate total confidence - boost if multiple attributes detected
+        # Calculate confidence based on semantic understanding
         total_confidence = product_confidence
-        if background:
-            total_confidence += background_confidence
-        if layout:
-            total_confidence += layout_confidence
-        if doc_type:
-            total_confidence += doc_confidence
+        if primary_intent[1]['score'] > 0:
+            total_confidence += primary_intent[1]['score'] * 0.5
         
-        # Boost total confidence if we have multiple specific attributes
-        if product and ((background and layout) or doc_type):
-            total_confidence = min(total_confidence * 1.2, 1.0)  # 20% boost for complete match
+        if product and primary_intent[1]['score'] > 0.3:
+            total_confidence = min(total_confidence * 1.3, 1.0)
         
         return {
             'product': product,
             'background': background,
             'layout': layout,
-            'doc_type': doc_type,
+            'primary_intent': primary_intent[0],
+            'intent_scores': intent_scores,
             'confidence': min(total_confidence, 1.0),
             'raw_request': request,
             'needs_ciq_disambiguation': is_ciq_product_query and product == 'ciq'
         }
 
     def _match_assets(self, product: str, parsed: Dict) -> List[Tuple[float, Dict, str]]:
-        """Match assets using declarative rules"""
+        """Match assets using semantic intent-based rules"""
         if product not in asset_data['assets']:
             return []
         
         product_assets = asset_data['assets'][product]
-        rules = asset_data['rules']
         matches = []
         
         for asset_key, asset in product_assets.items():
-            score, reason = self._score_asset(asset, parsed, rules)
+            score, reason = self._score_asset_semantic(asset, parsed)
             if score > 0:
                 matches.append((score, asset, reason))
         
         # Sort by score (highest first)
         return sorted(matches, key=lambda x: x[0], reverse=True)
+    
+    def _classify_assets_by_intent(self, assets: List[Dict]) -> Dict[str, List[Dict]]:
+        """Classify assets based on their type and properties"""
+        classification = {
+            'all': assets,
+            'logos': [],
+            'documents': [],
+            'sales_materials': [],
+            'technical_docs': [],
+            'visual_assets': []
+        }
+        
+        for asset in assets:
+            if asset['type'] == 'document':
+                classification['documents'].append(asset)
+                # Further classify documents by content type
+                doc_type = asset.get('doc_type', '').lower()
+                if any(term in doc_type for term in ['brief', 'overview', 'summary', 'sales']):
+                    classification['sales_materials'].append(asset)
+                elif any(term in doc_type for term in ['spec', 'technical', 'guide', 'manual']):
+                    classification['technical_docs'].append(asset)
+            else:
+                classification['logos'].append(asset)
+                classification['visual_assets'].append(asset)
+        
+        return classification
+    
+    def _score_asset_semantic(self, asset: Dict, parsed: Dict) -> Tuple[float, str]:
+        """Score assets using semantic intent understanding"""
+        score = 0.4  # Base score for product match
+        reasons = []
+        
+        primary_intent = parsed['primary_intent']
+        intent_scores = parsed['intent_scores']
+        
+        # Handle intent-based scoring
+        if primary_intent == 'all_assets':
+            score = 0.8  # High score for comprehensive requests
+            reasons.append("matches comprehensive asset request")
+            
+        elif primary_intent == 'documents':
+            if asset['type'] == 'document':
+                score = 0.9
+                reasons.append(f"document: {asset.get('doc_type', 'unknown type')}")
+            else:
+                score = 0.2  # Lower but not zero - might still be relevant
+                reasons.append("logo (documents requested)")
+                
+        elif primary_intent == 'sales_materials':
+            if asset['type'] == 'document':
+                doc_type = asset.get('doc_type', '').lower()
+                if any(term in doc_type for term in ['brief', 'overview', 'summary', 'sales']):
+                    score = 1.0
+                    reasons.append(f"perfect sales material: {asset['doc_type']}")
+                else:
+                    score = 0.5
+                    reasons.append(f"document: {asset['doc_type']}")
+            else:
+                score = 0.3
+                reasons.append("logo (sales materials requested)")
+                
+        elif primary_intent == 'visual_assets':
+            if asset['type'] != 'document':
+                # Use detailed legacy logo scoring for visual assets
+                score = self._legacy_score_asset(asset, parsed)
+                if parsed['background'] and asset.get('background') == parsed['background']:
+                    reasons.append(f"logo optimized for {parsed['background']} backgrounds")
+                elif parsed['layout'] and asset.get('layout') == parsed['layout']:
+                    reasons.append(f"exact {parsed['layout']} match")
+                else:
+                    reasons.append(f"{asset.get('layout', 'unknown')} logo")
+            else:
+                score = 0.1
+                reasons.append("document (logos requested)")
+        else:
+            # Default scoring - use detailed legacy scoring
+            if asset['type'] == 'document':
+                score = 0.6
+                reasons.append(f"document: {asset.get('doc_type', 'unknown type')}")
+            else:
+                score = self._legacy_score_asset(asset, parsed)
+                reasons.append("logo match")
+        
+        # Boost score if multiple intents match
+        high_intent_count = sum(1 for intent_data in intent_scores.values() if intent_data['score'] > 0.3)
+        if high_intent_count > 1:
+            score = min(score * 1.1, 1.0)
+            reasons.append("matches multiple intents")
+        
+        return score, " + ".join(reasons)
+    
+    def _legacy_score_asset(self, asset: Dict, parsed: Dict) -> float:
+        """Legacy scoring for backward compatibility"""
+        score = 0.3
+        
+        if asset['type'] == 'document':
+            return 0.6
+        
+        if parsed['background'] and asset.get('background') == parsed['background']:
+            score += 0.4
+        if parsed['layout'] and asset.get('layout') == parsed['layout']:
+            score += 0.3
+            
+        return min(score, 1.0)
 
     def _score_asset(self, asset: Dict, parsed: Dict, rules: Dict) -> Tuple[float, str]:
         """Score individual asset using confidence rules"""
@@ -260,7 +357,7 @@ class DeclarativeAssetMatcher:
         return score, " + ".join(reasons)
 
     def _format_response(self, matches: List[Tuple[float, Dict, str]], parsed: Dict) -> Dict[str, Any]:
-        """Format response based on confidence and matches"""
+        """Format response using semantic understanding"""
         if not matches:
             return {
                 'message': f"No {parsed['product']} assets found matching your criteria.",
@@ -271,6 +368,103 @@ class DeclarativeAssetMatcher:
         if parsed.get('needs_ciq_disambiguation'):
             return self._generate_ciq_disambiguation()
         
+        # Extract just the assets for classification
+        matched_assets = [match[1] for match in matches]
+        asset_classification = self._classify_assets_by_intent(matched_assets)
+        
+        primary_intent = parsed['primary_intent']
+        confidence_level = self._get_confidence_level(parsed['confidence'])
+        
+        # Handle different intent types
+        if primary_intent == 'all_assets':
+            return self._format_comprehensive_response(asset_classification, parsed, matches)
+        elif primary_intent == 'documents' or primary_intent == 'sales_materials':
+            return self._format_document_focused_response(asset_classification, parsed, matches, primary_intent)
+        else:
+            # Use enhanced legacy formatting
+            return self._format_legacy_enhanced_response(matches, parsed, asset_classification)
+    
+    def _format_comprehensive_response(self, classification: Dict, parsed: Dict, matches: List) -> Dict[str, Any]:
+        """Format response for 'show me everything' requests"""
+        product_name = parsed['product'].upper()
+        
+        response = {
+            'message': f"Here are all available {product_name} assets:",
+            'confidence': 'high',
+            'product': parsed['product']
+        }
+        
+        # Group assets by type
+        if classification['logos']:
+            response['logos'] = {
+                'count': len(classification['logos']),
+                'assets': self._format_asset_list(classification['logos'][:6])  # Limit for readability
+            }
+        
+        if classification['documents']:
+            response['documents'] = {
+                'count': len(classification['documents']),
+                'assets': self._format_asset_list(classification['documents'])
+            }
+        
+        total_count = len(classification['all'])
+        response['summary'] = f"Found {total_count} total assets ({len(classification['logos'])} logos, {len(classification['documents'])} documents)"
+        
+        return response
+    
+    def _format_document_focused_response(self, classification: Dict, parsed: Dict, matches: List, intent: str) -> Dict[str, Any]:
+        """Format response for document-focused requests"""
+        product_name = parsed['product'].upper()
+        
+        if not classification['documents']:
+            return {
+                'message': f"No documents found for {product_name}, but I have logos available:",
+                'logos': self._format_asset_list(classification['logos'][:3]),
+                'suggestion': f"Try asking for '{product_name} logos' or check if documents are available for other products.",
+                'confidence': 'medium'
+            }
+        
+        intent_label = 'sales materials' if intent == 'sales_materials' else 'documents'
+        
+        response = {
+            'message': f"Here are the {product_name} {intent_label} I found:",
+            'documents': self._format_asset_list(classification['documents']),
+            'confidence': 'high'
+        }
+        
+        # Also mention logos if available
+        if classification['logos']:
+            response['also_available'] = {
+                'message': f"I also have {len(classification['logos'])} {product_name} logos available if needed.",
+                'logos_sample': self._format_asset_list(classification['logos'][:2])
+            }
+        
+        return response
+    
+    def _format_asset_list(self, assets: List[Dict]) -> List[Dict]:
+        """Format list of assets for response"""
+        formatted = []
+        for asset in assets:
+            asset_info = {
+                'url': asset['url'],
+                'filename': asset['filename'],
+                'type': asset['type']
+            }
+            
+            if asset['type'] == 'document':
+                asset_info['doc_type'] = asset.get('doc_type', 'Document')
+                asset_info['description'] = f"{asset.get('doc_type', 'Document').title()} - {asset['filename']}"
+            else:
+                asset_info['layout'] = asset.get('layout', 'unknown')
+                asset_info['background'] = asset.get('background', 'any')
+                asset_info['description'] = f"{asset.get('layout', 'Logo').title()} logo for {asset.get('background', 'any')} backgrounds"
+            
+            formatted.append(asset_info)
+        
+        return formatted
+    
+    def _format_legacy_enhanced_response(self, matches: List, parsed: Dict, classification: Dict) -> Dict[str, Any]:
+        """Enhanced legacy response formatting"""
         confidence_level = self._get_confidence_level(parsed['confidence'])
         
         # Handle simple product-only queries (e.g., "CIQ logo", "can you find me a warewulf logo?") - ask for background first
@@ -546,7 +740,7 @@ class DeclarativeAssetMatcher:
         }
 
 # Initialize the matcher
-matcher = DeclarativeAssetMatcher()
+matcher = SemanticAssetMatcher()
 
 @mcp.tool()
 def get_brand_assets(request: str = "CIQ logo") -> Dict[str, Any]:
