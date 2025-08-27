@@ -128,22 +128,7 @@ class SemanticAssetMatcher:
         product_confidence = 0.0
         best_pattern_length = 0
         
-        # First pass: find all matches and their pattern lengths
-        all_matches = []
-        for prod, patterns in self.product_patterns.items():
-            for pattern in patterns:
-                if pattern in request_lower:
-                    confidence = min(len(pattern) / 10.0, 0.6)
-                    all_matches.append((prod, confidence, len(pattern), pattern))
-        
-        # Sort by pattern length (longer first), then by confidence
-        all_matches.sort(key=lambda x: (x[2], x[1]), reverse=True)
-        
-        # Take the best match
-        if all_matches:
-            product, product_confidence, _, _ = all_matches[0]
-        
-        # Detect semantic intent
+        # Detect semantic intent first
         intent_scores = {}
         for intent_type, patterns in self.intent_categories.items():
             score = 0.0
@@ -156,6 +141,46 @@ class SemanticAssetMatcher:
                 'score': min(score, 1.0),
                 'patterns': matched_patterns
             }
+        
+        # First pass: find all matches and their pattern lengths
+        all_matches = []
+        for prod, patterns in self.product_patterns.items():
+            for pattern in patterns:
+                if pattern in request_lower:
+                    confidence = min(len(pattern) / 10.0, 0.6)
+                    all_matches.append((prod, confidence, len(pattern), pattern))
+        
+        # Sort by pattern length (longer first), then by confidence
+        all_matches.sort(key=lambda x: (x[2], x[1]), reverse=True)
+        
+        # Smart product resolution based on context
+        is_document_query = (intent_scores.get('documents', {}).get('score', 0) > 0 or 
+                           intent_scores.get('sales_materials', {}).get('score', 0) > 0)
+        
+        if all_matches:
+            # Special case: If user asks for "RLC" documents, try "RLC-LTS" first since it's more likely to have docs
+            if is_document_query and len(all_matches) == 1 and all_matches[0][0] == 'rlc':
+                # Check if RLC-LTS would also match by checking if "rlc" appears in the query
+                if 'rlc' in request_lower and 'rlc-lts' not in request_lower:
+                    # User said "RLC" for docs - let's try RLC-LTS first since it has documents
+                    product = 'rlc-lts'
+                    product_confidence = all_matches[0][1]  # Use same confidence
+                else:
+                    product, product_confidence, _, _ = all_matches[0]
+            else:
+                # Multiple matches or non-document query - use standard logic
+                has_rlc = any(match[0] == 'rlc' for match in all_matches)
+                has_rlc_lts = any(match[0] == 'rlc-lts' for match in all_matches)
+                
+                if is_document_query and has_rlc and has_rlc_lts:
+                    # Prefer RLC-LTS for document queries when both match
+                    rlc_lts_matches = [m for m in all_matches if m[0] == 'rlc-lts']
+                    if rlc_lts_matches:
+                        product, product_confidence, _, _ = rlc_lts_matches[0]
+                    else:
+                        product, product_confidence, _, _ = all_matches[0]
+                else:
+                    product, product_confidence, _, _ = all_matches[0]
         
         # Determine primary intent
         primary_intent = max(intent_scores.items(), key=lambda x: x[1]['score'])
@@ -851,18 +876,26 @@ matcher = SemanticAssetMatcher()
 @mcp.tool()
 def get_brand_assets(request: str = "CIQ logo") -> Dict[str, Any]:
     """
-    Find and recommend CIQ brand assets based on your needs.
+    Find and recommend CIQ brand assets and documents based on your needs.
     
-    Specify what you need and I'll find the perfect asset:
-    - Product: CIQ, Fuzzball, Warewulf, Apptainer, etc.
-    - Background: light, dark
-    - Layout: icon, horizontal, vertical (or for CIQ: onecolor, twocolor, green)
-    - Use case: favicon, business card, presentation, etc.
+    I can help you find:
+    - LOGOS: Product logos, company logos, icons for different backgrounds and layouts
+    - DOCUMENTS: Solution briefs, documentation, sales materials, technical guides
+    - COMPREHENSIVE: Everything available for a specific product
+    
+    Specify what you need:
+    - Product: CIQ, Fuzzball, Warewulf, Apptainer, RLC-LTS, etc.
+    - Asset type: logos, solution briefs, documentation, everything
+    - Background (for logos): light, dark
+    - Layout (for logos): icon, horizontal, vertical
     
     Examples:
+    - "RLC-LTS solution brief" 
+    - "show me all solution briefs"
     - "Warewulf logo for dark backgrounds"
-    - "CIQ twocolor logo for presentations" 
-    - "Apptainer icon for favicon"
+    - "everything for Fuzzball"
+    - "CIQ twocolor logo for presentations"
+    - "what documents do you have?"
     """
     if not asset_data:
         if not load_asset_data():
