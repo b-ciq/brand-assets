@@ -34,6 +34,27 @@ def parse_filename(filename: str) -> Dict[str, str]:
         'ext': ext
     }
 
+def parse_document_filename(filename: str) -> Dict[str, str]:
+    """
+    Parse document filename: {Product}_{Document_Type}.{ext}
+    Returns: {product, doc_type, ext}
+    """
+    name_without_ext = filename.rsplit('.', 1)[0]
+    ext = filename.rsplit('.', 1)[1] if '.' in filename else 'pdf'
+    
+    parts = name_without_ext.split('_')
+    if len(parts) < 2:
+        return None
+    
+    # Join remaining parts as document type (e.g., "Solution_Brief")
+    doc_type = '_'.join(parts[1:]).lower().replace('_', ' ')
+    
+    return {
+        'product': parts[0].lower(),
+        'doc_type': doc_type,
+        'ext': ext
+    }
+
 def generate_asset_key(parsed: Dict[str, str]) -> str:
     """Generate consistent asset key"""
     if parsed['layout'] in ['onecolor', 'twocolor', 'green']:
@@ -75,6 +96,23 @@ def get_asset_tags(layout: str, type_: str) -> List[str]:
     
     return tags
 
+def get_document_tags(doc_type: str) -> List[str]:
+    """Get semantic tags for document matching"""
+    tags = ['document', 'pdf']
+    
+    if 'solution brief' in doc_type:
+        tags.extend(['sales', 'overview', 'features', 'benefits', 'summary'])
+    elif 'datasheet' in doc_type:
+        tags.extend(['technical', 'specifications', 'details', 'reference'])
+    elif 'white paper' in doc_type or 'whitepaper' in doc_type:
+        tags.extend(['research', 'deep_dive', 'analysis', 'thought_leadership'])
+    elif 'case study' in doc_type:
+        tags.extend(['customer', 'success_story', 'implementation', 'results'])
+    elif 'user guide' in doc_type or 'manual' in doc_type:
+        tags.extend(['documentation', 'how_to', 'instructions', 'guide'])
+    
+    return tags
+
 def scan_assets_directory(assets_path: Path) -> Dict[str, Any]:
     """Scan and catalog all assets"""
     assets = {}
@@ -106,10 +144,11 @@ def scan_assets_directory(assets_path: Path) -> Dict[str, Any]:
         for product_dir in products_path.iterdir():
             if product_dir.is_dir():
                 product_name = product_dir.name
-                logos_path = product_dir / "logos"
+                product_assets = {}
                 
+                # Scan logos
+                logos_path = product_dir / "logos"
                 if logos_path.exists():
-                    product_assets = {}
                     for file_path in logos_path.glob("*.png"):
                         parsed = parse_filename(file_path.name)
                         if parsed:
@@ -124,9 +163,25 @@ def scan_assets_directory(assets_path: Path) -> Dict[str, Any]:
                                 "size": parsed['size'],
                                 "tags": get_asset_tags(parsed['layout'], parsed['type'])
                             }
-                    
-                    if product_assets:
-                        assets[product_name] = product_assets
+                
+                # Scan documents
+                documents_path = product_dir / "documents"
+                if documents_path.exists():
+                    for file_path in documents_path.glob("*.pdf"):
+                        parsed = parse_document_filename(file_path.name)
+                        if parsed:
+                            key = f"doc_{parsed['doc_type'].replace(' ', '_')}"
+                            product_assets[key] = {
+                                "url": f"{BASE_URL}/assets/products/{product_name}/documents/{file_path.name}",
+                                "filename": file_path.name,
+                                "type": "document",
+                                "doc_type": parsed['doc_type'],
+                                "ext": parsed['ext'],
+                                "tags": get_document_tags(parsed['doc_type'])
+                            }
+                
+                if product_assets:
+                    assets[product_name] = product_assets
     
     return assets
 
@@ -226,12 +281,19 @@ def generate_index(assets: Dict[str, Any]) -> Dict[str, Any]:
     all_colors = set()
     all_backgrounds = set() 
     all_tags = set()
+    all_doc_types = set()
     
     for product_assets in assets.values():
         for asset in product_assets.values():
-            all_layouts.add(asset['layout'])
-            all_colors.add(asset['color'])
-            all_backgrounds.add(asset['background'])
+            # Handle logos
+            if asset['type'] != 'document':
+                all_layouts.add(asset['layout'])
+                all_colors.add(asset['color'])
+                all_backgrounds.add(asset['background'])
+            else:
+                # Handle documents
+                all_doc_types.add(asset['doc_type'])
+            
             all_tags.update(asset['tags'])
     
     return {
@@ -239,6 +301,7 @@ def generate_index(assets: Dict[str, Any]) -> Dict[str, Any]:
         "layouts": sorted(all_layouts),
         "colors": sorted(all_colors),
         "backgrounds": sorted(all_backgrounds),
+        "doc_types": sorted(all_doc_types),
         "tags": sorted(all_tags),
         "total_assets": sum(len(assets_dict) for assets_dict in assets.values())
     }

@@ -650,6 +650,33 @@
           "letterhead",
           "wide_format"
         ]
+      },
+      "doc_lts_solutionbrief_v1": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/rlc-lts/documents/RLC_LTS_SolutionBrief_V1.pdf",
+        "filename": "RLC_LTS_SolutionBrief_V1.pdf",
+        "type": "document",
+        "doc_type": "lts solutionbrief v1",
+        "ext": "pdf",
+        "tags": [
+          "document",
+          "pdf"
+        ]
+      },
+      "doc_solution_brief": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/rlc-lts/documents/RLC-LTS_Solution_Brief.pdf",
+        "filename": "RLC-LTS_Solution_Brief.pdf",
+        "type": "document",
+        "doc_type": "solution brief",
+        "ext": "pdf",
+        "tags": [
+          "document",
+          "pdf",
+          "sales",
+          "overview",
+          "features",
+          "benefits",
+          "summary"
+        ]
       }
     },
     "rlc": {
@@ -1128,16 +1155,23 @@
       "dark",
       "light"
     ],
+    "doc_types": [
+      "lts solutionbrief v1",
+      "solution brief"
+    ],
     "tags": [
       "accent",
       "app_icon",
       "avatar",
+      "benefits",
       "brand_pop",
       "business_card",
       "call_to_action",
       "compact",
+      "document",
       "email_signature",
       "favicon",
+      "features",
       "footer",
       "header",
       "hero",
@@ -1147,18 +1181,22 @@
       "main_branding",
       "minimal",
       "mobile",
+      "overview",
+      "pdf",
       "poster",
       "presentation",
       "primary",
       "professional",
+      "sales",
       "small_space",
       "social_profile",
       "stacked",
+      "summary",
       "supporting",
       "tall_banner",
       "watermark",
       "wide_format"
     ],
-    "total_assets": 62
+    "total_assets": 64
   }
 }

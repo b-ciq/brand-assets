@@ -72,6 +72,14 @@ class DeclarativeAssetMatcher:
             'twocolor': ['2-color', '2 color', 'two color', 'twocolor'],
             'green': ['green', 'accent']
         }
+        
+        self.document_patterns = {
+            'solution brief': ['solution brief', 'brief', 'overview', 'sales sheet'],
+            'datasheet': ['datasheet', 'data sheet', 'specs', 'specifications'],
+            'white paper': ['white paper', 'whitepaper', 'research', 'analysis'],
+            'case study': ['case study', 'success story', 'customer story'],
+            'user guide': ['user guide', 'manual', 'documentation', 'how to']
+        }
 
     def find_assets(self, request: str) -> Dict[str, Any]:
         """Main asset finding function using declarative rules"""
@@ -146,21 +154,35 @@ class DeclarativeAssetMatcher:
                     layout_confidence = 0.3  # Fixed confidence for layout
                     break
         
+        # Detect document type
+        doc_type = None
+        doc_confidence = 0.0
+        
+        for doc, patterns in self.document_patterns.items():
+            for pattern in patterns:
+                if pattern in request_lower:
+                    doc_type = doc
+                    doc_confidence = 0.4  # Higher confidence for document detection
+                    break
+        
         # Calculate total confidence - boost if multiple attributes detected
         total_confidence = product_confidence
         if background:
             total_confidence += background_confidence
         if layout:
             total_confidence += layout_confidence
+        if doc_type:
+            total_confidence += doc_confidence
         
         # Boost total confidence if we have multiple specific attributes
-        if product and background and layout:
+        if product and ((background and layout) or doc_type):
             total_confidence = min(total_confidence * 1.2, 1.0)  # 20% boost for complete match
         
         return {
             'product': product,
             'background': background,
             'layout': layout,
+            'doc_type': doc_type,
             'confidence': min(total_confidence, 1.0),
             'raw_request': request,
             'needs_ciq_disambiguation': is_ciq_product_query and product == 'ciq'
@@ -192,28 +214,43 @@ class DeclarativeAssetMatcher:
         score += rules['confidence_scoring']['fallback']
         reasons.append("product match")
         
-        # Background matching - critical when specified
-        if parsed['background'] and asset['background'] == parsed['background']:
-            score += rules['confidence_scoring']['background_match']
-            reasons.append(f"optimized for {parsed['background']} backgrounds")
-        elif parsed['background'] and asset['background'] != parsed['background']:
-            # Penalize wrong background when user specifies one
-            score *= 0.5  # Reduce score by half for wrong background
-            reasons.append(f"wrong background ({asset['background']} instead of {parsed['background']})")
+        # Handle document matching
+        if asset['type'] == 'document':
+            if parsed['doc_type']:
+                if parsed['doc_type'] in asset['doc_type']:
+                    score = rules['confidence_scoring']['exact_match']
+                    reasons = [f"exact document match: {asset['doc_type']}"]
+                else:
+                    score *= 0.3  # Low score for wrong document type
+                    reasons.append(f"document type mismatch")
+            else:
+                # Generic document request
+                score = 0.6
+                reasons = [f"document: {asset['doc_type']}"]
+        else:
+            # Handle logo matching (existing logic)
+            # Background matching - critical when specified
+            if parsed['background'] and asset.get('background') == parsed['background']:
+                score += rules['confidence_scoring']['background_match']
+                reasons.append(f"optimized for {parsed['background']} backgrounds")
+            elif parsed['background'] and asset.get('background') != parsed['background']:
+                # Penalize wrong background when user specifies one
+                score *= 0.5  # Reduce score by half for wrong background
+                reasons.append(f"wrong background ({asset.get('background')} instead of {parsed['background']})")
+            
+            # Layout matching
+            if parsed['layout'] and asset.get('layout') == parsed['layout']:
+                score += rules['confidence_scoring']['layout_match']
+                reasons.append(f"exact {parsed['layout']} match")
+            
+            # Both background and layout match = exact match
+            if (parsed['background'] and parsed['layout'] and 
+                asset.get('background') == parsed['background'] and 
+                asset.get('layout') == parsed['layout']):
+                score = rules['confidence_scoring']['exact_match']
+                reasons = [f"exact match: {parsed['layout']} for {parsed['background']} backgrounds"]
         
-        # Layout matching
-        if parsed['layout'] and asset['layout'] == parsed['layout']:
-            score += rules['confidence_scoring']['layout_match']
-            reasons.append(f"exact {parsed['layout']} match")
-        
-        # Both background and layout match = exact match
-        if (parsed['background'] and parsed['layout'] and 
-            asset['background'] == parsed['background'] and 
-            asset['layout'] == parsed['layout']):
-            score = rules['confidence_scoring']['exact_match']
-            reasons = [f"exact match: {parsed['layout']} for {parsed['background']} backgrounds"]
-        
-        # Use case tag matching
+        # Use case tag matching (for both logos and documents)
         if parsed.get('use_case'):
             asset_tags = asset.get('tags', [])
             if parsed['use_case'] in asset_tags:
