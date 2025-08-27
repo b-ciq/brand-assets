@@ -9,6 +9,7 @@ import json
 from pathlib import Path
 from typing import Dict, List, Any
 import argparse
+from datetime import datetime
 
 # Base GitHub raw URL for assets
 BASE_URL = "https://raw.githubusercontent.com/b-ciq/brand-assets/main"
@@ -306,6 +307,25 @@ def generate_index(assets: Dict[str, Any]) -> Dict[str, Any]:
         "total_assets": sum(len(assets_dict) for assets_dict in assets.values())
     }
 
+def load_color_palette_info(assets_path: Path) -> Dict[str, Any]:
+    """Load color palette information if available"""
+    color_file = assets_path / "global" / "colors" / "color-palette-dark.json"
+    if color_file.exists():
+        try:
+            with open(color_file, 'r') as f:
+                color_data = json.load(f)
+            return {
+                'available': True,
+                'summary': color_data.get('summary', {}),
+                'last_updated': datetime.now().isoformat(),
+                'file_path': str(color_file.relative_to(assets_path.parent))
+            }
+        except Exception as e:
+            print(f"⚠️  Warning: Could not load color palette data: {e}")
+            return {'available': False, 'error': str(e)}
+    else:
+        return {'available': False, 'reason': 'Color palette file not found'}
+
 def main():
     parser = argparse.ArgumentParser(description='Generate declarative asset metadata')
     parser.add_argument('--base-path', default='.', help='Base path to scan (default: current directory)')
@@ -319,11 +339,15 @@ def main():
     # Scan all assets
     assets = scan_assets_directory(assets_path)
     
+    # Load color palette info
+    color_info = load_color_palette_info(assets_path)
+    
     # Build metadata structure
     metadata = {
         "assets": assets,
         "rules": generate_rules(),
-        "index": generate_index(assets)
+        "index": generate_index(assets),
+        "colors": color_info
     }
     
     # Create output directory
@@ -343,6 +367,13 @@ def main():
     print(f"   🏷️  {len(metadata['index']['tags'])} semantic tags")
     print(f"   📐 {len(metadata['index']['layouts'])} layouts")
     print(f"   🎨 {len(metadata['index']['backgrounds'])} background types")
+    
+    if color_info['available']:
+        color_summary = color_info['summary']
+        print(f"   🌈 {color_summary.get('total_properties', 'N/A')} color properties")
+        print(f"   🎭 {color_summary.get('family_count', 'N/A')} color families")
+    else:
+        print(f"   ⚠️  Color palette: {color_info.get('reason', 'unavailable')}")
     
     print(f"\n🎯 Benefits:")
     print(f"   • Declarative rules for consistent matching")

@@ -9,15 +9,20 @@ import json
 import requests
 from typing import Optional, Dict, Any, List, Tuple
 import re
+import os
 
 # Asset metadata URL
 METADATA_URL = 'https://raw.githubusercontent.com/b-ciq/brand-assets/main/metadata/asset-inventory.json'
 
+# Color palette URL
+COLOR_PALETTE_URL = 'https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/global/colors/color-palette-dark.json'
+
 # Initialize FastMCP server
 mcp = FastMCP("CIQ Brand Assets")
 
-# Global asset data cache
+# Global data caches
 asset_data = None
+color_data = None
 
 def load_asset_data():
     """Load asset metadata from GitHub"""
@@ -35,10 +40,30 @@ def load_asset_data():
         products_count = len(asset_data['index']['products'])
         
         print(f"✅ Loaded {total_assets} assets across {products_count} products")
-        print(f"✅ Declarative rules engine ready")
         return True
     except Exception as e:
         print(f"❌ Failed to load asset data: {e}")
+        return False
+
+def load_color_data():
+    """Load color palette data from GitHub"""
+    global color_data
+    try:
+        response = requests.get(COLOR_PALETTE_URL, timeout=10)
+        response.raise_for_status()
+        color_data = response.json()
+        
+        # Validate structure
+        if 'colors' not in color_data or 'categories' not in color_data or 'families' not in color_data:
+            raise ValueError("Invalid color data structure")
+        
+        total_colors = color_data['summary']['total_properties']
+        families_count = color_data['summary']['family_count']
+        
+        print(f"✅ Loaded {total_colors} color properties across {families_count} color families")
+        return True
+    except Exception as e:
+        print(f"❌ Failed to load color data: {e}")
         return False
 
 class SemanticAssetMatcher:
@@ -80,7 +105,27 @@ class SemanticAssetMatcher:
             'sales_materials': ['sales', 'brief', 'sheet', '1-pager', '1 pager', 'one pager', 'overview', 'summary', 'sales sheet'],
             'technical_docs': ['specs', 'technical', 'datasheet', 'data sheet', 'whitepaper', 'white paper', 'guide', 'manual'],
             'visual_assets': ['logos', 'images', 'graphics', 'branding', 'visual', 'brand assets'],
-            'case_studies': ['case study', 'success story', 'customer story', 'case studies']
+            'case_studies': ['case study', 'success story', 'customer story', 'case studies'],
+            'colors': ['colors', 'color palette', 'colour', 'colours', 'palette', 'design tokens', 'brand colors'],
+            'color_families': ['blues', 'reds', 'greens', 'grays', 'greys', 'oranges', 'purples', 'color family', 'colour family'],
+            'design_system': ['design system', 'ui colors', 'interface colors', 'theme colors', 'css variables']
+        }
+        
+        # Color-specific patterns
+        self.color_patterns = {
+            'brand_colors': ['brand', 'primary', 'accent', 'company colors'],
+            'semantic_colors': ['text', 'background', 'border', 'foreground', 'semantic'],
+            'functional_colors': ['error', 'warning', 'success', 'danger', 'info'],
+            'utility_colors': ['utility', 'blue', 'red', 'green', 'gray', 'grey', 'orange', 'purple', 'pink', 'indigo', 'yellow'],
+            'theme_colors': ['dark mode', 'light mode', 'theme', 'dark theme', 'light theme']
+        }
+        
+        # Color usage context patterns
+        self.color_usage_patterns = {
+            'ui_elements': ['button', 'input', 'form', 'card', 'modal', 'dropdown'],
+            'text_colors': ['heading', 'body text', 'caption', 'link', 'disabled'],
+            'state_colors': ['hover', 'active', 'focus', 'disabled', 'selected'],
+            'feedback_colors': ['success', 'error', 'warning', 'info', 'danger']
         }
 
     def find_assets(self, request: str) -> Dict[str, Any]:
@@ -90,6 +135,10 @@ class SemanticAssetMatcher:
         
         # Parse user request
         parsed = self._parse_request(request)
+        
+        # Handle color queries
+        if parsed['primary_intent'] in ['colors', 'color_families', 'design_system']:
+            return self._handle_color_query(parsed)
         
         # Find matching assets
         if parsed['product']:
@@ -216,7 +265,8 @@ class SemanticAssetMatcher:
             'intent_scores': intent_scores,
             'confidence': min(total_confidence, 1.0),
             'raw_request': request,
-            'needs_ciq_disambiguation': is_ciq_product_query and product == 'ciq'
+            'needs_ciq_disambiguation': is_ciq_product_query and product == 'ciq',
+            'color_context': self._detect_color_context(request_lower)
         }
 
     def _match_assets(self, product: str, parsed: Dict) -> List[Tuple[float, Dict, str]]:
@@ -348,6 +398,269 @@ class SemanticAssetMatcher:
         response['summary'] = f"Found {len(assets)} {label} across {len(by_product)} products"
         
         return response
+    
+    def _detect_color_context(self, request_lower: str) -> Dict[str, Any]:
+        """Detect color-related context in the request"""
+        context = {
+            'has_color_intent': False,
+            'color_type': None,
+            'color_family': None,
+            'usage_context': None,
+            'specific_colors': []
+        }
+        
+        # Check for color type patterns
+        for color_type, patterns in self.color_patterns.items():
+            for pattern in patterns:
+                if pattern in request_lower:
+                    context['has_color_intent'] = True
+                    context['color_type'] = color_type
+                    break
+        
+        # Check for usage context
+        for usage_type, patterns in self.color_usage_patterns.items():
+            for pattern in patterns:
+                if pattern in request_lower:
+                    context['usage_context'] = usage_type
+                    break
+        
+        # Check for specific color families
+        if color_data:
+            for family_name in color_data.get('families', {}).keys():
+                if family_name in request_lower:
+                    context['color_family'] = family_name
+                    context['has_color_intent'] = True
+                    break
+        
+        return context
+    
+    def _handle_color_query(self, parsed: Dict) -> Dict[str, Any]:
+        """Handle color palette queries"""
+        if not color_data:
+            return {
+                'error': 'Color data not loaded',
+                'suggestion': 'Color palette information is currently unavailable. Please try again later.'
+            }
+        
+        color_context = parsed.get('color_context', {})
+        intent = parsed['primary_intent']
+        
+        # Handle different types of color queries
+        if intent == 'colors':
+            return self._format_general_color_response(parsed, color_context)
+        elif intent == 'color_families':
+            return self._format_color_families_response(parsed, color_context)
+        elif intent == 'design_system':
+            return self._format_design_system_response(parsed, color_context)
+        else:
+            return self._format_general_color_response(parsed, color_context)
+    
+    def _format_general_color_response(self, parsed: Dict, color_context: Dict) -> Dict[str, Any]:
+        """Format response for general color queries"""
+        summary = color_data['summary']
+        categories = color_data['categories']
+        
+        response = {
+            'message': 'Here is the CIQ color palette information:',
+            'confidence': 'high',
+            'type': 'colors'
+        }
+        
+        # If specific color type requested
+        color_type = color_context.get('color_type')
+        if color_type:
+            if color_type == 'brand_colors':
+                response['brand_colors'] = self._format_brand_colors(categories.get('brand', {}))
+                response['message'] = 'Here are the CIQ brand colors:'
+            elif color_type == 'semantic_colors':
+                response['semantic_colors'] = self._format_semantic_colors(categories.get('semantic', {}))
+                response['message'] = 'Here are the semantic color tokens:'
+            elif color_type == 'functional_colors':
+                response['functional_colors'] = self._format_functional_colors(categories.get('functional', {}))
+                response['message'] = 'Here are the functional colors (error, warning, success):'
+            elif color_type == 'utility_colors':
+                response['utility_colors'] = self._format_utility_colors(color_data.get('families', {}))
+                response['message'] = 'Here are the utility color families:'
+        else:
+            # General overview
+            response['overview'] = {
+                'total_properties': summary['total_properties'],
+                'color_families': summary['color_families'],
+                'categories': {
+                    'brand_colors': summary['categories']['brand'],
+                    'utility_colors': summary['categories']['utility'],
+                    'semantic_tokens': summary['categories']['semantic'],
+                    'functional_colors': summary['categories']['functional']
+                }
+            }
+            response['families'] = self._format_color_families_list(color_data.get('families', {}))
+        
+        return response
+    
+    def _format_color_families_response(self, parsed: Dict, color_context: Dict) -> Dict[str, Any]:
+        """Format response for color family queries"""
+        families = color_data.get('families', {})
+        
+        # If specific family requested
+        requested_family = color_context.get('color_family')
+        if requested_family and requested_family in families:
+            return self._format_single_color_family(requested_family, families[requested_family])
+        
+        # Show all families
+        return {
+            'message': f"Here are all {len(families)} color families in the CIQ design system:",
+            'families': self._format_color_families_list(families),
+            'total_families': len(families),
+            'confidence': 'high',
+            'type': 'color_families'
+        }
+    
+    def _format_design_system_response(self, parsed: Dict, color_context: Dict) -> Dict[str, Any]:
+        """Format response for design system queries"""
+        return {
+            'message': 'Here is the complete CIQ design system color information:',
+            'design_system': {
+                'theme': 'dark',
+                'total_tokens': color_data['summary']['total_properties'],
+                'structure': {
+                    'semantic_tokens': {
+                        'count': color_data['summary']['categories']['semantic'],
+                        'description': 'Role-based tokens (text-, bg-, border-, fg-)'
+                    },
+                    'brand_tokens': {
+                        'count': color_data['summary']['categories']['brand'],
+                        'description': 'CIQ brand color tokens'
+                    },
+                    'utility_palette': {
+                        'count': color_data['summary']['categories']['utility'],
+                        'families': len(color_data['families']),
+                        'description': 'Complete utility color palette'
+                    },
+                    'functional_tokens': {
+                        'count': color_data['summary']['categories']['functional'],
+                        'description': 'Error, warning, and success colors'
+                    }
+                }
+            },
+            'usage': {
+                'css_variables': 'All colors are available as CSS custom properties (--property-name)',
+                'naming_convention': 'Semantic tokens for UI, utility colors for illustrations and customization'
+            },
+            'confidence': 'high',
+            'type': 'design_system'
+        }
+    
+    def _format_brand_colors(self, brand_colors: Dict) -> Dict[str, Any]:
+        """Format brand color information"""
+        formatted = []
+        for prop_name, color_info in brand_colors.items():
+            formatted.append({
+                'property': f'--{prop_name}',
+                'value': color_info.get('reference', color_info.get('value', '')),
+                'type': color_info.get('type', 'unknown')
+            })
+        
+        return {
+            'count': len(formatted),
+            'colors': formatted[:10],  # Limit for readability
+            'note': 'Brand colors maintain CIQ visual identity across all interfaces'
+        }
+    
+    def _format_semantic_colors(self, semantic_colors: Dict) -> Dict[str, Any]:
+        """Format semantic color information"""
+        formatted = {}
+        for category, colors in semantic_colors.items():
+            formatted[category] = [
+                {
+                    'property': f'--{prop_name}',
+                    'value': color_info.get('reference', color_info.get('value', '')),
+                    'usage': self._get_semantic_usage(prop_name)
+                }
+                for prop_name, color_info in list(colors.items())[:5]  # Limit per category
+            ]
+        
+        return formatted
+    
+    def _format_functional_colors(self, functional_colors: Dict) -> Dict[str, Any]:
+        """Format functional color information"""
+        formatted = {}
+        for func_type, colors in functional_colors.items():
+            formatted[func_type] = [
+                {
+                    'property': f'--{prop_name}',
+                    'value': color_info.get('reference', color_info.get('value', '')),
+                    'usage': f'{func_type.title()} state indication'
+                }
+                for prop_name, color_info in list(colors.items())[:3]
+            ]
+        
+        return formatted
+    
+    def _format_utility_colors(self, color_families: Dict) -> Dict[str, Any]:
+        """Format utility color family information"""
+        formatted = {}
+        for family_name, shades in color_families.items():
+            formatted[family_name] = {
+                'shades_count': len(shades),
+                'range': f"{shades[0]['shade']}-{shades[-1]['shade']}" if shades else 'N/A',
+                'example_shades': [
+                    {
+                        'shade': shade['shade'],
+                        'property': f"--{shade['property']}",
+                        'value': shade['value']
+                    }
+                    for shade in shades[:3]  # Show first 3 shades
+                ]
+            }
+        
+        return formatted
+    
+    def _format_color_families_list(self, families: Dict) -> List[Dict]:
+        """Format color families for listing"""
+        formatted = []
+        for family_name, shades in families.items():
+            formatted.append({
+                'family': family_name,
+                'shades_count': len(shades),
+                'lightest': shades[0]['shade'] if shades else 'N/A',
+                'darkest': shades[-1]['shade'] if shades else 'N/A',
+                'example': f"--utility-{family_name}-500" if shades else f"--utility-{family_name}"
+            })
+        
+        return sorted(formatted, key=lambda x: x['family'])
+    
+    def _format_single_color_family(self, family_name: str, shades: List[Dict]) -> Dict[str, Any]:
+        """Format single color family details"""
+        return {
+            'message': f'Here are all shades in the {family_name} color family:',
+            'family': family_name,
+            'shades': [
+                {
+                    'shade': shade['shade'],
+                    'property': f"--{shade['property']}",
+                    'value': shade['value'],
+                    'css': f"var(--{shade['property']})"
+                }
+                for shade in shades
+            ],
+            'total_shades': len(shades),
+            'usage': f'Use these {family_name} colors for illustrations, accents, and custom components',
+            'confidence': 'high',
+            'type': 'color_family'
+        }
+    
+    def _get_semantic_usage(self, prop_name: str) -> str:
+        """Get usage description for semantic color properties"""
+        usage_map = {
+            'text-primary': 'Primary text content',
+            'text-secondary': 'Secondary text, captions',
+            'text-tertiary': 'Tertiary text, placeholders',
+            'bg-primary': 'Main background color',
+            'bg-secondary': 'Secondary background, cards',
+            'border-primary': 'Primary border color',
+            'fg-primary': 'Primary foreground elements'
+        }
+        return usage_map.get(prop_name, 'UI element styling')
     
     def _score_asset_semantic(self, asset: Dict, parsed: Dict) -> Tuple[float, str]:
         """Score assets using semantic intent understanding"""
@@ -876,18 +1189,20 @@ matcher = SemanticAssetMatcher()
 @mcp.tool()
 def get_brand_assets(request: str = "CIQ logo") -> Dict[str, Any]:
     """
-    Find and recommend CIQ brand assets and documents based on your needs.
+    Find and recommend CIQ brand assets, documents, and color palette based on your needs.
     
     I can help you find:
     - LOGOS: Product logos, company logos, icons for different backgrounds and layouts
     - DOCUMENTS: Solution briefs, documentation, sales materials, technical guides
-    - COMPREHENSIVE: Everything available for a specific product
+    - COLORS: Brand colors, design system, color families, semantic tokens
+    - COMPREHENSIVE: Everything available for a specific product or design system
     
     Specify what you need:
     - Product: CIQ, Fuzzball, Warewulf, Apptainer, RLC-LTS, etc.
-    - Asset type: logos, solution briefs, documentation, everything
+    - Asset type: logos, solution briefs, documentation, colors, everything
     - Background (for logos): light, dark
     - Layout (for logos): icon, horizontal, vertical
+    - Color type: brand colors, utility colors, semantic tokens, color families
     
     Examples:
     - "RLC-LTS solution brief" 
@@ -896,10 +1211,18 @@ def get_brand_assets(request: str = "CIQ logo") -> Dict[str, Any]:
     - "everything for Fuzzball"
     - "CIQ twocolor logo for presentations"
     - "what documents do you have?"
+    - "show me the brand colors"
+    - "blue color family"
+    - "design system colors"
+    - "error colors for UI"
     """
+    # Load data if not already loaded
     if not asset_data:
         if not load_asset_data():
             return {"error": "Unable to load asset data. Please try again."}
+    
+    if not color_data:
+        load_color_data()  # Color data is optional, don't fail if it can't load
     
     try:
         result = matcher.find_assets(request)
@@ -907,13 +1230,18 @@ def get_brand_assets(request: str = "CIQ logo") -> Dict[str, Any]:
     except Exception as e:
         return {
             "error": f"Error processing request: {e}",
-            "suggestion": "Try a simpler request like 'CIQ logo' or 'Fuzzball assets'"
+            "suggestion": "Try a simpler request like 'CIQ logo', 'Fuzzball assets', or 'brand colors'"
         }
 
-# Load asset data on startup
+# Load data on startup
 print("🚀 Starting CIQ Brand Assets MCP Server...")
-if load_asset_data():
-    print("✅ Server ready!")
+asset_loaded = load_asset_data()
+color_loaded = load_color_data()
+
+if asset_loaded and color_loaded:
+    print("✅ Server ready with full functionality (assets + colors)!")
+elif asset_loaded:
+    print("✅ Server ready with asset functionality (colors unavailable)!")
 else:
     print("⚠️  Server started with limited functionality")
 
