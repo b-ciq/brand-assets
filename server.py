@@ -56,7 +56,7 @@ class SemanticAssetMatcher:
             'rlc': ['rlc', 'rocky linux commercial', 'rocky linux'],
             'rlc-ai': ['rlc-ai', 'rlc ai', 'rocky linux ai'],
             'rlc-hardened': ['rlc-hardened', 'rlc hardened', 'rocky linux hardened'],
-            'rlc-lts': ['rlc-lts', 'rlc lts', 'rocky linux lts', 'long term support', 'long-term support']
+            'rlc-lts': ['rlc-lts', 'rlc lts', 'rocky linux lts', 'rocky linux commercial lts', 'long term support', 'long-term support', 'lts']
         }
         
         self.background_patterns = {
@@ -96,7 +96,11 @@ class SemanticAssetMatcher:
             matches = self._match_assets(parsed['product'], parsed)
             return self._format_response(matches, parsed)
         else:
-            return self._generate_product_help()
+            # Handle global queries when no specific product detected
+            if parsed['primary_intent'] in ['documents', 'sales_materials', 'technical_docs', 'all_assets']:
+                return self._handle_global_query(parsed)
+            else:
+                return self._generate_product_help()
 
     def _parse_request(self, request: str) -> Dict[str, Any]:
         """Parse user request using semantic intent recognition"""
@@ -119,17 +123,25 @@ class SemanticAssetMatcher:
         
         is_ciq_product_query = (contains_ciq and contains_product_context and not is_clearly_company_only)
         
-        # Detect product
+        # Detect product - prioritize longer, more specific patterns
         product = None
         product_confidence = 0.0
+        best_pattern_length = 0
         
+        # First pass: find all matches and their pattern lengths
+        all_matches = []
         for prod, patterns in self.product_patterns.items():
             for pattern in patterns:
                 if pattern in request_lower:
                     confidence = min(len(pattern) / 10.0, 0.6)
-                    if confidence > product_confidence:
-                        product = prod
-                        product_confidence = confidence
+                    all_matches.append((prod, confidence, len(pattern), pattern))
+        
+        # Sort by pattern length (longer first), then by confidence
+        all_matches.sort(key=lambda x: (x[2], x[1]), reverse=True)
+        
+        # Take the best match
+        if all_matches:
+            product, product_confidence, _, _ = all_matches[0]
         
         # Detect semantic intent
         intent_scores = {}
@@ -223,6 +235,94 @@ class SemanticAssetMatcher:
                 classification['visual_assets'].append(asset)
         
         return classification
+    
+    def _handle_global_query(self, parsed: Dict) -> Dict[str, Any]:
+        """Handle queries across all products (e.g., 'show me all solution briefs')"""
+        intent = parsed['primary_intent']
+        all_matching_assets = []
+        
+        # Search across all products
+        for product_name, product_assets in asset_data['assets'].items():
+            for asset_key, asset in product_assets.items():
+                # Filter by intent
+                should_include = False
+                
+                if intent == 'all_assets':
+                    should_include = True
+                elif intent == 'documents':
+                    should_include = (asset['type'] == 'document')
+                elif intent == 'sales_materials':
+                    should_include = (asset['type'] == 'document' and 
+                                    any(term in asset.get('doc_type', '').lower() 
+                                        for term in ['brief', 'overview', 'summary', 'sales']))
+                elif intent == 'technical_docs':
+                    should_include = (asset['type'] == 'document' and 
+                                    any(term in asset.get('doc_type', '').lower() 
+                                        for term in ['spec', 'technical', 'guide', 'manual']))
+                
+                if should_include:
+                    # Add product info to asset for display
+                    enhanced_asset = asset.copy()
+                    enhanced_asset['product'] = product_name
+                    all_matching_assets.append(enhanced_asset)
+        
+        return self._format_global_response(all_matching_assets, parsed)
+    
+    def _format_global_response(self, assets: List[Dict], parsed: Dict) -> Dict[str, Any]:
+        """Format response for global cross-product queries"""
+        intent = parsed['primary_intent']
+        
+        if not assets:
+            intent_label = {
+                'documents': 'documents',
+                'sales_materials': 'solution briefs or sales materials', 
+                'technical_docs': 'technical documentation',
+                'all_assets': 'assets'
+            }.get(intent, 'assets')
+            
+            return {
+                'message': f"No {intent_label} found across any products.",
+                'suggestion': "Try asking for a specific product, like 'RLC-LTS solution brief' or 'Warewulf logos'",
+                'confidence': 'medium'
+            }
+        
+        # Group by product for better presentation
+        by_product = {}
+        for asset in assets:
+            product = asset['product']
+            if product not in by_product:
+                by_product[product] = []
+            by_product[product].append(asset)
+        
+        intent_labels = {
+            'documents': 'documents',
+            'sales_materials': 'solution briefs and sales materials',
+            'technical_docs': 'technical documentation', 
+            'all_assets': 'assets'
+        }
+        label = intent_labels.get(intent, 'assets')
+        
+        response = {
+            'message': f"Here are all available {label} across CIQ products:",
+            'total_count': len(assets),
+            'products_with_assets': len(by_product),
+            'confidence': 'high'
+        }
+        
+        # Add products with their assets
+        product_results = []
+        for product_name, product_assets in by_product.items():
+            product_info = {
+                'product': product_name.upper(),
+                'count': len(product_assets),
+                'assets': self._format_asset_list(product_assets)
+            }
+            product_results.append(product_info)
+        
+        response['by_product'] = sorted(product_results, key=lambda x: x['product'])
+        response['summary'] = f"Found {len(assets)} {label} across {len(by_product)} products"
+        
+        return response
     
     def _score_asset_semantic(self, asset: Dict, parsed: Dict) -> Tuple[float, str]:
         """Score assets using semantic intent understanding"""
@@ -419,7 +519,10 @@ class SemanticAssetMatcher:
         if not classification['documents']:
             return {
                 'message': f"No documents found for {product_name}, but I have logos available:",
-                'logos': self._format_asset_list(classification['logos'][:3]),
+                'logos': {
+                    'count': len(classification['logos']),
+                    'assets': self._format_asset_list(classification['logos'][:3])
+                },
                 'suggestion': f"Try asking for '{product_name} logos' or check if documents are available for other products.",
                 'confidence': 'medium'
             }
@@ -428,7 +531,10 @@ class SemanticAssetMatcher:
         
         response = {
             'message': f"Here are the {product_name} {intent_label} I found:",
-            'documents': self._format_asset_list(classification['documents']),
+            'documents': {
+                'count': len(classification['documents']),
+                'assets': self._format_asset_list(classification['documents'])
+            },
             'confidence': 'high'
         }
         
