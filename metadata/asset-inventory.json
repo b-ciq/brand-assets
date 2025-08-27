@@ -775,6 +775,17 @@
           "letterhead",
           "wide_format"
         ]
+      },
+      "doc_solutionbrief_v2.3": {
+        "url": "https://raw.githubusercontent.com/b-ciq/brand-assets/main/assets/products/rlc/documents/RLC_SolutionBrief_V2.3.pdf",
+        "filename": "RLC_SolutionBrief_V2.3.pdf",
+        "type": "document",
+        "doc_type": "solutionbrief v2.3",
+        "ext": "pdf",
+        "tags": [
+          "document",
+          "pdf"
+        ]
       }
     },
     "support": {
@@ -1157,7 +1168,8 @@
     ],
     "doc_types": [
       "lts solutionbrief v1",
-      "solution brief"
+      "solution brief",
+      "solutionbrief v2.3"
     ],
     "tags": [
       "accent",
@@ -1197,6 +1209,6 @@
       "watermark",
       "wide_format"
     ],
-    "total_assets": 64
+    "total_assets": 65
   }
 }
