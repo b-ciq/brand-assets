@@ -1,5 +1,7 @@
 timestamp: 1756099817
-trigger: clean_structure_deployment
+trigger: color_functionality_deployment
 assets_cleaned: true
 rlc_separated: true
-metadata_updated: pending
+metadata_updated: complete
+color_support_added: true
+branch: add-color-assets
